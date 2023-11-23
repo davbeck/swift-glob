@@ -26,7 +26,7 @@ func XCTAssertDoesNotMatch(
 ) throws {
 	try XCTAssertFalse(
 		Pattern(pattern, options: options).match(value),
-		"\(value) matched pattern \(pattern) with options \(options)",
+		"'\(value)' matched pattern '\(pattern)' with options \(options)",
 		file: file,
 		line: line
 	)
