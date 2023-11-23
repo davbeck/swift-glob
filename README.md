@@ -1,6 +1,6 @@
 # swift-glob
 
-A native Swift implementation of glob patterns.
+A native Swift implementation of glob patterns, those patterns used to match and filter files.
 
 ## Project goals
 
