@@ -76,3 +76,5 @@ Contributions are highly encouraged. Here are some ways you can contribute:
 **Submitting issues:** if you find a bug or an inconsistentcy in how patterns are matched, pleas file an issue.
 
 If you have any questions, either open an issue on Github or reach out on [Mastodon](https://tnku.co/@david).
+
+By participating in this project you agree to abide by the [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
