@@ -1,9 +1,9 @@
-name: CI
+name: Format
 
 on:
   push:
-    branches:
-      - "**"
+    paths:
+      - "**/*.swift"
 
 env:
   GITHUB_ELEVATED_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
