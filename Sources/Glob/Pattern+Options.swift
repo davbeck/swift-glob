@@ -31,7 +31,14 @@ public extension Pattern {
 
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init()
-
+		
+		/// Attempts to match the behavior of [VSCode](https://code.visualstudio.com/docs/editor/glob-patterns).
+		public static var vscode: Self {
+			var options = Options()
+			options.wildcardBehavior = .doubleStarMatchesFullPath
+			return options
+		}
+		
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
 		public static var go: Self {
 			var options = Options()
