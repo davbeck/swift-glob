@@ -11,9 +11,12 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: macOS-latest
+    runs-on: macOS-13
     steps:
       - uses: actions/checkout@v3
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ^15.0.1
       - name: Test
         run: swift test
 
