@@ -40,9 +40,10 @@ public struct Pattern {
 	public var options: Options
 
 	/// Parses a pattern string into a reusable pattern
-	public init(_ pattern: some StringProtocol,
-	            options: Options = .default) throws
-	{
+	public init(
+		_ pattern: some StringProtocol,
+		options: Options = .default
+	) throws {
 		var pattern = Substring(pattern)
 		var sections: [Section] = []
 

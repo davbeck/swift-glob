@@ -34,12 +34,13 @@ public struct MatchResult {
 ///   - keys: An array of keys that identify the properties that you want pre-fetched for each returned url. The values for these keys are cached in the corresponding URL objects. You may specify nil for this parameter. For a list of keys you can specify, see [Common File System Resource Keys](https://developer.apple.com/documentation/corefoundation/cfurl/common_file_system_resource_keys).
 ///   - skipHiddenFiles: When true, hidden files will not be returned.
 /// - Returns: An async collection of urls.
-public func search(directory baseURL: URL = .currentDirectory(),
-                   include: [Pattern] = [],
-                   exclude: [Pattern] = [],
-                   includingPropertiesForKeys keys: [URLResourceKey] = [],
-                   skipHiddenFiles: Bool = true) -> AsyncThrowingStream<URL, any Error>
-{
+public func search(
+	directory baseURL: URL = .currentDirectory(),
+	include: [Pattern] = [],
+	exclude: [Pattern] = [],
+	includingPropertiesForKeys keys: [URLResourceKey] = [],
+	skipHiddenFiles: Bool = true
+) -> AsyncThrowingStream<URL, any Error> {
 	search(
 		directory: baseURL,
 		matching: { _, relativePath in
@@ -75,11 +76,12 @@ public func search(directory baseURL: URL = .currentDirectory(),
 ///   - keys: An array of keys that identify the properties that you want pre-fetched for each returned url. The values for these keys are cached in the corresponding URL objects. You may specify nil for this parameter. For a list of keys you can specify, see [Common File System Resource Keys](https://developer.apple.com/documentation/corefoundation/cfurl/common_file_system_resource_keys).
 ///   - skipHiddenFiles: When true, hidden files will not be returned.
 /// - Returns: An async collection of urls.
-public func search(directory baseURL: URL = .currentDirectory(),
-                   matching: @escaping @Sendable (_ url: URL, _ relativePath: String) throws -> MatchResult,
-                   includingPropertiesForKeys keys: [URLResourceKey] = [],
-                   skipHiddenFiles: Bool = true) -> AsyncThrowingStream<URL, any Error>
-{
+public func search(
+	directory baseURL: URL = .currentDirectory(),
+	matching: @escaping @Sendable (_ url: URL, _ relativePath: String) throws -> MatchResult,
+	includingPropertiesForKeys keys: [URLResourceKey] = [],
+	skipHiddenFiles: Bool = true
+) -> AsyncThrowingStream<URL, any Error> {
 	AsyncThrowingStream(bufferingPolicy: .unbounded) { continuation in
 		let task = Task {
 			do {

@@ -29,9 +29,10 @@ extension Pattern {
 	}
 
 	// recursively matches against the pattern
-	private func match(components: ArraySlice<Section>,
-	                   _ name: Substring) -> Bool
-	{
+	private func match(
+		components: ArraySlice<Section>,
+		_ name: Substring
+	) -> Bool {
 		if name.isEmpty {
 			if components.isEmpty || (components.count == 1 && components.first?.isWildcard == true) {
 				return true
