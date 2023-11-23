@@ -1,5 +1,13 @@
 import Foundation
 
+#if os(Linux)
+	extension URL {
+		func currentDirectory() -> URL {
+			URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+		}
+	}
+#endif
+
 // not exposing fileManager as an option at this time because while it is thread safe according to the documentation, it is not marked as Sendable, and it might cause unexpected behavior if it has a delegate set when those delegate methods get called from a background thread
 private let fileManager = FileManager.default
 
@@ -36,14 +44,14 @@ public func search(directory baseURL: URL = .currentDirectory(),
 		directory: baseURL,
 		matching: { _, relativePath in
 			if !include.isEmpty {
-				guard try include.contains(where: { try $0.match(relativePath) }) else {
+				guard include.contains(where: { $0.match(relativePath) }) else {
 					// for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendents or we won't find the files that do match
 					return .init(matches: false, skipDescendents: false)
 				}
 			}
 
 			for pattern in exclude {
-				if try pattern.match(relativePath) {
+				if pattern.match(relativePath) {
 					return .init(matches: false, skipDescendents: true)
 				}
 			}
