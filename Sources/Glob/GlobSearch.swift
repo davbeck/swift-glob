@@ -5,12 +5,12 @@ private let fileManager = FileManager.default
 
 /// The result of a custom matcher for searching directory components
 public struct MatchResult {
-    /// When true, the url will be added to the output
-    var matches: Bool
-    /// When true, the descendents of a directory will be skipped entirely
-    ///
-    /// This has no effect if the url is not a directory.
-    var skipDescendents: Bool
+	/// When true, the url will be added to the output
+	var matches: Bool
+	/// When true, the descendents of a directory will be skipped entirely
+	///
+	/// This has no effect if the url is not a directory.
+	var skipDescendents: Bool
 }
 
 /// Recursively search the contents of a directory, filtering by the provided patterns
@@ -30,28 +30,29 @@ public func search(directory baseURL: URL = .currentDirectory(),
                    include: [Pattern] = [],
                    exclude: [Pattern] = [],
                    includingPropertiesForKeys keys: [URLResourceKey] = [],
-                   skipHiddenFiles: Bool = true) -> AsyncThrowingStream<URL, any Error> {
-    search(
-        directory: baseURL,
-        matching: { _, relativePath in
-            if !include.isEmpty {
-                guard try include.contains(where: { try $0.match(relativePath) }) else {
-                    // for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendents or we won't find the files that do match
-                    return .init(matches: false, skipDescendents: false)
-                }
-            }
-        
-            for pattern in exclude {
-                if try pattern.match(relativePath) {
-                    return .init(matches: false, skipDescendents: true)
-                }
-            }
-        
-            return .init(matches: true, skipDescendents: false)
-        },
-        includingPropertiesForKeys: keys,
-        skipHiddenFiles: skipHiddenFiles
-    )
+                   skipHiddenFiles: Bool = true) -> AsyncThrowingStream<URL, any Error>
+{
+	search(
+		directory: baseURL,
+		matching: { _, relativePath in
+			if !include.isEmpty {
+				guard try include.contains(where: { try $0.match(relativePath) }) else {
+					// for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendents or we won't find the files that do match
+					return .init(matches: false, skipDescendents: false)
+				}
+			}
+
+			for pattern in exclude {
+				if try pattern.match(relativePath) {
+					return .init(matches: false, skipDescendents: true)
+				}
+			}
+
+			return .init(matches: true, skipDescendents: false)
+		},
+		includingPropertiesForKeys: keys,
+		skipHiddenFiles: skipHiddenFiles
+	)
 }
 
 /// Recursively search the contents of a directory, filtering by the provided matching closure
@@ -69,59 +70,60 @@ public func search(directory baseURL: URL = .currentDirectory(),
 public func search(directory baseURL: URL = .currentDirectory(),
                    matching: @escaping @Sendable (_ url: URL, _ relativePath: String) throws -> MatchResult,
                    includingPropertiesForKeys keys: [URLResourceKey] = [],
-                   skipHiddenFiles: Bool = true) -> AsyncThrowingStream<URL, any Error> {
-    return AsyncThrowingStream(bufferingPolicy: .unbounded) { continuation in
-        let task = Task {
-            do {
-                @Sendable func enumerate(directory: URL, relativePath relativeDirectoryPath: String) async throws {
-                    do {
-                        var options: FileManager.DirectoryEnumerationOptions = []
-                        if skipHiddenFiles {
-                            options.insert(.skipsHiddenFiles)
-                        }
-                        let contents = try fileManager.contentsOfDirectory(
-                            at: directory,
-                            includingPropertiesForKeys: keys + [.isDirectoryKey],
-                            options: options
-                        )
-                        
-                        try await withThrowingTaskGroup(of: Void.self) { group in
-                            for url in contents {
-                                let relativePath = relativeDirectoryPath + url.lastPathComponent
-                                
-                                let matchResult = try matching(url, relativePath)
-                                
-                                if matchResult.matches {
-                                    continuation.yield(url)
-                                }
-                                
-                                guard !matchResult.skipDescendents else { continue }
-                                
-                                let resourceValues = try url.resourceValues(forKeys: [.isDirectoryKey])
-                                if resourceValues.isDirectory == true {
-                                    group.addTask {
-                                        try await enumerate(directory: url, relativePath: relativePath + "/")
-                                    }
-                                }
-                            }
-                            
-                            try await group.waitForAll()
-                        }
-                    } catch {
-                        throw error
-                    }
-                }
-                
-                try await enumerate(directory: baseURL, relativePath: "")
-                
-                continuation.finish()
-            } catch {
-                continuation.finish(throwing: error)
-            }
-        }
-        
-        continuation.onTermination = { _ in
-            task.cancel()
-        }
-    }
+                   skipHiddenFiles: Bool = true) -> AsyncThrowingStream<URL, any Error>
+{
+	AsyncThrowingStream(bufferingPolicy: .unbounded) { continuation in
+		let task = Task {
+			do {
+				@Sendable func enumerate(directory: URL, relativePath relativeDirectoryPath: String) async throws {
+					do {
+						var options: FileManager.DirectoryEnumerationOptions = []
+						if skipHiddenFiles {
+							options.insert(.skipsHiddenFiles)
+						}
+						let contents = try fileManager.contentsOfDirectory(
+							at: directory,
+							includingPropertiesForKeys: keys + [.isDirectoryKey],
+							options: options
+						)
+
+						try await withThrowingTaskGroup(of: Void.self) { group in
+							for url in contents {
+								let relativePath = relativeDirectoryPath + url.lastPathComponent
+
+								let matchResult = try matching(url, relativePath)
+
+								if matchResult.matches {
+									continuation.yield(url)
+								}
+
+								guard !matchResult.skipDescendents else { continue }
+
+								let resourceValues = try url.resourceValues(forKeys: [.isDirectoryKey])
+								if resourceValues.isDirectory == true {
+									group.addTask {
+										try await enumerate(directory: url, relativePath: relativePath + "/")
+									}
+								}
+							}
+
+							try await group.waitForAll()
+						}
+					} catch {
+						throw error
+					}
+				}
+
+				try await enumerate(directory: baseURL, relativePath: "")
+
+				continuation.finish()
+			} catch {
+				continuation.finish(throwing: error)
+			}
+		}
+
+		continuation.onTermination = { _ in
+			task.cancel()
+		}
+	}
 }
