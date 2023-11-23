@@ -1,13 +1,5 @@
 import Foundation
 
-#if os(Linux)
-	extension URL {
-		func currentDirectory() -> URL {
-			URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-		}
-	}
-#endif
-
 // not exposing fileManager as an option at this time because while it is thread safe according to the documentation, it is not marked as Sendable, and it might cause unexpected behavior if it has a delegate set when those delegate methods get called from a background thread
 private let fileManager = FileManager.default
 
@@ -35,7 +27,7 @@ public struct MatchResult {
 ///   - skipHiddenFiles: When true, hidden files will not be returned.
 /// - Returns: An async collection of urls.
 public func search(
-	directory baseURL: URL = .currentDirectory(),
+	directory baseURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
 	include: [Pattern] = [],
 	exclude: [Pattern] = [],
 	includingPropertiesForKeys keys: [URLResourceKey] = [],
@@ -77,7 +69,7 @@ public func search(
 ///   - skipHiddenFiles: When true, hidden files will not be returned.
 /// - Returns: An async collection of urls.
 public func search(
-	directory baseURL: URL = .currentDirectory(),
+	directory baseURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
 	matching: @escaping @Sendable (_ url: URL, _ relativePath: String) throws -> MatchResult,
 	includingPropertiesForKeys keys: [URLResourceKey] = [],
 	skipHiddenFiles: Bool = true
