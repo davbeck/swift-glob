@@ -23,10 +23,9 @@ jobs:
   linux-test:
     name: Test Linux
     runs-on: ubuntu-latest
+    container:
+      image: swift:5.9
     steps:
-      - uses: sersoft-gmbh/swifty-linux-action@v3
-        with:
-          release-version: 5.9
       - uses: actions/checkout@v3
       - name: Test
         run: swift test
