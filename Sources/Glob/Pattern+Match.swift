@@ -29,13 +29,13 @@ extension Pattern {
     /// Test if a given string matches the pattern
     /// - Parameter name: The string to match against
     /// - Returns: true if the string matches the pattern
-    public func match(_ name: some StringProtocol) throws -> Bool {
-        try match(components: .init(sections), .init(name))
+    public func match(_ name: some StringProtocol) -> Bool {
+        match(components: .init(sections), .init(name))
     }
     
     // recursively matches against the pattern
     private func match(components: ArraySlice<Section>,
-                       _ name: Substring) throws -> Bool {
+                       _ name: Substring) -> Bool {
         if name.isEmpty {
             if components.isEmpty || (components.count == 1 && components.first?.isWildcard == true) {
                 return true
@@ -52,7 +52,7 @@ extension Pattern {
         switch (components.first, components.last) {
         case let (.constant(constant), _):
             if let remaining = name.dropPrefix(constant) {
-                return try match(
+                return match(
                     components: components.dropFirst(),
                     remaining
                 )
@@ -61,19 +61,19 @@ extension Pattern {
             }
         case (.singleCharacter, _):
             guard name.first != options.pathSeparator else { return false }
-            return try match(
+            return match(
                 components: components.dropFirst(),
                 name.dropFirst()
             )
         case let (.oneOf(ranges, isNegated: isNegated), _):
             guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
-            return try match(
+            return match(
                 components: components.dropFirst(),
                 name.dropFirst()
             )
         case let (_, .constant(constant)):
             if let remaining = name.dropSuffix(constant) {
-                return try match(
+                return match(
                     components: components.dropLast(),
                     remaining
                 )
@@ -82,13 +82,13 @@ extension Pattern {
             }
         case (_, .singleCharacter):
             guard name.last != options.pathSeparator else { return false }
-            return try match(
+            return match(
                 components: components.dropLast(),
                 name.dropLast()
             )
         case let (_, .oneOf(ranges, isNegated: isNegated)):
             guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
-            return try match(
+            return match(
                 components: components.dropLast(),
                 name.dropLast()
             )
@@ -98,16 +98,16 @@ extension Pattern {
                 return !name.contains(options.pathSeparator)
             }
             
-            if try match(components: components.dropFirst(), name) {
+            if match(components: components.dropFirst(), name) {
                 return true
             } else {
-                return try match(components: components, name.dropFirst())
+                return match(components: components, name.dropFirst())
             }
         case (_, .componentWildcard):
-            if try match(components: components.dropLast(), name) {
+            if match(components: components.dropLast(), name) {
                 return true
             } else {
-                return try match(components: components, name.dropLast())
+                return match(components: components, name.dropLast())
             }
         case (.pathWildcard, _):
             if components.count == 1 {
@@ -115,10 +115,10 @@ extension Pattern {
                 return true
             }
             
-            if try match(components: components.dropFirst(), name) {
+            if match(components: components.dropFirst(), name) {
                 return true
             } else {
-                return try match(components: components, name.dropFirst())
+                return match(components: components, name.dropFirst())
             }
         case (.none, _):
             return name.isEmpty
