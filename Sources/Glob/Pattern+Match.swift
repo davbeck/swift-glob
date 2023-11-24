@@ -57,7 +57,7 @@ extension Pattern {
 				return false
 			}
 		case (.singleCharacter, _):
-			guard name.first != options.pathSeparator else { return false }
+			guard options.wildcardBehavior == .singleStarMatchesFullPath || name.first != options.pathSeparator else { return false }
 			return match(
 				components: components.dropFirst(),
 				name.dropFirst()
@@ -78,7 +78,7 @@ extension Pattern {
 				return false
 			}
 		case (_, .singleCharacter):
-			guard name.last != options.pathSeparator else { return false }
+			guard options.wildcardBehavior == .singleStarMatchesFullPath || name.last != options.pathSeparator else { return false }
 			return match(
 				components: components.dropLast(),
 				name.dropLast()
