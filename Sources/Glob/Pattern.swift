@@ -123,7 +123,7 @@ public struct Pattern {
 
 					guard pattern.first == "]" else { throw PatternParsingError.rangeNotClosed }
 					pattern = pattern.dropFirst()
-					
+
 					guard !ranges.isEmpty else {
 						if options.allowsEmptyRanges {
 							break
