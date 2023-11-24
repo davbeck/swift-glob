@@ -93,7 +93,7 @@ public struct Pattern {
 					sections.append(.singleCharacter)
 				case "[":
 					let negated: Bool
-					if pattern.first == "^" {
+					if pattern.first == options.rangeNegationCharacter {
 						negated = true
 						pattern = pattern.dropFirst()
 					} else {
