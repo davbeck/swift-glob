@@ -128,6 +128,7 @@ public struct Pattern {
 					sections.append(.oneOf(ranges, isNegated: negated))
 				case #"\"#:
 					guard let next = pattern.first else { throw PatternParsingError.invalidEscapeCharacter }
+					pattern = pattern.dropFirst()
 					appendConstant(next)
 				default:
 					appendConstant(next)
