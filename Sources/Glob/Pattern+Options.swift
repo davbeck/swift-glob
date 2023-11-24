@@ -60,9 +60,9 @@ public extension Pattern {
 				allowsEmptyRanges: true
 			)
 		}
-		
+
 		public static func fnmatch(flags: Int32) -> Self {
-			return .fnmatch(
+			.fnmatch(
 				usePathnameBehavior: (flags & FNM_PATHNAME) != 0
 			)
 		}
