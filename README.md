@@ -11,6 +11,8 @@ A native Swift implementation of glob patterns, those patterns used to match and
 
 In other words, the project seeks to be _the_ glob library for Swift that can be used both in low level tools and in high level apps.
 
+By creating a glob matching implimentation in native Swift with strict compatibility with existing things like POSIX, it allows tools to be migrated to Swift, behavior to be customized and exteded, and implimentations to be made more performant and concurrent.
+
 ## Status
 
 Basic pattern matching and director search is working and in my tests searching a large hiearchy of files and folders with about 10 exclude patterns runs very quickly. However there are still some features missing like [grouping](https://github.com/davbeck/swift-glob/issues/1). The [tests to match `fnmatch` behavior](https://github.com/davbeck/swift-glob/pull/5) has 588 failing tests as of this writing.
