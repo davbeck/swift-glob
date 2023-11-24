@@ -121,9 +121,16 @@ public struct Pattern {
 						}
 					}
 
-					guard !ranges.isEmpty else { throw PatternParsingError.rangeIsEmpty }
 					guard pattern.first == "]" else { throw PatternParsingError.rangeNotClosed }
 					pattern = pattern.dropFirst()
+					
+					guard !ranges.isEmpty else {
+						if options.allowsEmptyRanges {
+							break
+						} else {
+							throw PatternParsingError.rangeIsEmpty
+						}
+					}
 
 					sections.append(.oneOf(ranges, isNegated: negated))
 				case #"\"#:

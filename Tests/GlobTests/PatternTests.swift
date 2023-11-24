@@ -26,13 +26,13 @@ final class PatternTests: XCTestCase {
 	}
 
 	func test_pathWildcard_pathComponentsOnly_doesNotMatchPath() throws {
-		var options = Pattern.Options()
+		var options = Pattern.Options.default
 		options.wildcardBehavior = .pathComponentsOnly
 		try XCTAssertDoesNotMatch("Target/Other/.build", pattern: "**/.build", options: options)
 	}
 
 	func test_componentWildcard_pathComponentsOnly_doesMatchSingleComponent() throws {
-		var options = Pattern.Options()
+		var options = Pattern.Options.default
 		options.wildcardBehavior = .pathComponentsOnly
 		try XCTAssertMatches("Target/.build", pattern: "*/.build", options: options)
 	}

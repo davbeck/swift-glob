@@ -20,40 +20,45 @@ public extension Pattern {
 		}
 
 		/// How wildcards are interpreted
-		public var wildcardBehavior: WildcardBehavior = .doubleStarMatchesFullPath
+		public var wildcardBehavior: WildcardBehavior
+
+		/// When false, an error will be thrown if an empty range (`[]`) is found.
+		public var allowsEmptyRanges: Bool
 
 		/// The path separator to use in matching
 		///
 		/// Defaults to "/" regardless of operating system.
 		public var pathSeparator: Character = "/"
 
-		public init() {}
-
 		/// Default options for parsing and matching patterns.
-		public static let `default`: Self = .init()
+		public static let `default`: Self = .init(
+			wildcardBehavior: .doubleStarMatchesFullPath,
+			allowsEmptyRanges: false
+		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
-		public static var go: Self {
-			var options = Options()
-			options.wildcardBehavior = .pathComponentsOnly
-			return options
-		}
+		public static let go: Self = Options(
+			wildcardBehavior: .pathComponentsOnly,
+			allowsEmptyRanges: false
+		)
 
 		/// Attempts to match the behavior of [POSIX glob](https://man7.org/linux/man-pages/man7/glob.7.html).
 		/// - Returns: Options to use to create a Pattern.
 		public static func posix() -> Self {
-			var options = Options()
-			options.wildcardBehavior = .pathComponentsOnly
-			return options
+			Options(
+				wildcardBehavior: .pathComponentsOnly,
+				allowsEmptyRanges: true
+			)
 		}
 
 		/// Attempts to match the behavior of `fnmatch`.
 		/// - Parameter usePathnameBehavior: When true, matches the behavior of FNM_PATHNAME. Namely, wildcards will not match path separators.
 		/// - Returns: Options to use to create a Pattern.
 		public static func fnmatch(usePathnameBehavior: Bool = false) -> Self {
-			var options = Options()
-			options.wildcardBehavior = usePathnameBehavior ? .pathComponentsOnly : .singleStarMatchesFullPath
-			return options
+			Options(
+				wildcardBehavior: usePathnameBehavior ? .pathComponentsOnly : .singleStarMatchesFullPath,
+				allowsEmptyRanges: true
+			)
 		}
 	}
 }
