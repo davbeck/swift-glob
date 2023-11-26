@@ -36,6 +36,13 @@ public extension Pattern {
 			allowsEmptyRanges: false
 		)
 
+		/// Attempts to match the behavior of [VSCode](https://code.visualstudio.com/docs/editor/glob-patterns).
+		public static var vscode: Self {
+			var options = Options()
+			options.wildcardBehavior = .doubleStarMatchesFullPath
+			return options
+		}
+
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
 		public static let go: Self = Options(
 			wildcardBehavior: .pathComponentsOnly,
