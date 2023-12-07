@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "sourceLanguages": ["swift"],
+      "args": [],
+      "cwd": "${workspaceFolder:Benchmark}",
+      "name": "Debug Benchmark",
+      "program": "${workspaceFolder:Benchmark}/.build/debug/Benchmark",
+      "preLaunchTask": "swift: Build Debug Benchmark"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "sourceLanguages": ["swift"],
+      "args": [],
+      "cwd": "${workspaceFolder:Benchmark}",
+      "name": "Release Benchmark",
+      "program": "${workspaceFolder:Benchmark}/.build/release/Benchmark",
+      "preLaunchTask": "swift: Build Release Benchmark"
+    }
+  ]
+}
