@@ -24,7 +24,7 @@ public extension Pattern {
 
 		/// When false, an error will be thrown if an empty range (`[]`) is found.
 		public var allowsEmptyRanges: Bool
-		
+
 		/// The character used to specify when a range matches characters that aren't in the range.
 		public var rangeNegationCharacter: Character = "!"
 
