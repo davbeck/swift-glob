@@ -26,7 +26,7 @@ let package = Package(
 			dependencies: [
 			],
 			swiftSettings: [
-				.enableUpcomingFeature("StrictConcurrency"),
+				.enableExperimentalFeature("StrictConcurrency"),
 			]
 		),
 		.testTarget(
