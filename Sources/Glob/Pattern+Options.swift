@@ -2,9 +2,9 @@ import Foundation
 
 public extension Pattern {
 	/// Options to control how patterns are parsed and matched
-	struct Options {
+	struct Options: Sendable {
 		/// How wildcards are interpreted
-		public enum WildcardBehavior {
+		public enum WildcardBehavior: Sendable {
 			/// A single star/asterisk will match any character, including the path separator
 			///
 			/// Additional star/asterisks are ignored. This matches the behavior of fnmatch when `FNM_PATHNAME` is not provided.

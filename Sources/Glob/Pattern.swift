@@ -5,8 +5,8 @@ extension Character {
 }
 
 /// A glob pattern that can be matched against string content.
-public struct Pattern {
-	public enum Section: Equatable {
+public struct Pattern: Sendable {
+	public enum Section: Equatable, Sendable {
 		/// A wildcard that matches any 0 or more characters except for the path separator ("/" by default)
 		case componentWildcard
 		/// A wildcard that matches any 0 or more characters
