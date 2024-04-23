@@ -93,7 +93,7 @@ public struct Pattern: Sendable {
 					sections.append(.singleCharacter)
 				case "[":
 					let negated: Bool
-					if pattern.first == "^" {
+					if pattern.first == options.rangeNegationCharacter {
 						negated = true
 						pattern = pattern.dropFirst()
 					} else {
@@ -115,6 +115,7 @@ public struct Pattern: Sendable {
 								let upper = try getNext()
 							else { throw PatternParsingError.rangeNotClosed }
 
+							guard lower <= upper else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
 							ranges.append(lower ... upper)
 						} else {
 							ranges.append(lower ... lower)
