@@ -17,7 +17,7 @@ By creating a glob matching implimentation in native Swift with strict compatibi
 
 Basic pattern matching and director search is working and in my tests searching a large hiearchy of files and folders with about 10 exclude patterns runs very quickly. However there are still some features missing like [grouping](https://github.com/davbeck/swift-glob/issues/1). The [tests to match `fnmatch` behavior](https://github.com/davbeck/swift-glob/pull/5) has 588 failing tests as of this writing.
 
-Until compatibility tests are matching, there won't be a release tag for this package. Meaning you can use it only by specifying a branch name or commit hash.
+A 1.0.0 release is dependent on compatibility tests with `fnmatch` passing.
 
 ## Usage
 
