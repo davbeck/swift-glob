@@ -25,6 +25,9 @@ public extension Pattern {
 		/// When false, an error will be thrown if an empty range (`[]`) is found.
 		public var allowsEmptyRanges: Bool
 
+		/// The character used to specify when a range matches characters that aren't in the range.
+		public var rangeNegationCharacter: Character = "!"
+
 		/// The path separator to use in matching
 		///
 		/// Defaults to "/" regardless of operating system.
@@ -39,7 +42,8 @@ public extension Pattern {
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
 		public static let go: Self = Options(
 			wildcardBehavior: .pathComponentsOnly,
-			allowsEmptyRanges: false
+			allowsEmptyRanges: false,
+			rangeNegationCharacter: "^"
 		)
 
 		/// Attempts to match the behavior of [POSIX glob](https://man7.org/linux/man-pages/man7/glob.7.html).
@@ -58,6 +62,12 @@ public extension Pattern {
 			Options(
 				wildcardBehavior: usePathnameBehavior ? .pathComponentsOnly : .singleStarMatchesFullPath,
 				allowsEmptyRanges: true
+			)
+		}
+
+		public static func fnmatch(flags: Int32) -> Self {
+			.fnmatch(
+				usePathnameBehavior: (flags & FNM_PATHNAME) != 0
 			)
 		}
 	}
