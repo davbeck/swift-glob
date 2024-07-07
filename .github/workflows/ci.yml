@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "README.md"
+      - "CODE_OF_CONDUCT.md"
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test macOS
+    runs-on: macOS-14
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.4.app/Contents/Developer
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: set -o pipefail && xcodebuild -scheme swift-glob -destination "platform=macOS" test | xcbeautify --renderer github-actions
+
+  linux_test:
+    name: Test Linux
+    runs-on: ubuntu-latest
+    container:
+      image: swift:5.9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: swift test
