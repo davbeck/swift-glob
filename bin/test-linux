@@ -1,5 +1,5 @@
 docker run --rm --privileged \
 --volume "$(pwd):/src" \
 --workdir "/src" \
-swift:5.9
+swift:5.9 \
 swift test
