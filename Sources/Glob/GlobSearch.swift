@@ -1,8 +1,5 @@
 import Foundation
 
-// not exposing fileManager as an option at this time because while it is thread safe according to the documentation, it is not marked as Sendable, and it might cause unexpected behavior if it has a delegate set when those delegate methods get called from a background thread
-private let fileManager = FileManager.default
-
 /// The result of a custom matcher for searching directory components
 public struct MatchResult {
 	/// When true, the url will be added to the output
@@ -83,7 +80,7 @@ public func search(
 						if skipHiddenFiles {
 							options.insert(.skipsHiddenFiles)
 						}
-						let contents = try fileManager.contentsOfDirectory(
+						let contents = try FileManager.default.contentsOfDirectory(
 							at: directory,
 							includingPropertiesForKeys: keys + [.isDirectoryKey],
 							options: options
