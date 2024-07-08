@@ -19,7 +19,7 @@ public struct Pattern: Sendable {
 		/// Matches a single character in any of the given ranges
 		///
 		/// A range may be a single character (ie "a"..."a"). For instance the pattern [abc] will create 3 ranges that are each a single character.
-		case oneOf([ClosedRange<Character>], isNegated: Bool)
+		case oneOf([CharacterClass], isNegated: Bool)
 
 		/// If the section can match a variable length of characters
 		///
@@ -30,6 +30,87 @@ public struct Pattern: Sendable {
 				false
 			case .componentWildcard, .pathWildcard:
 				true
+			}
+		}
+	}
+
+	public enum CharacterClass: Equatable, Sendable {
+		case range(ClosedRange<Character>)
+
+		public enum Name: String, Equatable, Sendable {
+			// https://man7.org/linux/man-pages/man7/glob.7.html
+			// https://www.domaintools.com/resources/user-guides/dnsdb-glob-reference-guide/
+
+			/// Alphanumeric characters 0-9, A-Z, and a-z
+			case alphaNumeric = "alnum"
+			/// Alphabetic characters A-Z, a-z
+			case alpha
+			/// Blank characters (space and tab)
+			case blank
+			/// Control characters
+			case control = "cntrl"
+			/// Decimal digits 0-9
+			case numeric = "digit"
+			/// Any printable character other than space.
+			case graph
+			/// Lower case alphabetic characters a-z
+			case lower
+			/// Any printable character
+			case printable = "print"
+			/// Printable characters other than space and `alphaNumeric`
+			case punctuation = "punct"
+			///  Any whitespace character
+			case space
+			/// Upper case alphabetic characters A-Z
+			case upper
+			/// Hexadecimal digits 0-9, a-f, A-F
+			case hexadecimalDigit = "xdigit"
+
+			public func contains(_ character: Character) -> Bool {
+				switch self {
+				case .alphaNumeric:
+					character.isLetter || character.isNumber
+				case .alpha:
+					character.isLetter
+				case .blank:
+					character.isWhitespace
+				case .control:
+					character.unicodeScalars
+						.allSatisfy { $0.properties.generalCategory == .control }
+				case .numeric:
+					character.isNumber
+				case .graph:
+					character != " " && character.unicodeScalars
+						.allSatisfy { $0.properties.generalCategory.isPrintable }
+				case .lower:
+					character.isLowercase
+				case .printable:
+					character.unicodeScalars
+						.allSatisfy { $0.properties.generalCategory.isPrintable }
+				case .punctuation:
+					character.isPunctuation
+				case .space:
+					character.isWhitespace
+				case .upper:
+					character.isUppercase
+				case .hexadecimalDigit:
+					character.isHexDigit
+				}
+			}
+		}
+
+		case named(Name)
+
+		static func character(_ character: Character) -> Self {
+			.range(character ... character)
+		}
+
+		public func contains(_ character: Character) -> Bool {
+			switch self {
+			case let .range(closedRange):
+				closedRange.contains(character)
+			case let .named(name):
+				name.contains(character)
 			}
 		}
 	}
@@ -100,33 +181,59 @@ public struct Pattern: Sendable {
 						negated = false
 					}
 
-					var ranges: [ClosedRange<Character>] = []
+					var ranges: [CharacterClass] = []
 
 					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter && pattern.first == "]" {
 						// https://man7.org/linux/man-pages/man7/glob.7.html
 						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
 
 						pattern = pattern.dropFirst()
-						ranges.append("]" ... "]")
+						ranges.append(.character("]"))
 					}
 
 					while pattern.first != "]" {
-						guard pattern.first != "-" else { throw PatternParsingError.rangeMissingBounds }
-						guard let lower = try getNext() else { break }
-
-						if pattern.first == "-" {
-							// this is a range like a-z, find the upper limit of the range
+						if pattern.first == "[" {
 							pattern = pattern.dropFirst()
 
-							guard
-								pattern.first != "]",
-								let upper = try getNext()
-							else { throw PatternParsingError.rangeNotClosed }
+							if pattern.first == ":" {
+								// Named character classes
+								pattern = pattern.dropFirst()
+								guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
 
-							guard lower <= upper else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
-							ranges.append(lower ... upper)
+								let name = pattern.prefix(upTo: endIndex)
+
+								if let name = CharacterClass.Name(rawValue: String(name)) {
+									ranges.append(.named(name))
+									pattern = pattern[endIndex...].dropFirst()
+
+									guard pattern.first == "]" else {
+										throw PatternParsingError.rangeNotClosed
+									}
+									pattern = pattern.dropFirst()
+								} else {
+									throw PatternParsingError.invalidNamedCharacterClass(String(name))
+								}
+							} else {
+								ranges.append(.character("["))
+							}
 						} else {
-							ranges.append(lower ... lower)
+							guard pattern.first != "-" else { throw PatternParsingError.rangeMissingBounds }
+							guard let lower = try getNext() else { break }
+
+							if pattern.first == "-" {
+								// this is a range like a-z, find the upper limit of the range
+								pattern = pattern.dropFirst()
+
+								guard
+									pattern.first != "]",
+									let upper = try getNext()
+								else { throw PatternParsingError.rangeNotClosed }
+
+								guard lower <= upper else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
+								ranges.append(.range(lower ... upper))
+							} else {
+								ranges.append(.range(lower ... lower))
+							}
 						}
 					}
 

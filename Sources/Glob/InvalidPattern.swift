@@ -22,4 +22,7 @@ public enum PatternParsingError: Error {
 
 	/// An escape was started without an actual escaped character because the escape was at the end of the pattern
 	case invalidEscapeCharacter
+	
+	/// A character class (like `[:alnum:]`) was used with an unrecognized name
+	case invalidNamedCharacterClass(String)
 }

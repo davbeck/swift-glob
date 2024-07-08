@@ -271,288 +271,292 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 017(C)
 	func test_b_6_017_c() throws {
+		// C		 "a"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "a"			"[![:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[![:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "-"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "a]a"			"[[:alnum:]]a"	       NOMATCH
+		XCTAssertMatchesFNMatch("a]a", pattern: "[[:alnum:]]a", flags: 0, result: NOMATCH)
+		// C		 "-"			"[[:alnum:]-]"	       0
 		XCTExpectFailure {
-			// C		 "a"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "a"			"[![:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[![:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "-"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "a]a"			"[[:alnum:]]a"	       NOMATCH
-			XCTAssertMatchesFNMatch("a]a", pattern: "[[:alnum:]]a", flags: 0, result: NOMATCH)
-			// C		 "-"			"[[:alnum:]-]"	       0
 			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]-]", flags: 0, result: 0)
-			// C		 "aa"			"[[:alnum:]]a"	       0
-			XCTAssertMatchesFNMatch("aa", pattern: "[[:alnum:]]a", flags: 0, result: 0)
-			// C		 "-"			"[![:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[![:alnum:]]", flags: 0, result: 0)
-			// C		 "]"			"[!][:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("]", pattern: "[!][:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "["			"[![:alnum:][]"	       NOMATCH
-			XCTAssertMatchesFNMatch("[", pattern: "[![:alnum:][]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "b"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "c"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "d"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("d", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "e"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("e", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "f"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("f", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "g"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("g", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "h"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("h", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "i"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("i", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "j"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("j", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "k"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("k", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "l"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("l", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "m"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("m", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "n"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("n", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "o"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("o", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "p"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("p", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "q"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("q", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "r"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("r", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "s"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("s", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "t"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "u"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("u", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "v"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("v", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "w"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("w", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "x"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("x", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "y"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("y", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "z"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("z", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "A"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "B"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("B", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "C"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("C", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "D"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("D", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "E"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("E", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "F"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("F", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "G"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("G", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "H"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("H", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "I"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("I", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "J"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("J", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "K"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("K", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "L"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("L", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "M"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("M", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "N"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("N", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "O"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("O", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "P"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("P", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "Q"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("Q", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "R"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("R", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "S"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("S", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "T"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("T", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "U"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("U", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "V"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("V", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "W"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("W", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "X"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("X", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "Y"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("Y", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "Z"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "0"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("0", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "1"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("1", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "2"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("2", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "3"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("3", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "4"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("4", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "5"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("5", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "6"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("6", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "7"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("7", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "8"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("8", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "9"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("9", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C		 "!"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("!", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "#"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("#", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "%"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("%", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "+"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("+", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 ","			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(",", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "-"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "."			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(".", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "/"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("/", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 ":"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(":", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 ";"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(";", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "="			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("=", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "@"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("@", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "["			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("[", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "\\"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\\", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "]"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("]", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "^"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("^", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "_"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("_", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "{"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("{", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "}"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("}", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "~"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("~", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "\""			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\"", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "$"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("$", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "&"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("&", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "'"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("'", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "("			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("(", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 ")"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(")", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "*"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("*", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "?"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("?", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "`"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("`", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "|"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("|", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "<"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("<", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 ">"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(">", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C		 "\t"			"[[:cntrl:]]"	       0
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:cntrl:]]", flags: 0, result: 0)
-			// C		 "t"			"[[:cntrl:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:cntrl:]]", flags: 0, result: NOMATCH)
-			// C		 "t"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// C		 "\t"			"[[:lower:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
-			// C		 "T"			"[[:lower:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("T", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
-			// C		 "\t"			"[[:space:]]"	       0
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:space:]]", flags: 0, result: 0)
-			// C		 "t"			"[[:space:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:space:]]", flags: 0, result: NOMATCH)
-			// C		 "t"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// C		 "\t"			"[[:alpha:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:alpha:]]", flags: 0, result: NOMATCH)
-			// C		 "0"			"[[:digit:]]"	       0
-			XCTAssertMatchesFNMatch("0", pattern: "[[:digit:]]", flags: 0, result: 0)
-			// C		 "\t"			"[[:digit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
-			// C		 "t"			"[[:digit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
-			// C		 "\t"			"[[:print:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:print:]]", flags: 0, result: NOMATCH)
-			// C		 "t"			"[[:print:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:print:]]", flags: 0, result: 0)
-			// C		 "T"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("T", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// C		 "\t"			"[[:upper:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
-			// C		 "t"			"[[:upper:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
-			// C		 "\t"			"[[:blank:]]"	       0
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:blank:]]", flags: 0, result: 0)
-			// C		 "t"			"[[:blank:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:blank:]]", flags: 0, result: NOMATCH)
-			// C		 "\t"			"[[:graph:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:graph:]]", flags: 0, result: NOMATCH)
-			// C		 "t"			"[[:graph:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:graph:]]", flags: 0, result: 0)
-			// C		 "."			"[[:punct:]]"	       0
-			XCTAssertMatchesFNMatch(".", pattern: "[[:punct:]]", flags: 0, result: 0)
-			// C		 "t"			"[[:punct:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
-			// C		 "\t"			"[[:punct:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
-			// C		 "0"			"[[:xdigit:]]"	       0
-			XCTAssertMatchesFNMatch("0", pattern: "[[:xdigit:]]", flags: 0, result: 0)
-			// C		 "\t"			"[[:xdigit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[:xdigit:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:xdigit:]]", flags: 0, result: 0)
-			// C		 "A"			"[[:xdigit:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:xdigit:]]", flags: 0, result: 0)
-			// C		 "t"			"[[:xdigit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[alpha]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[[alpha]]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[alpha:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[[alpha:]]", flags: 0, result: NOMATCH)
-			// C		 "a]"			"[[alpha]]"	       0
-			XCTAssertMatchesFNMatch("a]", pattern: "[[alpha]]", flags: 0, result: 0)
-			// C		 "a]"			"[[alpha:]]"	       0
-			XCTAssertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
-			// C		 "a"			"[[:alpha:][.b.]]"     0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
-			// C		 "a"			"[[:alpha:][=b=]]"     0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
-			// C		 "a"			"[[:alpha:][:digit:]]" 0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
-			// C		 "a"			"[[:digit:][:alpha:]]" 0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:digit:][:alpha:]]", flags: 0, result: 0)
 		}
+		// C		 "aa"			"[[:alnum:]]a"	       0
+		XCTAssertMatchesFNMatch("aa", pattern: "[[:alnum:]]a", flags: 0, result: 0)
+		// C		 "-"			"[![:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[![:alnum:]]", flags: 0, result: 0)
+		// C		 "]"			"[!][:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("]", pattern: "[!][:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "["			"[![:alnum:][]"	       NOMATCH
+		XCTAssertMatchesFNMatch("[", pattern: "[![:alnum:][]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "b"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "c"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "d"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("d", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "e"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("e", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "f"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("f", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "g"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("g", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "h"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("h", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "i"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("i", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "j"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("j", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "k"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("k", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "l"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("l", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "m"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("m", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "n"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("n", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "o"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("o", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "p"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("p", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "q"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("q", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "r"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("r", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "s"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("s", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "t"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "u"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("u", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "v"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("v", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "w"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("w", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "x"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("x", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "y"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("y", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "z"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("z", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "A"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "B"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("B", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "C"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("C", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "D"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("D", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "E"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("E", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "F"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("F", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "G"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("G", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "H"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("H", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "I"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("I", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "J"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("J", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "K"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("K", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "L"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("L", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "M"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("M", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "N"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("N", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "O"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("O", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "P"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("P", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "Q"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("Q", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "R"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("R", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "S"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("S", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "T"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("T", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "U"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("U", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "V"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("V", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "W"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("W", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "X"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("X", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "Y"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("Y", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "Z"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "0"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("0", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "1"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("1", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "2"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("2", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "3"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("3", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "4"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("4", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "5"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("5", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "6"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("6", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "7"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("7", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "8"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("8", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "9"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("9", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C		 "!"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("!", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "#"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("#", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "%"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("%", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "+"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("+", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 ","			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(",", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "-"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "."			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(".", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "/"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("/", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 ":"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(":", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 ";"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(";", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "="			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("=", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "@"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("@", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "["			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("[", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "\\"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\\", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "]"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("]", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "^"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("^", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "_"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("_", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "{"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("{", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "}"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("}", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "~"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("~", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "\""			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\"", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "$"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("$", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "&"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("&", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "'"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("'", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "("			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("(", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 ")"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(")", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "*"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("*", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "?"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("?", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "`"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("`", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "|"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("|", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "<"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("<", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 ">"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(">", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C		 "\t"			"[[:cntrl:]]"	       0
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:cntrl:]]", flags: 0, result: 0)
+		// C		 "t"			"[[:cntrl:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:cntrl:]]", flags: 0, result: NOMATCH)
+		// C		 "t"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// C		 "\t"			"[[:lower:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
+		// C		 "T"			"[[:lower:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("T", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
+		// C		 "\t"			"[[:space:]]"	       0
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:space:]]", flags: 0, result: 0)
+		// C		 "t"			"[[:space:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:space:]]", flags: 0, result: NOMATCH)
+		// C		 "t"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// C		 "\t"			"[[:alpha:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:alpha:]]", flags: 0, result: NOMATCH)
+		// C		 "0"			"[[:digit:]]"	       0
+		XCTAssertMatchesFNMatch("0", pattern: "[[:digit:]]", flags: 0, result: 0)
+		// C		 "\t"			"[[:digit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
+		// C		 "t"			"[[:digit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
+		// C		 "\t"			"[[:print:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:print:]]", flags: 0, result: NOMATCH)
+		// C		 "t"			"[[:print:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:print:]]", flags: 0, result: 0)
+		// C		 "T"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("T", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// C		 "\t"			"[[:upper:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
+		// C		 "t"			"[[:upper:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
+		// C		 "\t"			"[[:blank:]]"	       0
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:blank:]]", flags: 0, result: 0)
+		// C		 "t"			"[[:blank:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:blank:]]", flags: 0, result: NOMATCH)
+		// C		 "\t"			"[[:graph:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:graph:]]", flags: 0, result: NOMATCH)
+		// C		 "t"			"[[:graph:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:graph:]]", flags: 0, result: 0)
+		// C		 "."			"[[:punct:]]"	       0
+		XCTAssertMatchesFNMatch(".", pattern: "[[:punct:]]", flags: 0, result: 0)
+		// C		 "t"			"[[:punct:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
+		// C		 "\t"			"[[:punct:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
+		// C		 "0"			"[[:xdigit:]]"	       0
+		XCTAssertMatchesFNMatch("0", pattern: "[[:xdigit:]]", flags: 0, result: 0)
+		// C		 "\t"			"[[:xdigit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[:xdigit:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:xdigit:]]", flags: 0, result: 0)
+		// C		 "A"			"[[:xdigit:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:xdigit:]]", flags: 0, result: 0)
+		// C		 "t"			"[[:xdigit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[alpha]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[[alpha]]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[alpha:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[[alpha:]]", flags: 0, result: NOMATCH)
+		// C		 "a]"			"[[alpha]]"	       0
+		XCTAssertMatchesFNMatch("a]", pattern: "[[alpha]]", flags: 0, result: 0)
+		// C		 "a]"			"[[alpha:]]"	       0
+		XCTAssertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
+		// C		 "a"			"[[:alpha:][.b.]]"     0
+		XCTExpectFailure {
+			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
+		}
+		// C		 "a"			"[[:alpha:][=b=]]"     0
+		XCTExpectFailure {
+			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
+		}
+		// C		 "a"			"[[:alpha:][:digit:]]" 0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
+		// C		 "a"			"[[:digit:][:alpha:]]" 0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:digit:][:alpha:]]", flags: 0, result: 0)
 	}
 
 	//  B.6 018(C)
