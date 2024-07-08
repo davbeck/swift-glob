@@ -19,6 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: irgaly/setup-mint@v1
+      - run: echo "$HOME/bin" >> $GITHUB_PATH
 
       - run: bin/format
 
