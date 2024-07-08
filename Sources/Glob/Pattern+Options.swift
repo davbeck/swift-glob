@@ -22,8 +22,18 @@ public extension Pattern {
 		/// How wildcards are interpreted
 		public var wildcardBehavior: WildcardBehavior
 
-		/// When false, an error will be thrown if an empty range (`[]`) is found.
-		public var allowsEmptyRanges: Bool
+		/// How empty ranges (`[]`) are treated
+		public enum EmptyRangeBehavior: Sendable {
+			/// Treat an empty range as matching nothing, equivalent to nothing at all
+			case allow
+			/// Throw an error when an empty range is used
+			case error
+			/// When a range starts with a closing range character, treat the closing bracket as a character and continue the range
+			case treatClosingBracketAsCharacter
+		}
+
+		/// How are empty ranges handled.
+		public var emptyRangeBehavior: EmptyRangeBehavior
 
 		/// The character used to specify when a range matches characters that aren't in the range.
 		public var rangeNegationCharacter: Character = "!"
@@ -36,20 +46,20 @@ public extension Pattern {
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init(
 			wildcardBehavior: .doubleStarMatchesFullPath,
-			allowsEmptyRanges: false
+			emptyRangeBehavior: .error
 		)
 
 		/// Attempts to match the behavior of [VSCode](https://code.visualstudio.com/docs/editor/glob-patterns).
 		public static let vscode: Self = Options(
 			wildcardBehavior: .doubleStarMatchesFullPath,
-			allowsEmptyRanges: false,
+			emptyRangeBehavior: .error,
 			rangeNegationCharacter: "^"
 		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
 		public static let go: Self = Options(
 			wildcardBehavior: .pathComponentsOnly,
-			allowsEmptyRanges: false,
+			emptyRangeBehavior: .error,
 			rangeNegationCharacter: "^"
 		)
 
@@ -58,7 +68,7 @@ public extension Pattern {
 		public static func posix() -> Self {
 			Options(
 				wildcardBehavior: .pathComponentsOnly,
-				allowsEmptyRanges: true
+				emptyRangeBehavior: .allow
 			)
 		}
 
@@ -68,7 +78,7 @@ public extension Pattern {
 		public static func fnmatch(usePathnameBehavior: Bool = false) -> Self {
 			Options(
 				wildcardBehavior: usePathnameBehavior ? .pathComponentsOnly : .singleStarMatchesFullPath,
-				allowsEmptyRanges: true
+				emptyRangeBehavior: .treatClosingBracketAsCharacter
 			)
 		}
 

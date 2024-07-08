@@ -102,6 +102,14 @@ public struct Pattern: Sendable {
 
 					var ranges: [ClosedRange<Character>] = []
 
+					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter && pattern.first == "]" {
+						// https://man7.org/linux/man-pages/man7/glob.7.html
+						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
+						
+						pattern = pattern.dropFirst()
+						ranges.append("]" ... "]")
+					}
+
 					while pattern.first != "]" {
 						guard pattern.first != "-" else { throw PatternParsingError.rangeMissingBounds }
 						guard let lower = try getNext() else { break }
@@ -126,10 +134,10 @@ public struct Pattern: Sendable {
 					pattern = pattern.dropFirst()
 
 					guard !ranges.isEmpty else {
-						if options.allowsEmptyRanges {
-							break
-						} else {
+						if options.emptyRangeBehavior == .error {
 							throw PatternParsingError.rangeIsEmpty
+						} else {
+							break
 						}
 					}
 

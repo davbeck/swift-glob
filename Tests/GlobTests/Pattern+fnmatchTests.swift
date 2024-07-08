@@ -176,9 +176,7 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		 "a"			"[][abc]"	       0
 		XCTAssertMatchesFNMatch("a", pattern: "[][abc]", flags: 0, result: 0)
 		// C		 "a]"			"[]a]]"		       0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a]", pattern: "[]a]]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("a]", pattern: "[]a]]", flags: 0, result: 0)
 	}
 
 	//  B.6 010(C)
@@ -194,17 +192,13 @@ final class PatternFNMatchTests: XCTestCase {
 	//  B.6 011(C)
 	func test_b_6_011_c() throws {
 		// C		 "]"			"[][abc]"	       0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("]", pattern: "[][abc]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("]", pattern: "[][abc]", flags: 0, result: 0)
 		// C		 "abc]"			"[][abc]"	       NOMATCH
 		XCTAssertMatchesFNMatch("abc]", pattern: "[][abc]", flags: 0, result: NOMATCH)
 		// C		 "[]abc"		"[][]abc"	       NOMATCH
 		XCTAssertMatchesFNMatch("[]abc", pattern: "[][]abc", flags: 0, result: NOMATCH)
 		// C		 "]"			"[!]]"		       NOMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("]", pattern: "[!]]", flags: 0, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("]", pattern: "[!]]", flags: 0, result: NOMATCH)
 		// C		 "aa]"			"[!]a]"		       NOMATCH
 		XCTAssertMatchesFNMatch("aa]", pattern: "[!]a]", flags: 0, result: NOMATCH)
 		// C		 "]"			"[!a]"		       0
@@ -991,9 +985,7 @@ final class PatternFNMatchTests: XCTestCase {
 		// C.UTF-8		 "a"			"[][abc]"	       0
 		XCTAssertMatchesFNMatch("a", pattern: "[][abc]", flags: 0, result: 0)
 		// C.UTF-8		 "a]"			"[]a]]"		       0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a]", pattern: "[]a]]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("a]", pattern: "[]a]]", flags: 0, result: 0)
 	}
 
 	//  B.6 010(C) utf8
@@ -1008,18 +1000,14 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 011(C) utf8
 	func test_b_6_011_c_utf8() throws {
-		XCTExpectFailure {
-			// C.UTF-8		 "]"			"[][abc]"	       0
-			XCTAssertMatchesFNMatch("]", pattern: "[][abc]", flags: 0, result: 0)
-		}
+		// C.UTF-8		 "]"			"[][abc]"	       0
+		XCTAssertMatchesFNMatch("]", pattern: "[][abc]", flags: 0, result: 0)
 		// C.UTF-8		 "abc]"			"[][abc]"	       NOMATCH
 		XCTAssertMatchesFNMatch("abc]", pattern: "[][abc]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "[]abc"		"[][]abc"	       NOMATCH
 		XCTAssertMatchesFNMatch("[]abc", pattern: "[][]abc", flags: 0, result: NOMATCH)
-		XCTExpectFailure {
-			// C.UTF-8		 "]"			"[!]]"		       NOMATCH
-			XCTAssertMatchesFNMatch("]", pattern: "[!]]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		 "]"			"[!]]"		       NOMATCH
+		XCTAssertMatchesFNMatch("]", pattern: "[!]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "aa]"			"[!]a]"		       NOMATCH
 		XCTAssertMatchesFNMatch("aa]", pattern: "[!]a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "]"			"[!a]"		       0
