@@ -105,7 +105,7 @@ public struct Pattern: Sendable {
 					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter && pattern.first == "]" {
 						// https://man7.org/linux/man-pages/man7/glob.7.html
 						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
-						
+
 						pattern = pattern.dropFirst()
 						ranges.append("]" ... "]")
 					}
