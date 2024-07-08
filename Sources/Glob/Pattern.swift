@@ -81,12 +81,12 @@ public struct Pattern: Sendable {
 					character.isNumber
 				case .graph:
 					character != " " && character.unicodeScalars
-						.allSatisfy { $0.properties.generalCategory.isPrintable }
+						.allSatisfy(\.properties.generalCategory.isPrintable)
 				case .lower:
 					character.isLowercase
 				case .printable:
 					character.unicodeScalars
-						.allSatisfy { $0.properties.generalCategory.isPrintable }
+						.allSatisfy(\.properties.generalCategory.isPrintable)
 				case .punctuation:
 					character.isPunctuation
 				case .space:

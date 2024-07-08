@@ -57,7 +57,7 @@ final class PatternTests: XCTestCase {
 	func test_singleCharacter_doesNotMatchSeparator() throws {
 		try XCTAssertDoesNotMatch("a/b", pattern: "a?b")
 	}
-	
+
 	func test_namedCharacterClasses_alpha() throws {
 		try XCTAssertMatches("b", pattern: "[[:alpha:]]")
 		try XCTAssertMatches("B", pattern: "[[:alpha:]]")
