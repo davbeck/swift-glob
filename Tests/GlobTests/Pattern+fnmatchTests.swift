@@ -7,9 +7,9 @@ private let PERIOD = FNM_PERIOD
 private let NOESCAPE = FNM_NOESCAPE
 private let NOMATCH = FNM_NOMATCH
 #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-private let LEADING_DIR = FNM_LEADING_DIR
+	private let LEADING_DIR = FNM_LEADING_DIR
 #else
-private let LEADING_DIR = (1 as Int32) << 29
+	private let LEADING_DIR = (1 as Int32) << 29
 #endif
 private let EXTMATCH = (1 as Int32) << 30 // FNM_EXTMATCH
 
