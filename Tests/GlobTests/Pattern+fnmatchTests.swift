@@ -43,7 +43,7 @@ private func XCTAssertMatchesFNMatch(
 	)
 	XCTAssertEqual(
 		patternResult,
-		fnmatchResult,
+		expectedResult,
 		"matching '\(value)' to pattern '\(pattern)' with flags \(flags) did not match fnmatch result \(expectedResult)",
 		file: file,
 		line: line
@@ -760,6 +760,7 @@ final class PatternFNMatchTests: XCTestCase {
 		XCTAssertMatchesFNMatch("/[", pattern: "\\/\\[", flags: 0, result: 0)
 		// C		 "/["			"\\/["		       0
 		XCTExpectFailure {
+			// Apple's implimentation of fnmatch doesn't produce this result
 			XCTAssertMatchesFNMatch("/[", pattern: "\\/[", flags: 0, result: 0)
 		}
 		// C		 "/[]"			"\\/\\[]"	       0
