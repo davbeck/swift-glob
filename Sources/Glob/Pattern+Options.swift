@@ -34,7 +34,7 @@ public extension Pattern {
 
 		/// How are empty ranges handled.
 		public var emptyRangeBehavior: EmptyRangeBehavior
-		
+
 		/// If the pattern supports escaping control characters with '\'
 		///
 		/// When true, a backslash character ( '\' ) in pattern followed by any other character shall match that second character in string. In particular, "\\" shall match a backslash in string. Otherwise a backslash character shall be treated as an ordinary character.
@@ -90,7 +90,7 @@ public extension Pattern {
 		) -> Self {
 			Options(
 				wildcardBehavior: usePathnameBehavior ? .pathComponentsOnly : .singleStarMatchesFullPath,
-				emptyRangeBehavior: .treatClosingBracketAsCharacter, 
+				emptyRangeBehavior: .treatClosingBracketAsCharacter,
 				allowEscapedCharacters: allowEscapedCharacters
 			)
 		}
