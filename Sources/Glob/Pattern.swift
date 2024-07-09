@@ -163,7 +163,7 @@ public struct Pattern: Sendable {
 				switch next {
 				case ("*", false):
 					if sections.last == .componentWildcard {
-						if options.wildcardBehavior == .doubleStarMatchesFullPath {
+						if options.allowsPathLevelWildcards {
 							sections[sections.endIndex - 1] = .pathWildcard
 						} else {
 							break // ignore repeated wildcards
@@ -171,11 +171,7 @@ public struct Pattern: Sendable {
 					} else if sections.last == .pathWildcard {
 						break // ignore repeated wildcards
 					} else {
-						if options.wildcardBehavior == .singleStarMatchesFullPath {
-							sections.append(.pathWildcard)
-						} else {
-							sections.append(.componentWildcard)
-						}
+						sections.append(.componentWildcard)
 					}
 				case ("?", false):
 					sections.append(.singleCharacter)

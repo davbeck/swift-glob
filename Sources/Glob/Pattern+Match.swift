@@ -57,7 +57,7 @@ extension Pattern {
 				return false
 			}
 		case (.singleCharacter, _):
-			guard options.wildcardBehavior == .singleStarMatchesFullPath || name.first != options.pathSeparator else { return false }
+			guard name.first != options.pathSeparator else { return false }
 			return match(
 				components: components.dropFirst(),
 				name.dropFirst()
@@ -78,7 +78,7 @@ extension Pattern {
 				return false
 			}
 		case (_, .singleCharacter):
-			guard options.wildcardBehavior == .singleStarMatchesFullPath || name.last != options.pathSeparator else { return false }
+			guard name.last != options.pathSeparator else { return false }
 			return match(
 				components: components.dropLast(),
 				name.dropLast()
@@ -91,8 +91,13 @@ extension Pattern {
 			)
 		case (.componentWildcard, _):
 			if components.count == 1 {
-				// the last component is a component level wildcard, which matches anything except for the path separator
-				return !name.contains(options.pathSeparator)
+				if let pathSeparator = options.pathSeparator {
+					// the last component is a component level wildcard, which matches anything except for the path separator
+					return !name.contains(pathSeparator)
+				} else {
+					// no special treatment for path separators
+					return true
+				}
 			}
 
 			if match(components: components.dropFirst(), name) {
