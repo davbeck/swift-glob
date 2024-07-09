@@ -135,14 +135,14 @@ public struct Pattern: Sendable {
 
 					if next == .escape {
 						guard let escaped = updatedPattern.first else { throw PatternParsingError.invalidEscapeCharacter }
-						
+
 						guard condition((escaped, true)) else { return nil }
-						
+
 						pattern = updatedPattern.dropFirst()
 						return (escaped, true)
 					} else {
 						guard condition((next, false)) else { return nil }
-						
+
 						pattern = updatedPattern
 						return (next, false)
 					}
@@ -171,7 +171,11 @@ public struct Pattern: Sendable {
 					} else if sections.last == .pathWildcard {
 						break // ignore repeated wildcards
 					} else {
-						sections.append(.componentWildcard)
+						if options.wildcardBehavior == .singleStarMatchesFullPath {
+							sections.append(.pathWildcard)
+						} else {
+							sections.append(.componentWildcard)
+						}
 					}
 				case ("?", false):
 					sections.append(.singleCharacter)
@@ -217,7 +221,7 @@ public struct Pattern: Sendable {
 							if !options.allowsRangeSeparatorInCharacterClasses {
 								throw PatternParsingError.rangeMissingBounds
 							}
-							
+
 							// https://man7.org/linux/man-pages/man7/glob.7.html
 							// One may include '-' in its literal meaning by making it the first or last character between the brackets.
 							ranges.append(.character("-"))
@@ -227,7 +231,7 @@ public struct Pattern: Sendable {
 									if !options.allowsRangeSeparatorInCharacterClasses {
 										throw PatternParsingError.rangeNotClosed
 									}
-									
+
 									// `-` is the last character in the group, treat it as a character
 									// https://man7.org/linux/man-pages/man7/glob.7.html
 									// One may include '-' in its literal meaning by making it the first or last character between the brackets.

@@ -663,9 +663,7 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		 ""			"*"		       0
 		XCTAssertMatchesFNMatch("", pattern: "*", flags: 0, result: 0)
 		// C		 "asd/sdf"		"*"		       0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "*", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "*", flags: 0, result: 0)
 	}
 
 	//  B.6 025(C)
@@ -678,14 +676,12 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 026(C)
 	func test_b_6_026_c() throws {
-		XCTExpectFailure {
-			// C		 "asd/sdf"		"as*df"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*df", flags: 0, result: 0)
-			// C		 "asd/sdf"		"as*"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*", flags: 0, result: 0)
-			// C		 "asd/sdf"		"*df"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "*df", flags: 0, result: 0)
-		}
+		// C		 "asd/sdf"		"as*df"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*df", flags: 0, result: 0)
+		// C		 "asd/sdf"		"as*"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*", flags: 0, result: 0)
+		// C		 "asd/sdf"		"*df"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "*df", flags: 0, result: 0)
 		// C		 "asd/sdf"		"as*dg"		       NOMATCH
 		XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*dg", flags: 0, result: NOMATCH)
 		// C		 "asdf"			"as*df"		       0
@@ -787,9 +783,7 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		 ".asd"			".*"		       0       PERIOD
 		XCTAssertMatchesFNMatch(".asd", pattern: ".*", flags: PERIOD, result: 0)
 		// C		 "/.asd"		"*"		       0       PERIOD
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("/.asd", pattern: "*", flags: PERIOD, result: 0)
-		}
+		XCTAssertMatchesFNMatch("/.asd", pattern: "*", flags: PERIOD, result: 0)
 		// C		 "/as/.df"		"*/?*f"		       0       PERIOD
 		XCTAssertMatchesFNMatch("/as/.df", pattern: "*/?*f", flags: PERIOD, result: 0)
 		// C		 "..asd"		".[!a-z]*"	       0       PERIOD
@@ -1472,10 +1466,8 @@ final class PatternFNMatchTests: XCTestCase {
 	func test_b_6_024_c_utf8() throws {
 		// C.UTF-8		 ""			"*"		       0
 		XCTAssertMatchesFNMatch("", pattern: "*", flags: 0, result: 0)
-		XCTExpectFailure {
-			// C.UTF-8		 "asd/sdf"		"*"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "*", flags: 0, result: 0)
-		}
+		// C.UTF-8		 "asd/sdf"		"*"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "*", flags: 0, result: 0)
 	}
 
 	//  B.6 025(C) utf8
@@ -1488,14 +1480,12 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 026(C) utf8
 	func test_b_6_026_c_utf8() throws {
-		XCTExpectFailure {
-			// C.UTF-8		 "asd/sdf"		"as*df"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*df", flags: 0, result: 0)
-			// C.UTF-8		 "asd/sdf"		"as*"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*", flags: 0, result: 0)
-			// C.UTF-8		 "asd/sdf"		"*df"		       0
-			XCTAssertMatchesFNMatch("asd/sdf", pattern: "*df", flags: 0, result: 0)
-		}
+		// C.UTF-8		 "asd/sdf"		"as*df"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*df", flags: 0, result: 0)
+		// C.UTF-8		 "asd/sdf"		"as*"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*", flags: 0, result: 0)
+		// C.UTF-8		 "asd/sdf"		"*df"		       0
+		XCTAssertMatchesFNMatch("asd/sdf", pattern: "*df", flags: 0, result: 0)
 		// C.UTF-8		 "asd/sdf"		"as*dg"		       NOMATCH
 		XCTAssertMatchesFNMatch("asd/sdf", pattern: "as*dg", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "asdf"			"as*df"		       0
@@ -1598,10 +1588,8 @@ final class PatternFNMatchTests: XCTestCase {
 	func test_b_6_033_c_utf8() throws {
 		// C.UTF-8		 ".asd"			".*"		       0       PERIOD
 		XCTAssertMatchesFNMatch(".asd", pattern: ".*", flags: PERIOD, result: 0)
-		XCTExpectFailure {
-			// C.UTF-8		 "/.asd"		"*"		       0       PERIOD
-			XCTAssertMatchesFNMatch("/.asd", pattern: "*", flags: PERIOD, result: 0)
-		}
+		// C.UTF-8		 "/.asd"		"*"		       0       PERIOD
+		XCTAssertMatchesFNMatch("/.asd", pattern: "*", flags: PERIOD, result: 0)
 		// C.UTF-8		 "/as/.df"		"*/?*f"		       0       PERIOD
 		XCTAssertMatchesFNMatch("/as/.df", pattern: "*/?*f", flags: PERIOD, result: 0)
 		// C.UTF-8		 "..asd"		".[!a-z]*"	       0       PERIOD
