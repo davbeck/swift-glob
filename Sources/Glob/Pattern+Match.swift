@@ -25,13 +25,14 @@ extension Pattern {
 	/// - Parameter name: The string to match against
 	/// - Returns: true if the string matches the pattern
 	public func match(_ name: some StringProtocol) -> Bool {
-		match(components: .init(sections), .init(name))
+		match(components: .init(sections), .init(name), isAtStart: true)
 	}
 
 	// recursively matches against the pattern
 	private func match(
 		components: ArraySlice<Section>,
-		_ name: Substring
+		_ name: Substring,
+		isAtStart: Bool
 	) -> Bool {
 		if name.isEmpty {
 			if components.isEmpty || (components.count == 1 && components.first?.isWildcard == true) {
@@ -51,28 +52,43 @@ extension Pattern {
 			if let remaining = name.dropPrefix(constant) {
 				return match(
 					components: components.dropFirst(),
-					remaining
+					remaining,
+					isAtStart: constant.last == options.pathSeparator
 				)
 			} else {
 				return false
 			}
 		case (.singleCharacter, _):
 			guard name.first != options.pathSeparator else { return false }
+			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+				return false
+			}
+
 			return match(
 				components: components.dropFirst(),
-				name.dropFirst()
+				name.dropFirst(),
+				isAtStart: false
 			)
 		case let (.oneOf(ranges, isNegated: isNegated), _):
+			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+				// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
+				// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
+				// in our implimentation, it will not match
+				return false
+			}
+
 			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 			return match(
 				components: components.dropFirst(),
-				name.dropFirst()
+				name.dropFirst(),
+				isAtStart: next == options.pathSeparator
 			)
 		case let (_, .constant(constant)):
 			if let remaining = name.dropSuffix(constant) {
 				return match(
 					components: components.dropLast(),
-					remaining
+					remaining,
+					isAtStart: isAtStart
 				)
 			} else {
 				return false
@@ -81,15 +97,21 @@ extension Pattern {
 			guard name.last != options.pathSeparator else { return false }
 			return match(
 				components: components.dropLast(),
-				name.dropLast()
+				name.dropLast(),
+				isAtStart: isAtStart
 			)
 		case let (_, .oneOf(ranges, isNegated: isNegated)):
 			guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 			return match(
 				components: components.dropLast(),
-				name.dropLast()
+				name.dropLast(),
+				isAtStart: isAtStart
 			)
 		case (.componentWildcard, _):
+			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+				return false
+			}
+
 			if components.count == 1 {
 				if let pathSeparator = options.pathSeparator {
 					// the last component is a component level wildcard, which matches anything except for the path separator
@@ -100,16 +122,17 @@ extension Pattern {
 				}
 			}
 
-			if match(components: components.dropFirst(), name) {
+			if match(components: components.dropFirst(), name, isAtStart: isAtStart) {
 				return true
 			} else {
-				return match(components: components, name.dropFirst())
+				let next = name.first
+				return match(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
 			}
 		case (_, .componentWildcard):
-			if match(components: components.dropLast(), name) {
+			if match(components: components.dropLast(), name, isAtStart: isAtStart) {
 				return true
 			} else {
-				return match(components: components, name.dropLast())
+				return match(components: components, name.dropLast(), isAtStart: isAtStart)
 			}
 		case (.pathWildcard, _):
 			if components.count == 1 {
@@ -117,10 +140,11 @@ extension Pattern {
 				return true
 			}
 
-			if match(components: components.dropFirst(), name) {
+			if match(components: components.dropFirst(), name, isAtStart: isAtStart) {
 				return true
 			} else {
-				return match(components: components, name.dropFirst())
+				let next = name.first
+				return match(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
 			}
 		case (.none, _):
 			return name.isEmpty

@@ -29,6 +29,13 @@ public extension Pattern {
 		/// Allows the `-` character to be included in a character class if it is the first or last character (ie `[-abc]` or `[abc-]`)
 		public var allowsRangeSeparatorInCharacterClasses: Bool = true
 
+		/// If a period in the name is at the beginning of a component, don't match using wildcards.
+		///
+		/// Treat the `.` character specially if it appears at the beginning of string. If this flag is set, wildcard constructs in pattern cannot match `.` as the first character of string. If you set both this and `pathSeparator`, then the special treatment applies to `.` following `pathSeparator` as well as to `.` at the beginning of string.
+		///
+		/// Equivalent to `FNM_PERIOD`.
+		public var requiresExplicitLeadingPeriods: Bool = true
+
 		/// The character used to specify when a range matches characters that aren't in the range.
 		public var rangeNegationCharacter: Character = "!"
 
@@ -65,7 +72,8 @@ public extension Pattern {
 		public static func posix() -> Self {
 			Options(
 				allowsPathLevelWildcards: false,
-				emptyRangeBehavior: .allow
+				emptyRangeBehavior: .allow,
+				requiresExplicitLeadingPeriods: true
 			)
 		}
 
@@ -74,12 +82,14 @@ public extension Pattern {
 		/// - Returns: Options to use to create a Pattern.
 		public static func fnmatch(
 			usePathnameBehavior: Bool = false,
-			allowEscapedCharacters: Bool = true
+			allowEscapedCharacters: Bool = true,
+			requiresExplicitLeadingPeriods: Bool = false
 		) -> Self {
 			Options(
 				allowsPathLevelWildcards: false,
 				emptyRangeBehavior: .treatClosingBracketAsCharacter,
 				allowEscapedCharacters: allowEscapedCharacters,
+				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
 				pathSeparator: usePathnameBehavior ? "/" : nil
 			)
 		}
@@ -87,7 +97,8 @@ public extension Pattern {
 		public static func fnmatch(flags: Int32) -> Self {
 			.fnmatch(
 				usePathnameBehavior: (flags & FNM_PATHNAME) != 0,
-				allowEscapedCharacters: (flags & FNM_NOESCAPE) == 0
+				allowEscapedCharacters: (flags & FNM_NOESCAPE) == 0,
+				requiresExplicitLeadingPeriods: (flags & FNM_PERIOD) != 0
 			)
 		}
 	}

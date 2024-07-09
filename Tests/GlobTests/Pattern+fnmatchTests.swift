@@ -791,14 +791,13 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 034(C)
 	func test_b_6_034_c() throws {
-		XCTExpectFailure {
-			// C		 ".asd"			"*"		       NOMATCH PERIOD
-			XCTAssertMatchesFNMatch(".asd", pattern: "*", flags: PERIOD, result: NOMATCH)
-			// C		 ".asd"			"?asd"		       NOMATCH PERIOD
-			XCTAssertMatchesFNMatch(".asd", pattern: "?asd", flags: PERIOD, result: NOMATCH)
-			// C		 ".asd"			"[!a-z]*"	       NOMATCH PERIOD
-			XCTAssertMatchesFNMatch(".asd", pattern: "[!a-z]*", flags: PERIOD, result: NOMATCH)
-		}
+		// we need to somehow apply requiresExplicitLeadingPeriods only for . after path separators or at the beginning
+		// C		 ".asd"			"*"		       NOMATCH PERIOD
+		XCTAssertMatchesFNMatch(".asd", pattern: "*", flags: PERIOD, result: NOMATCH)
+		// C		 ".asd"			"?asd"		       NOMATCH PERIOD
+		XCTAssertMatchesFNMatch(".asd", pattern: "?asd", flags: PERIOD, result: NOMATCH)
+		// C		 ".asd"			"[!a-z]*"	       NOMATCH PERIOD
+		XCTAssertMatchesFNMatch(".asd", pattern: "[!a-z]*", flags: PERIOD, result: NOMATCH)
 	}
 
 	//  B.6 035(C)
@@ -813,20 +812,18 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 036(C)
 	func test_b_6_036_c() throws {
-		XCTExpectFailure {
-			// C		 "/."			"*"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "*", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C		 "/."			"/*"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "/*", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C		 "/."			"/?"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "/?", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C		 "/."			"/[!a-z]"	       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "/[!a-z]", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C		 "/a./.b."		"/*/*"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/a./.b.", pattern: "/*/*", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C		 "/a./.b."		"/??/???"	       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/a./.b.", pattern: "/??/???", flags: PATHNAME | PERIOD, result: NOMATCH)
-		}
+		// C		 "/."			"*"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "*", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C		 "/."			"/*"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "/*", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C		 "/."			"/?"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "/?", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C		 "/."			"/[!a-z]"	       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "/[!a-z]", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C		 "/a./.b."		"/*/*"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/a./.b.", pattern: "/*/*", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C		 "/a./.b."		"/??/???"	       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/a./.b.", pattern: "/??/???", flags: PATHNAME | PERIOD, result: NOMATCH)
 	}
 
 	//  Some home-grown tests utf8
@@ -1593,14 +1590,12 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 034(C) utf8
 	func test_b_6_034_c_utf8() throws {
-		XCTExpectFailure {
-			// C.UTF-8		 ".asd"			"*"		       NOMATCH PERIOD
-			XCTAssertMatchesFNMatch(".asd", pattern: "*", flags: PERIOD, result: NOMATCH)
-			// C.UTF-8		 ".asd"			"?asd"		       NOMATCH PERIOD
-			XCTAssertMatchesFNMatch(".asd", pattern: "?asd", flags: PERIOD, result: NOMATCH)
-			// C.UTF-8		 ".asd"			"[!a-z]*"	       NOMATCH PERIOD
-			XCTAssertMatchesFNMatch(".asd", pattern: "[!a-z]*", flags: PERIOD, result: NOMATCH)
-		}
+		// C.UTF-8		 ".asd"			"*"		       NOMATCH PERIOD
+		XCTAssertMatchesFNMatch(".asd", pattern: "*", flags: PERIOD, result: NOMATCH)
+		// C.UTF-8		 ".asd"			"?asd"		       NOMATCH PERIOD
+		XCTAssertMatchesFNMatch(".asd", pattern: "?asd", flags: PERIOD, result: NOMATCH)
+		// C.UTF-8		 ".asd"			"[!a-z]*"	       NOMATCH PERIOD
+		XCTAssertMatchesFNMatch(".asd", pattern: "[!a-z]*", flags: PERIOD, result: NOMATCH)
 	}
 
 	//  B.6 035(C) utf8
@@ -1617,18 +1612,16 @@ final class PatternFNMatchTests: XCTestCase {
 	func test_b_6_036_c_utf8() throws {
 		// C.UTF-8		 "/."			"*"		       NOMATCH PATHNAME|PERIOD
 		XCTAssertMatchesFNMatch("/.", pattern: "*", flags: PATHNAME | PERIOD, result: NOMATCH)
-		XCTExpectFailure {
-			// C.UTF-8		 "/."			"/*"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "/*", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C.UTF-8		 "/."			"/?"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "/?", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C.UTF-8		 "/."			"/[!a-z]"	       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/.", pattern: "/[!a-z]", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C.UTF-8		 "/a./.b."		"/*/*"		       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/a./.b.", pattern: "/*/*", flags: PATHNAME | PERIOD, result: NOMATCH)
-			// C.UTF-8		 "/a./.b."		"/??/???"	       NOMATCH PATHNAME|PERIOD
-			XCTAssertMatchesFNMatch("/a./.b.", pattern: "/??/???", flags: PATHNAME | PERIOD, result: NOMATCH)
-		}
+		// C.UTF-8		 "/."			"/*"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "/*", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C.UTF-8		 "/."			"/?"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "/?", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C.UTF-8		 "/."			"/[!a-z]"	       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/.", pattern: "/[!a-z]", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C.UTF-8		 "/a./.b."		"/*/*"		       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/a./.b.", pattern: "/*/*", flags: PATHNAME | PERIOD, result: NOMATCH)
+		// C.UTF-8		 "/a./.b."		"/??/???"	       NOMATCH PATHNAME|PERIOD
+		XCTAssertMatchesFNMatch("/a./.b.", pattern: "/??/???", flags: PATHNAME | PERIOD, result: NOMATCH)
 	}
 
 	//  Some home-grown tests.
