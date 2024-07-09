@@ -133,7 +133,7 @@ public struct Pattern: Sendable {
 				if let next = pattern.first {
 					let updatedPattern = pattern.dropFirst()
 
-					if next == .escape {
+					if options.allowEscapedCharacters, next == .escape {
 						guard let escaped = updatedPattern.first else { throw PatternParsingError.invalidEscapeCharacter }
 
 						guard condition((escaped, true)) else { return nil }

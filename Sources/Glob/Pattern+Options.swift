@@ -34,6 +34,11 @@ public extension Pattern {
 
 		/// How are empty ranges handled.
 		public var emptyRangeBehavior: EmptyRangeBehavior
+		
+		/// If the pattern supports escaping control characters with '\'
+		///
+		/// When true, a backslash character ( '\' ) in pattern followed by any other character shall match that second character in string. In particular, "\\" shall match a backslash in string. Otherwise a backslash character shall be treated as an ordinary character.
+		public var allowEscapedCharacters: Bool = true
 
 		/// Allows the `-` character to be included in a character class if it is the first or last character (ie `[-abc]` or `[abc-]`)
 		public var allowsRangeSeparatorInCharacterClasses: Bool = true
@@ -79,16 +84,21 @@ public extension Pattern {
 		/// Attempts to match the behavior of `fnmatch`.
 		/// - Parameter usePathnameBehavior: When true, matches the behavior of FNM_PATHNAME. Namely, wildcards will not match path separators.
 		/// - Returns: Options to use to create a Pattern.
-		public static func fnmatch(usePathnameBehavior: Bool = false) -> Self {
+		public static func fnmatch(
+			usePathnameBehavior: Bool = false,
+			allowEscapedCharacters: Bool = true
+		) -> Self {
 			Options(
 				wildcardBehavior: usePathnameBehavior ? .pathComponentsOnly : .singleStarMatchesFullPath,
-				emptyRangeBehavior: .treatClosingBracketAsCharacter
+				emptyRangeBehavior: .treatClosingBracketAsCharacter, 
+				allowEscapedCharacters: allowEscapedCharacters
 			)
 		}
 
 		public static func fnmatch(flags: Int32) -> Self {
 			.fnmatch(
-				usePathnameBehavior: (flags & FNM_PATHNAME) != 0
+				usePathnameBehavior: (flags & FNM_PATHNAME) != 0,
+				allowEscapedCharacters: (flags & FNM_NOESCAPE) == 0
 			)
 		}
 	}

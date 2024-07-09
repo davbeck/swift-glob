@@ -769,14 +769,12 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 032(C)
 	func test_b_6_032_c() throws {
-		XCTExpectFailure {
-			// C		 "/$"			"\\/\\$"	       NOMATCH NOESCAPE
-			XCTAssertMatchesFNMatch("/$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
-			// C		 "/\\$"			"\\/\\$"	       NOMATCH NOESCAPE
-			XCTAssertMatchesFNMatch("/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
-			// C		 "\\/\\$"		"\\/\\$"	       0       NOESCAPE
-			XCTAssertMatchesFNMatch("\\/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: 0)
-		}
+		// C		 "/$"			"\\/\\$"	       NOMATCH NOESCAPE
+		XCTAssertMatchesFNMatch("/$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
+		// C		 "/\\$"			"\\/\\$"	       NOMATCH NOESCAPE
+		XCTAssertMatchesFNMatch("/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
+		// C		 "\\/\\$"		"\\/\\$"	       0       NOESCAPE
+		XCTAssertMatchesFNMatch("\\/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: 0)
 	}
 
 	//  B.6 033(C)
@@ -1574,15 +1572,11 @@ final class PatternFNMatchTests: XCTestCase {
 	//  B.6 032(C) utf8
 	func test_b_6_032_c_utf8() throws {
 		// C.UTF-8		 "/$"			"\\/\\$"	       NOMATCH NOESCAPE
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("/$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("/$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
 		// C.UTF-8		 "/\\$"			"\\/\\$"	       NOMATCH NOESCAPE
 		XCTAssertMatchesFNMatch("/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: NOMATCH)
 		// C.UTF-8		 "\\/\\$"		"\\/\\$"	       0       NOESCAPE
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("\\/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: 0)
-		}
+		XCTAssertMatchesFNMatch("\\/\\$", pattern: "\\/\\$", flags: NOESCAPE, result: 0)
 	}
 
 	//  B.6 033(C) utf8
