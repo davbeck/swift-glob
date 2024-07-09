@@ -34,6 +34,9 @@ public extension Pattern {
 
 		/// How are empty ranges handled.
 		public var emptyRangeBehavior: EmptyRangeBehavior
+		
+		/// Allows the `-` character to be included in a character class if it is the first or last character (ie `[-abc]` or `[abc-]`)
+		public var allowsRangeSeparatorInCharacterClasses: Bool = true
 
 		/// The character used to specify when a range matches characters that aren't in the range.
 		public var rangeNegationCharacter: Character = "!"
@@ -60,6 +63,7 @@ public extension Pattern {
 		public static let go: Self = Options(
 			wildcardBehavior: .pathComponentsOnly,
 			emptyRangeBehavior: .error,
+			allowsRangeSeparatorInCharacterClasses: false,
 			rangeNegationCharacter: "^"
 		)
 

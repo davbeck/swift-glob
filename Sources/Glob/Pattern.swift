@@ -129,17 +129,22 @@ public struct Pattern: Sendable {
 		var sections: [Section] = []
 
 		do {
-			func getNext() throws -> Character? {
+			func getNext(_ condition: ((character: Character, isEscaped: Bool)) -> Bool = { _ in true }) throws -> (character: Character, isEscaped: Bool)? {
 				if let next = pattern.first {
-					pattern = pattern.dropFirst()
+					let updatedPattern = pattern.dropFirst()
 
 					if next == .escape {
-						guard let escaped = pattern.first else { throw PatternParsingError.invalidEscapeCharacter }
-						pattern = pattern.dropFirst()
-
-						return escaped
+						guard let escaped = updatedPattern.first else { throw PatternParsingError.invalidEscapeCharacter }
+						
+						guard condition((escaped, true)) else { return nil }
+						
+						pattern = updatedPattern.dropFirst()
+						return (escaped, true)
 					} else {
-						return next
+						guard condition((next, false)) else { return nil }
+						
+						pattern = updatedPattern
+						return (next, false)
 					}
 				}
 
@@ -154,11 +159,9 @@ public struct Pattern: Sendable {
 				}
 			}
 
-			while let next = pattern.first {
-				pattern = pattern.dropFirst()
-
+			while let next = try getNext() {
 				switch next {
-				case "*":
+				case ("*", false):
 					if sections.last == .componentWildcard {
 						if options.wildcardBehavior == .doubleStarMatchesFullPath {
 							sections[sections.endIndex - 1] = .pathWildcard
@@ -170,9 +173,9 @@ public struct Pattern: Sendable {
 					} else {
 						sections.append(.componentWildcard)
 					}
-				case "?":
+				case ("?", false):
 					sections.append(.singleCharacter)
-				case "[":
+				case ("[", false):
 					let negated: Bool
 					if pattern.first == options.rangeNegationCharacter {
 						negated = true
@@ -183,21 +186,16 @@ public struct Pattern: Sendable {
 
 					var ranges: [CharacterClass] = []
 
-					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter && pattern.first == "]" {
+					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, let closing = try getNext({ !$0.isEscaped && $0.character == "]" }) {
 						// https://man7.org/linux/man-pages/man7/glob.7.html
 						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
-
-						pattern = pattern.dropFirst()
-						ranges.append(.character("]"))
+						ranges.append(.character(closing.character))
 					}
 
-					while pattern.first != "]" {
-						if pattern.first == "[" {
-							pattern = pattern.dropFirst()
-
-							if pattern.first == ":" {
+					while let next = try getNext({ $0.isEscaped || $0.character != "]" }) {
+						if !next.isEscaped && next.character == "[" {
+							if try getNext({ !$0.isEscaped && $0.character == ":" }) != nil {
 								// Named character classes
-								pattern = pattern.dropFirst()
 								guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
 
 								let name = pattern.prefix(upTo: endIndex)
@@ -206,39 +204,51 @@ public struct Pattern: Sendable {
 									ranges.append(.named(name))
 									pattern = pattern[endIndex...].dropFirst()
 
-									guard pattern.first == "]" else {
+									if try getNext({ !$0.isEscaped && $0.character == "]" }) == nil {
 										throw PatternParsingError.rangeNotClosed
 									}
-									pattern = pattern.dropFirst()
 								} else {
 									throw PatternParsingError.invalidNamedCharacterClass(String(name))
 								}
 							} else {
 								ranges.append(.character("["))
 							}
+						} else if !next.isEscaped && next.character == "-" {
+							if !options.allowsRangeSeparatorInCharacterClasses {
+								throw PatternParsingError.rangeMissingBounds
+							}
+							
+							// https://man7.org/linux/man-pages/man7/glob.7.html
+							// One may include '-' in its literal meaning by making it the first or last character between the brackets.
+							ranges.append(.character("-"))
 						} else {
-							guard pattern.first != "-" else { throw PatternParsingError.rangeMissingBounds }
-							guard let lower = try getNext() else { break }
+							if try getNext({ !$0.isEscaped && $0.character == "-" }) != nil {
+								if pattern.first == "]" {
+									if !options.allowsRangeSeparatorInCharacterClasses {
+										throw PatternParsingError.rangeNotClosed
+									}
+									
+									// `-` is the last character in the group, treat it as a character
+									// https://man7.org/linux/man-pages/man7/glob.7.html
+									// One may include '-' in its literal meaning by making it the first or last character between the brackets.
+									ranges.append(.character(next.character))
+									ranges.append(.character("-"))
+								} else {
+									// this is a range like a-z, find the upper limit of the range
+									guard
+										let upper = try getNext()
+									else { throw PatternParsingError.rangeNotClosed }
 
-							if pattern.first == "-" {
-								// this is a range like a-z, find the upper limit of the range
-								pattern = pattern.dropFirst()
-
-								guard
-									pattern.first != "]",
-									let upper = try getNext()
-								else { throw PatternParsingError.rangeNotClosed }
-
-								guard lower <= upper else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
-								ranges.append(.range(lower ... upper))
+									guard next.character <= upper.character else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
+									ranges.append(.range(next.character ... upper.character))
+								}
 							} else {
-								ranges.append(.range(lower ... lower))
+								ranges.append(.character(next.character))
 							}
 						}
 					}
 
-					guard pattern.first == "]" else { throw PatternParsingError.rangeNotClosed }
-					pattern = pattern.dropFirst()
+					guard try getNext({ !$0.isEscaped && $0.character == "]" }) != nil else { throw PatternParsingError.rangeNotClosed }
 
 					guard !ranges.isEmpty else {
 						if options.emptyRangeBehavior == .error {
@@ -249,12 +259,8 @@ public struct Pattern: Sendable {
 					}
 
 					sections.append(.oneOf(ranges, isNegated: negated))
-				case #"\"#:
-					guard let next = pattern.first else { throw PatternParsingError.invalidEscapeCharacter }
-					pattern = pattern.dropFirst()
-					appendConstant(next)
 				default:
-					appendConstant(next)
+					appendConstant(next.character)
 				}
 			}
 

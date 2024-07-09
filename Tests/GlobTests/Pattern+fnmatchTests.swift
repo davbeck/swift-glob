@@ -280,9 +280,7 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		 "a]a"			"[[:alnum:]]a"	       NOMATCH
 		XCTAssertMatchesFNMatch("a]a", pattern: "[[:alnum:]]a", flags: 0, result: NOMATCH)
 		// C		 "-"			"[[:alnum:]-]"	       0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]-]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]-]", flags: 0, result: 0)
 		// C		 "aa"			"[[:alnum:]]a"	       0
 		XCTAssertMatchesFNMatch("aa", pattern: "[[:alnum:]]a", flags: 0, result: 0)
 		// C		 "-"			"[![:alnum:]]"	       0
@@ -642,24 +640,22 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 021(C)
 	func test_b_6_021_c() throws {
-		XCTExpectFailure {
-			// C		 "-"			"[-a]"		       0
-			XCTAssertMatchesFNMatch("-", pattern: "[-a]", flags: 0, result: 0)
-			// C		 "a"			"[-b]"		       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[-b]", flags: 0, result: NOMATCH)
-			// C		 "-"			"[!-a]"		       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[!-a]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[!-b]"		       0
-			XCTAssertMatchesFNMatch("a", pattern: "[!-b]", flags: 0, result: 0)
-			// C		 "-"			"[a-c-0-9]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[a-c-0-9]", flags: 0, result: 0)
-			// C		 "b"			"[a-c-0-9]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[a-c-0-9]", flags: 0, result: 0)
-			// C		 "a:"			"a[0-9-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a:", pattern: "a[0-9-a]", flags: 0, result: NOMATCH)
-			// C		 "a:"			"a[09-a]"	       0
-			XCTAssertMatchesFNMatch("a:", pattern: "a[09-a]", flags: 0, result: 0)
-		}
+		// C		 "-"			"[-a]"		       0
+		XCTAssertMatchesFNMatch("-", pattern: "[-a]", flags: 0, result: 0)
+		// C		 "a"			"[-b]"		       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[-b]", flags: 0, result: NOMATCH)
+		// C		 "-"			"[!-a]"		       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[!-a]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[!-b]"		       0
+		XCTAssertMatchesFNMatch("a", pattern: "[!-b]", flags: 0, result: 0)
+		// C		 "-"			"[a-c-0-9]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[a-c-0-9]", flags: 0, result: 0)
+		// C		 "b"			"[a-c-0-9]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[a-c-0-9]", flags: 0, result: 0)
+		// C		 "a:"			"a[0-9-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a:", pattern: "a[0-9-a]", flags: 0, result: NOMATCH)
+		// C		 "a:"			"a[09-a]"	       0
+		XCTAssertMatchesFNMatch("a:", pattern: "a[09-a]", flags: 0, result: 0)
 	}
 
 	//  B.6 024(C)
@@ -842,92 +838,90 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  Some home-grown tests utf8
 	func test_some_home_grown_tests_utf8() throws {
-		XCTExpectFailure {
-			// C		"foobar"		"foo*[abc]z"	       NOMATCH
-			XCTAssertMatchesFNMatch("foobar", pattern: "foo*[abc]z", flags: 0, result: NOMATCH)
-			// C		"foobaz"		"foo*[abc][xyz]"       0
-			XCTAssertMatchesFNMatch("foobaz", pattern: "foo*[abc][xyz]", flags: 0, result: 0)
-			// C		"foobaz"		"foo?*[abc][xyz]"      0
-			XCTAssertMatchesFNMatch("foobaz", pattern: "foo?*[abc][xyz]", flags: 0, result: 0)
-			// C		"foobaz"		"foo?*[abc][x/yz]"     0
-			XCTAssertMatchesFNMatch("foobaz", pattern: "foo?*[abc][x/yz]", flags: 0, result: 0)
-			// C		"foobaz"		"foo?*[abc]/[xyz]"     NOMATCH PATHNAME
-			XCTAssertMatchesFNMatch("foobaz", pattern: "foo?*[abc]/[xyz]", flags: PATHNAME, result: NOMATCH)
-			// C		"a"			"a/"                   NOMATCH PATHNAME
-			XCTAssertMatchesFNMatch("a", pattern: "a/", flags: PATHNAME, result: NOMATCH)
-			// C		"a/"			"a"		       NOMATCH PATHNAME
-			XCTAssertMatchesFNMatch("a/", pattern: "a", flags: PATHNAME, result: NOMATCH)
-			// C		"//a"			"/a"		       NOMATCH PATHNAME
-			XCTAssertMatchesFNMatch("//a", pattern: "/a", flags: PATHNAME, result: NOMATCH)
-			// C		"/a"			"//a"		       NOMATCH PATHNAME
-			XCTAssertMatchesFNMatch("/a", pattern: "//a", flags: PATHNAME, result: NOMATCH)
-			// C		"az"			"[a-]z"		       0
-			XCTAssertMatchesFNMatch("az", pattern: "[a-]z", flags: 0, result: 0)
-			// C		"bz"			"[ab-]z"	       0
-			XCTAssertMatchesFNMatch("bz", pattern: "[ab-]z", flags: 0, result: 0)
-			// C		"cz"			"[ab-]z"	       NOMATCH
-			XCTAssertMatchesFNMatch("cz", pattern: "[ab-]z", flags: 0, result: NOMATCH)
-			// C		"-z"			"[ab-]z"	       0
-			XCTAssertMatchesFNMatch("-z", pattern: "[ab-]z", flags: 0, result: 0)
-			// C		"az"			"[-a]z"		       0
-			XCTAssertMatchesFNMatch("az", pattern: "[-a]z", flags: 0, result: 0)
-			// C		"bz"			"[-ab]z"	       0
-			XCTAssertMatchesFNMatch("bz", pattern: "[-ab]z", flags: 0, result: 0)
-			// C		"cz"			"[-ab]z"	       NOMATCH
-			XCTAssertMatchesFNMatch("cz", pattern: "[-ab]z", flags: 0, result: NOMATCH)
-			// C		"-z"			"[-ab]z"	       0
-			XCTAssertMatchesFNMatch("-z", pattern: "[-ab]z", flags: 0, result: 0)
-			// C		"\\"			"[\\\\-a]"	       0
-			XCTAssertMatchesFNMatch("\\", pattern: "[\\\\-a]", flags: 0, result: 0)
-			// C		"_"			"[\\\\-a]"	       0
-			XCTAssertMatchesFNMatch("_", pattern: "[\\\\-a]", flags: 0, result: 0)
-			// C		"a"			"[\\\\-a]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[\\\\-a]", flags: 0, result: 0)
-			// C		"-"			"[\\\\-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[\\\\-a]", flags: 0, result: NOMATCH)
-			// C		"\\"			"[\\]-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\\", pattern: "[\\]-a]", flags: 0, result: NOMATCH)
-			// C		"_"			"[\\]-a]"	       0
-			XCTAssertMatchesFNMatch("_", pattern: "[\\]-a]", flags: 0, result: 0)
-			// C		"a"			"[\\]-a]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[\\]-a]", flags: 0, result: 0)
-			// C		"]"			"[\\]-a]"	       0
-			XCTAssertMatchesFNMatch("]", pattern: "[\\]-a]", flags: 0, result: 0)
-			// C		"-"			"[\\]-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[\\]-a]", flags: 0, result: NOMATCH)
-			// C		"\\"			"[!\\\\-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\\", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
-			// C		"_"			"[!\\\\-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("_", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
-			// C		"a"			"[!\\\\-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
-			// C		"-"			"[!\\\\-a]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[!\\\\-a]", flags: 0, result: 0)
-			// C		"!"			"[\\!-]"	       0
-			XCTAssertMatchesFNMatch("!", pattern: "[\\!-]", flags: 0, result: 0)
-			// C		"-"			"[\\!-]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[\\!-]", flags: 0, result: 0)
-			// C		"\\"			"[\\!-]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\\", pattern: "[\\!-]", flags: 0, result: NOMATCH)
-			// C		"Z"			"[Z-\\\\]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[Z-\\\\]", flags: 0, result: 0)
-			// C		"["			"[Z-\\\\]"	       0
-			XCTAssertMatchesFNMatch("[", pattern: "[Z-\\\\]", flags: 0, result: 0)
-			// C		"\\"			"[Z-\\\\]"	       0
-			XCTAssertMatchesFNMatch("\\", pattern: "[Z-\\\\]", flags: 0, result: 0)
-			// C		"-"			"[Z-\\\\]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[Z-\\\\]", flags: 0, result: NOMATCH)
-			// C		"Z"			"[Z-\\]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[Z-\\]]", flags: 0, result: 0)
-			// C		"["			"[Z-\\]]"	       0
-			XCTAssertMatchesFNMatch("[", pattern: "[Z-\\]]", flags: 0, result: 0)
-			// C		"\\"			"[Z-\\]]"	       0
-			XCTAssertMatchesFNMatch("\\", pattern: "[Z-\\]]", flags: 0, result: 0)
-			// C		"]"			"[Z-\\]]"	       0
-			XCTAssertMatchesFNMatch("]", pattern: "[Z-\\]]", flags: 0, result: 0)
-			// C		"-"			"[Z-\\]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[Z-\\]]", flags: 0, result: NOMATCH)
-		}
+		// C		"foobar"		"foo*[abc]z"	       NOMATCH
+		XCTAssertMatchesFNMatch("foobar", pattern: "foo*[abc]z", flags: 0, result: NOMATCH)
+		// C		"foobaz"		"foo*[abc][xyz]"       0
+		XCTAssertMatchesFNMatch("foobaz", pattern: "foo*[abc][xyz]", flags: 0, result: 0)
+		// C		"foobaz"		"foo?*[abc][xyz]"      0
+		XCTAssertMatchesFNMatch("foobaz", pattern: "foo?*[abc][xyz]", flags: 0, result: 0)
+		// C		"foobaz"		"foo?*[abc][x/yz]"     0
+		XCTAssertMatchesFNMatch("foobaz", pattern: "foo?*[abc][x/yz]", flags: 0, result: 0)
+		// C		"foobaz"		"foo?*[abc]/[xyz]"     NOMATCH PATHNAME
+		XCTAssertMatchesFNMatch("foobaz", pattern: "foo?*[abc]/[xyz]", flags: PATHNAME, result: NOMATCH)
+		// C		"a"			"a/"                   NOMATCH PATHNAME
+		XCTAssertMatchesFNMatch("a", pattern: "a/", flags: PATHNAME, result: NOMATCH)
+		// C		"a/"			"a"		       NOMATCH PATHNAME
+		XCTAssertMatchesFNMatch("a/", pattern: "a", flags: PATHNAME, result: NOMATCH)
+		// C		"//a"			"/a"		       NOMATCH PATHNAME
+		XCTAssertMatchesFNMatch("//a", pattern: "/a", flags: PATHNAME, result: NOMATCH)
+		// C		"/a"			"//a"		       NOMATCH PATHNAME
+		XCTAssertMatchesFNMatch("/a", pattern: "//a", flags: PATHNAME, result: NOMATCH)
+		// C		"az"			"[a-]z"		       0
+		XCTAssertMatchesFNMatch("az", pattern: "[a-]z", flags: 0, result: 0)
+		// C		"bz"			"[ab-]z"	       0
+		XCTAssertMatchesFNMatch("bz", pattern: "[ab-]z", flags: 0, result: 0)
+		// C		"cz"			"[ab-]z"	       NOMATCH
+		XCTAssertMatchesFNMatch("cz", pattern: "[ab-]z", flags: 0, result: NOMATCH)
+		// C		"-z"			"[ab-]z"	       0
+		XCTAssertMatchesFNMatch("-z", pattern: "[ab-]z", flags: 0, result: 0)
+		// C		"az"			"[-a]z"		       0
+		XCTAssertMatchesFNMatch("az", pattern: "[-a]z", flags: 0, result: 0)
+		// C		"bz"			"[-ab]z"	       0
+		XCTAssertMatchesFNMatch("bz", pattern: "[-ab]z", flags: 0, result: 0)
+		// C		"cz"			"[-ab]z"	       NOMATCH
+		XCTAssertMatchesFNMatch("cz", pattern: "[-ab]z", flags: 0, result: NOMATCH)
+		// C		"-z"			"[-ab]z"	       0
+		XCTAssertMatchesFNMatch("-z", pattern: "[-ab]z", flags: 0, result: 0)
+		// C		"\\"			"[\\\\-a]"	       0
+		XCTAssertMatchesFNMatch("\\", pattern: "[\\\\-a]", flags: 0, result: 0)
+		// C		"_"			"[\\\\-a]"	       0
+		XCTAssertMatchesFNMatch("_", pattern: "[\\\\-a]", flags: 0, result: 0)
+		// C		"a"			"[\\\\-a]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[\\\\-a]", flags: 0, result: 0)
+		// C		"-"			"[\\\\-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[\\\\-a]", flags: 0, result: NOMATCH)
+		// C		"\\"			"[\\]-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\\", pattern: "[\\]-a]", flags: 0, result: NOMATCH)
+		// C		"_"			"[\\]-a]"	       0
+		XCTAssertMatchesFNMatch("_", pattern: "[\\]-a]", flags: 0, result: 0)
+		// C		"a"			"[\\]-a]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[\\]-a]", flags: 0, result: 0)
+		// C		"]"			"[\\]-a]"	       0
+		XCTAssertMatchesFNMatch("]", pattern: "[\\]-a]", flags: 0, result: 0)
+		// C		"-"			"[\\]-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[\\]-a]", flags: 0, result: NOMATCH)
+		// C		"\\"			"[!\\\\-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\\", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
+		// C		"_"			"[!\\\\-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("_", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
+		// C		"a"			"[!\\\\-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
+		// C		"-"			"[!\\\\-a]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[!\\\\-a]", flags: 0, result: 0)
+		// C		"!"			"[\\!-]"	       0
+		XCTAssertMatchesFNMatch("!", pattern: "[\\!-]", flags: 0, result: 0)
+		// C		"-"			"[\\!-]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[\\!-]", flags: 0, result: 0)
+		// C		"\\"			"[\\!-]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\\", pattern: "[\\!-]", flags: 0, result: NOMATCH)
+		// C		"Z"			"[Z-\\\\]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[Z-\\\\]", flags: 0, result: 0)
+		// C		"["			"[Z-\\\\]"	       0
+		XCTAssertMatchesFNMatch("[", pattern: "[Z-\\\\]", flags: 0, result: 0)
+		// C		"\\"			"[Z-\\\\]"	       0
+		XCTAssertMatchesFNMatch("\\", pattern: "[Z-\\\\]", flags: 0, result: 0)
+		// C		"-"			"[Z-\\\\]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[Z-\\\\]", flags: 0, result: NOMATCH)
+		// C		"Z"			"[Z-\\]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[Z-\\]]", flags: 0, result: 0)
+		// C		"["			"[Z-\\]]"	       0
+		XCTAssertMatchesFNMatch("[", pattern: "[Z-\\]]", flags: 0, result: 0)
+		// C		"\\"			"[Z-\\]]"	       0
+		XCTAssertMatchesFNMatch("\\", pattern: "[Z-\\]]", flags: 0, result: 0)
+		// C		"]"			"[Z-\\]]"	       0
+		XCTAssertMatchesFNMatch("]", pattern: "[Z-\\]]", flags: 0, result: 0)
+		// C		"-"			"[Z-\\]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[Z-\\]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 004(C) utf8
@@ -1456,22 +1450,20 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 021(C) utf8
 	func test_b_6_021_c_utf8() throws {
-		XCTExpectFailure {
-			// C.UTF-8		 "-"			"[-a]"		       0
-			XCTAssertMatchesFNMatch("-", pattern: "[-a]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[-b]"		       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[-b]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "-"			"[!-a]"		       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[!-a]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a"			"[!-b]"		       0
-			XCTAssertMatchesFNMatch("a", pattern: "[!-b]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[a-c-0-9]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[a-c-0-9]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[a-c-0-9]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[a-c-0-9]", flags: 0, result: 0)
-			// C.UTF-8		 "a:"			"a[0-9-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a:", pattern: "a[0-9-a]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		 "-"			"[-a]"		       0
+		XCTAssertMatchesFNMatch("-", pattern: "[-a]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[-b]"		       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[-b]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "-"			"[!-a]"		       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[!-a]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a"			"[!-b]"		       0
+		XCTAssertMatchesFNMatch("a", pattern: "[!-b]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[a-c-0-9]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[a-c-0-9]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[a-c-0-9]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[a-c-0-9]", flags: 0, result: 0)
+		// C.UTF-8		 "a:"			"a[0-9-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a:", pattern: "a[0-9-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a:"			"a[09-a]"	       0
 		XCTAssertMatchesFNMatch("a:", pattern: "a[09-a]", flags: 0, result: 0)
 	}
@@ -1676,24 +1668,22 @@ final class PatternFNMatchTests: XCTestCase {
 		XCTAssertMatchesFNMatch("//a", pattern: "/a", flags: PATHNAME, result: NOMATCH)
 		// C.UTF-8		"/a"			"//a"		       NOMATCH PATHNAME
 		XCTAssertMatchesFNMatch("/a", pattern: "//a", flags: PATHNAME, result: NOMATCH)
-		XCTExpectFailure {
-			// C.UTF-8		"az"			"[a-]z"		       0
-			XCTAssertMatchesFNMatch("az", pattern: "[a-]z", flags: 0, result: 0)
-			// C.UTF-8		"bz"			"[ab-]z"	       0
-			XCTAssertMatchesFNMatch("bz", pattern: "[ab-]z", flags: 0, result: 0)
-			// C.UTF-8		"cz"			"[ab-]z"	       NOMATCH
-			XCTAssertMatchesFNMatch("cz", pattern: "[ab-]z", flags: 0, result: NOMATCH)
-			// C.UTF-8		"-z"			"[ab-]z"	       0
-			XCTAssertMatchesFNMatch("-z", pattern: "[ab-]z", flags: 0, result: 0)
-			// C.UTF-8		"az"			"[-a]z"		       0
-			XCTAssertMatchesFNMatch("az", pattern: "[-a]z", flags: 0, result: 0)
-			// C.UTF-8		"bz"			"[-ab]z"	       0
-			XCTAssertMatchesFNMatch("bz", pattern: "[-ab]z", flags: 0, result: 0)
-			// C.UTF-8		"cz"			"[-ab]z"	       NOMATCH
-			XCTAssertMatchesFNMatch("cz", pattern: "[-ab]z", flags: 0, result: NOMATCH)
-			// C.UTF-8		"-z"			"[-ab]z"	       0
-			XCTAssertMatchesFNMatch("-z", pattern: "[-ab]z", flags: 0, result: 0)
-		}
+		// C.UTF-8		"az"			"[a-]z"		       0
+		XCTAssertMatchesFNMatch("az", pattern: "[a-]z", flags: 0, result: 0)
+		// C.UTF-8		"bz"			"[ab-]z"	       0
+		XCTAssertMatchesFNMatch("bz", pattern: "[ab-]z", flags: 0, result: 0)
+		// C.UTF-8		"cz"			"[ab-]z"	       NOMATCH
+		XCTAssertMatchesFNMatch("cz", pattern: "[ab-]z", flags: 0, result: NOMATCH)
+		// C.UTF-8		"-z"			"[ab-]z"	       0
+		XCTAssertMatchesFNMatch("-z", pattern: "[ab-]z", flags: 0, result: 0)
+		// C.UTF-8		"az"			"[-a]z"		       0
+		XCTAssertMatchesFNMatch("az", pattern: "[-a]z", flags: 0, result: 0)
+		// C.UTF-8		"bz"			"[-ab]z"	       0
+		XCTAssertMatchesFNMatch("bz", pattern: "[-ab]z", flags: 0, result: 0)
+		// C.UTF-8		"cz"			"[-ab]z"	       NOMATCH
+		XCTAssertMatchesFNMatch("cz", pattern: "[-ab]z", flags: 0, result: NOMATCH)
+		// C.UTF-8		"-z"			"[-ab]z"	       0
+		XCTAssertMatchesFNMatch("-z", pattern: "[-ab]z", flags: 0, result: 0)
 		// C.UTF-8		"\\"			"[\\\\-a]"	       0
 		XCTAssertMatchesFNMatch("\\", pattern: "[\\\\-a]", flags: 0, result: 0)
 		// C.UTF-8		"_"			"[\\\\-a]"	       0
@@ -1720,14 +1710,12 @@ final class PatternFNMatchTests: XCTestCase {
 		XCTAssertMatchesFNMatch("a", pattern: "[!\\\\-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		"-"			"[!\\\\-a]"	       0
 		XCTAssertMatchesFNMatch("-", pattern: "[!\\\\-a]", flags: 0, result: 0)
-		XCTExpectFailure {
-			// C.UTF-8		"!"			"[\\!-]"	       0
-			XCTAssertMatchesFNMatch("!", pattern: "[\\!-]", flags: 0, result: 0)
-			// C.UTF-8		"-"			"[\\!-]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[\\!-]", flags: 0, result: 0)
-			// C.UTF-8		"\\"			"[\\!-]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\\", pattern: "[\\!-]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		"!"			"[\\!-]"	       0
+		XCTAssertMatchesFNMatch("!", pattern: "[\\!-]", flags: 0, result: 0)
+		// C.UTF-8		"-"			"[\\!-]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[\\!-]", flags: 0, result: 0)
+		// C.UTF-8		"\\"			"[\\!-]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\\", pattern: "[\\!-]", flags: 0, result: NOMATCH)
 		// C.UTF-8		"Z"			"[Z-\\\\]"	       0
 		XCTAssertMatchesFNMatch("Z", pattern: "[Z-\\\\]", flags: 0, result: 0)
 		// C.UTF-8		"["			"[Z-\\\\]"	       0

@@ -40,6 +40,12 @@ final class PatternTests: XCTestCase {
 	func test_constant() throws {
 		try XCTAssertMatches("abc", pattern: "abc")
 	}
+	
+	func test_ranges() throws {
+		try XCTAssertMatches("b", pattern: "[a-c]")
+		try XCTAssertMatches("B", pattern: "[A-C]")
+		try XCTAssertDoesNotMatch("n", pattern: "[a-c]")
+	}
 
 	func test_multipleRanges() throws {
 		try XCTAssertMatches("b", pattern: "[a-cA-C]")
