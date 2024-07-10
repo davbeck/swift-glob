@@ -46,7 +46,7 @@ extension Pattern {
 		// matching at the beginning of a string is faster than iterating over the end of a string
 		// matching constant length components is faster than wildcards
 		// matching a component level wildcard is faster than a path level wildcard because it is more likely to find a limit
-		
+
 		// when matchLeadingDirectories is set, we can't match from the end
 
 		switch (components.first, components.last, options.matchLeadingDirectories) {
@@ -152,7 +152,7 @@ extension Pattern {
 			if options.matchLeadingDirectories && name.first == options.pathSeparator {
 				return true
 			}
-			
+
 			return name.isEmpty
 		}
 	}

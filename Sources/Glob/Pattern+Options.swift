@@ -1,5 +1,5 @@
-import Foundation
 import FNMDefinitions
+import Foundation
 
 public extension Pattern {
 	/// Options to control how patterns are parsed and matched
@@ -36,7 +36,7 @@ public extension Pattern {
 		///
 		/// Equivalent to `FNM_PERIOD`.
 		public var requiresExplicitLeadingPeriods: Bool = true
-		
+
 		/// If a pattern should match if it matches a parent directory, as defined by `pathSeparator`
 		///
 		/// Ignore a trailing sequence of characters starting with a `/' in string; that is to say, test whether string starts with a directory name that pattern matches. If this flag is set, either `foo*` or `foobar` as a pattern would match the string `foobar/frobozz`. Equivalent to `FNM_LEADING_DIR`.`
