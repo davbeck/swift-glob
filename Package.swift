@@ -21,9 +21,11 @@ let package = Package(
 	dependencies: [
 	],
 	targets: [
+        .target(name: "FNMDefinitions", dependencies: []),
 		.target(
 			name: "Glob",
 			dependencies: [
+				"FNMDefinitions"
 			],
 			swiftSettings: [
 				.enableExperimentalFeature("StrictConcurrency"),

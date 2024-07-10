@@ -1,4 +1,5 @@
 import XCTest
+import FNMDefinitions
 
 @testable import Glob
 
@@ -6,11 +7,7 @@ private let PATHNAME = FNM_PATHNAME
 private let PERIOD = FNM_PERIOD
 private let NOESCAPE = FNM_NOESCAPE
 private let NOMATCH = FNM_NOMATCH
-#if os(macOS) || os(iOS) || os(watchOS) || os(tvOS)
-	private let LEADING_DIR = FNM_LEADING_DIR
-#else
-	private let LEADING_DIR = (1 as Int32) << 29
-#endif
+private let LEADING_DIR = FNM_LEADING_DIR
 private let EXTMATCH = (1 as Int32) << 30 // FNM_EXTMATCH
 
 private func XCTAssertMatchesFNMatch(
@@ -1068,288 +1065,290 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  B.6 017(C) utf8
 	func test_b_6_017_c_utf8() throws {
+		// C.UTF-8		 "a"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[![:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[![:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "-"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a]a"			"[[:alnum:]]a"	       NOMATCH
+		XCTAssertMatchesFNMatch("a]a", pattern: "[[:alnum:]]a", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "-"			"[[:alnum:]-]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]-]", flags: 0, result: 0)
+		// C.UTF-8		 "aa"			"[[:alnum:]]a"	       0
+		XCTAssertMatchesFNMatch("aa", pattern: "[[:alnum:]]a", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[![:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[![:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "]"			"[!][:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("]", pattern: "[!][:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "["			"[![:alnum:][]"	       NOMATCH
+		XCTAssertMatchesFNMatch("[", pattern: "[![:alnum:][]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "d"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("d", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "e"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("e", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "f"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("f", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "g"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("g", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "h"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("h", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "i"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("i", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "j"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("j", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "k"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("k", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "l"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("l", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "m"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("m", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "n"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("n", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "o"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("o", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "p"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("p", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "q"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("q", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "r"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("r", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "s"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("s", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "t"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "u"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("u", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "v"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("v", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "w"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("w", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "x"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("x", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "y"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("y", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "z"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("z", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "A"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "B"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("B", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "C"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("C", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "D"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("D", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "E"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("E", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "F"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("F", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "G"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("G", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "H"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("H", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "I"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("I", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "J"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("J", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "K"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("K", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "L"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("L", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "M"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("M", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "N"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("N", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "O"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("O", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "P"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("P", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "Q"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("Q", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "R"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("R", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "S"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("S", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "T"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("T", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "U"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("U", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "V"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("V", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "W"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("W", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "X"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("X", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "Y"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("Y", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "Z"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "0"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("0", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "1"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("1", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "2"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("2", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "3"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("3", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "4"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("4", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "5"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("5", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "6"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("6", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "7"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("7", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "8"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("8", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "9"			"[[:alnum:]]"	       0
+		XCTAssertMatchesFNMatch("9", pattern: "[[:alnum:]]", flags: 0, result: 0)
+		// C.UTF-8		 "!"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("!", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "#"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("#", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "%"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("%", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "+"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("+", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 ","			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(",", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "-"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "."			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(".", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "/"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("/", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 ":"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(":", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 ";"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(";", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "="			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("=", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "@"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("@", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "["			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("[", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\\"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\\", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "]"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("]", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "^"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("^", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "_"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("_", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "{"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("{", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "}"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("}", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "~"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("~", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\""			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\"", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "$"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("$", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "&"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("&", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "'"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("'", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "("			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("(", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 ")"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(")", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "*"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("*", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "?"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("?", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "`"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("`", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "|"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("|", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "<"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("<", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 ">"			"[[:alnum:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch(">", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\t"			"[[:cntrl:]]"	       0
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:cntrl:]]", flags: 0, result: 0)
+		// C.UTF-8		 "t"			"[[:cntrl:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:cntrl:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "t"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// C.UTF-8		 "\t"			"[[:lower:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "T"			"[[:lower:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("T", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\t"			"[[:space:]]"	       0
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:space:]]", flags: 0, result: 0)
+		// C.UTF-8		 "t"			"[[:space:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:space:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "t"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// C.UTF-8		 "\t"			"[[:alpha:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:alpha:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "0"			"[[:digit:]]"	       0
+		XCTAssertMatchesFNMatch("0", pattern: "[[:digit:]]", flags: 0, result: 0)
+		// C.UTF-8		 "\t"			"[[:digit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "t"			"[[:digit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\t"			"[[:print:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:print:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "t"			"[[:print:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:print:]]", flags: 0, result: 0)
+		// C.UTF-8		 "T"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("T", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// C.UTF-8		 "\t"			"[[:upper:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "t"			"[[:upper:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\t"			"[[:blank:]]"	       0
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:blank:]]", flags: 0, result: 0)
+		// C.UTF-8		 "t"			"[[:blank:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:blank:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\t"			"[[:graph:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:graph:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "t"			"[[:graph:]]"	       0
+		XCTAssertMatchesFNMatch("t", pattern: "[[:graph:]]", flags: 0, result: 0)
+		// C.UTF-8		 "."			"[[:punct:]]"	       0
+		XCTAssertMatchesFNMatch(".", pattern: "[[:punct:]]", flags: 0, result: 0)
+		// C.UTF-8		 "t"			"[[:punct:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "\t"			"[[:punct:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "0"			"[[:xdigit:]]"	       0
+		XCTAssertMatchesFNMatch("0", pattern: "[[:xdigit:]]", flags: 0, result: 0)
+		// C.UTF-8		 "\t"			"[[:xdigit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("\t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a"			"[[:xdigit:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:xdigit:]]", flags: 0, result: 0)
+		// C.UTF-8		 "A"			"[[:xdigit:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:xdigit:]]", flags: 0, result: 0)
+		// C.UTF-8		 "t"			"[[:xdigit:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a"			"[[alpha]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[[alpha]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a"			"[[alpha:]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[[alpha:]]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "a]"			"[[alpha]]"	       0
+		XCTAssertMatchesFNMatch("a]", pattern: "[[alpha]]", flags: 0, result: 0)
+		// C.UTF-8		 "a]"			"[[alpha:]]"	       0
+		XCTAssertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[:alpha:][.b.]]"     0
 		XCTExpectFailure {
-			// C.UTF-8		 "a"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[![:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[![:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "-"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a]a"			"[[:alnum:]]a"	       NOMATCH
-			XCTAssertMatchesFNMatch("a]a", pattern: "[[:alnum:]]a", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "-"			"[[:alnum:]-]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]-]", flags: 0, result: 0)
-			// C.UTF-8		 "aa"			"[[:alnum:]]a"	       0
-			XCTAssertMatchesFNMatch("aa", pattern: "[[:alnum:]]a", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[![:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[![:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "]"			"[!][:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("]", pattern: "[!][:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "["			"[![:alnum:][]"	       NOMATCH
-			XCTAssertMatchesFNMatch("[", pattern: "[![:alnum:][]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "d"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("d", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "e"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("e", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "f"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("f", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "g"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("g", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "h"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("h", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "i"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("i", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "j"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("j", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "k"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("k", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "l"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("l", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "m"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("m", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "n"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("n", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "o"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("o", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "p"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("p", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "q"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("q", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "r"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("r", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "s"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("s", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "t"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "u"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("u", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "v"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("v", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "w"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("w", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "x"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("x", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "y"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("y", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "z"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("z", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "A"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "B"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("B", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "C"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("C", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "D"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("D", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "E"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("E", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "F"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("F", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "G"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("G", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "H"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("H", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "I"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("I", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "J"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("J", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "K"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("K", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "L"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("L", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "M"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("M", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "N"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("N", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "O"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("O", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "P"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("P", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "Q"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("Q", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "R"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("R", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "S"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("S", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "T"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("T", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "U"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("U", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "V"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("V", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "W"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("W", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "X"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("X", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "Y"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("Y", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "Z"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "0"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("0", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "1"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("1", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "2"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("2", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "3"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("3", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "4"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("4", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "5"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("5", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "6"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("6", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "7"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("7", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "8"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("8", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "9"			"[[:alnum:]]"	       0
-			XCTAssertMatchesFNMatch("9", pattern: "[[:alnum:]]", flags: 0, result: 0)
-			// C.UTF-8		 "!"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("!", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "#"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("#", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "%"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("%", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "+"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("+", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 ","			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(",", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "-"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("-", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "."			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(".", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "/"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("/", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 ":"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(":", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 ";"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(";", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "="			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("=", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "@"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("@", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "["			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("[", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\\"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\\", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "]"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("]", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "^"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("^", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "_"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("_", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "{"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("{", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "}"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("}", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "~"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("~", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\""			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\"", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "$"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("$", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "&"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("&", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "'"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("'", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "("			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("(", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 ")"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(")", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "*"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("*", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "?"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("?", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "`"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("`", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "|"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("|", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "<"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("<", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 ">"			"[[:alnum:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch(">", pattern: "[[:alnum:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\t"			"[[:cntrl:]]"	       0
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:cntrl:]]", flags: 0, result: 0)
-			// C.UTF-8		 "t"			"[[:cntrl:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:cntrl:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "t"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// C.UTF-8		 "\t"			"[[:lower:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "T"			"[[:lower:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("T", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\t"			"[[:space:]]"	       0
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:space:]]", flags: 0, result: 0)
-			// C.UTF-8		 "t"			"[[:space:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:space:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "t"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// C.UTF-8		 "\t"			"[[:alpha:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:alpha:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "0"			"[[:digit:]]"	       0
-			XCTAssertMatchesFNMatch("0", pattern: "[[:digit:]]", flags: 0, result: 0)
-			// C.UTF-8		 "\t"			"[[:digit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "t"			"[[:digit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:digit:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\t"			"[[:print:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:print:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "t"			"[[:print:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:print:]]", flags: 0, result: 0)
-			// C.UTF-8		 "T"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("T", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// C.UTF-8		 "\t"			"[[:upper:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "t"			"[[:upper:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\t"			"[[:blank:]]"	       0
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:blank:]]", flags: 0, result: 0)
-			// C.UTF-8		 "t"			"[[:blank:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:blank:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\t"			"[[:graph:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:graph:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "t"			"[[:graph:]]"	       0
-			XCTAssertMatchesFNMatch("t", pattern: "[[:graph:]]", flags: 0, result: 0)
-			// C.UTF-8		 "."			"[[:punct:]]"	       0
-			XCTAssertMatchesFNMatch(".", pattern: "[[:punct:]]", flags: 0, result: 0)
-			// C.UTF-8		 "t"			"[[:punct:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "\t"			"[[:punct:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:punct:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "0"			"[[:xdigit:]]"	       0
-			XCTAssertMatchesFNMatch("0", pattern: "[[:xdigit:]]", flags: 0, result: 0)
-			// C.UTF-8		 "\t"			"[[:xdigit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("\t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a"			"[[:xdigit:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:xdigit:]]", flags: 0, result: 0)
-			// C.UTF-8		 "A"			"[[:xdigit:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:xdigit:]]", flags: 0, result: 0)
-			// C.UTF-8		 "t"			"[[:xdigit:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("t", pattern: "[[:xdigit:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a"			"[[alpha]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[[alpha]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a"			"[[alpha:]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[[alpha:]]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "a]"			"[[alpha]]"	       0
-			XCTAssertMatchesFNMatch("a]", pattern: "[[alpha]]", flags: 0, result: 0)
-			// C.UTF-8		 "a]"			"[[alpha:]]"	       0
-			XCTAssertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[:alpha:][.b.]]"     0
 			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[:alpha:][=b=]]"     0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[:alpha:][:digit:]]" 0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[:digit:][:alpha:]]" 0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:digit:][:alpha:]]", flags: 0, result: 0)
 		}
+		// C.UTF-8		 "a"			"[[:alpha:][=b=]]"     0
+		XCTExpectFailure {
+			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
+		}
+		// C.UTF-8		 "a"			"[[:alpha:][:digit:]]" 0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[:digit:][:alpha:]]" 0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:digit:][:alpha:]]", flags: 0, result: 0)
 	}
 
 	//  B.6 018(C) utf8
@@ -2106,51 +2105,49 @@ final class PatternFNMatchTests: XCTestCase {
 
 	//  GNU extensions.
 	func test_gnu_extensions() throws {
-		XCTExpectFailure {
-			// C		 "x"			"x"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "x", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y"			"x"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "x", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y/z"		"x"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "x", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x"			"*"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "*", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y"			"*"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "*", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y/z"		"*"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "*", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x"			"*x"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "*x", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x"			"x"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "x", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y"			"x"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "x", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y/z"		"x"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "x", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x"			"*"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "*", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y"			"*"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "*", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y/z"		"*"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "*", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x"			"*x"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "*x", flags: PATHNAME | LEADING_DIR, result: 0)
 
-			// C		 "x/y"			"*x"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "*x", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y/z"		"*x"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "*x", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x"			"x*"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "x*", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y"			"x*"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "x*", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y/z"		"x*"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "x*", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x"			"a"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "a", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-			// C		 "x/y"			"a"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "a", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-			// C		 "x/y/z"		"a"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "a", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-			// C		 "x"			"x/y"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "x/y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-			// C		 "x/y"			"x/y"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "x/y", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x/y/z"		"x/y"		       0       PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "x/y", flags: PATHNAME | LEADING_DIR, result: 0)
-			// C		 "x"			"x?y"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x", pattern: "x?y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-			// C		 "x/y"			"x?y"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y", pattern: "x?y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-			// C		 "x/y/z"		"x?y"		       NOMATCH PATHNAME|LEADING_DIR
-			XCTAssertMatchesFNMatch("x/y/z", pattern: "x?y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
-		}
+		// C		 "x/y"			"*x"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "*x", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y/z"		"*x"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "*x", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x"			"x*"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "x*", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y"			"x*"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "x*", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y/z"		"x*"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "x*", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x"			"a"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "a", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
+		// C		 "x/y"			"a"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "a", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
+		// C		 "x/y/z"		"a"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "a", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
+		// C		 "x"			"x/y"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "x/y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
+		// C		 "x/y"			"x/y"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "x/y", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x/y/z"		"x/y"		       0       PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "x/y", flags: PATHNAME | LEADING_DIR, result: 0)
+		// C		 "x"			"x?y"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x", pattern: "x?y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
+		// C		 "x/y"			"x?y"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y", pattern: "x?y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
+		// C		 "x/y/z"		"x?y"		       NOMATCH PATHNAME|LEADING_DIR
+		XCTAssertMatchesFNMatch("x/y/z", pattern: "x?y", flags: PATHNAME | LEADING_DIR, result: NOMATCH)
 	}
 
 	//  Bug 14185

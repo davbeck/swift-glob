@@ -46,9 +46,11 @@ extension Pattern {
 		// matching at the beginning of a string is faster than iterating over the end of a string
 		// matching constant length components is faster than wildcards
 		// matching a component level wildcard is faster than a path level wildcard because it is more likely to find a limit
+		
+		// when matchLeadingDirectories is set, we can't match from the end
 
-		switch (components.first, components.last) {
-		case let (.constant(constant), _):
+		switch (components.first, components.last, options.matchLeadingDirectories) {
+		case let (.constant(constant), _, _):
 			if let remaining = name.dropPrefix(constant) {
 				return match(
 					components: components.dropFirst(),
@@ -58,7 +60,7 @@ extension Pattern {
 			} else {
 				return false
 			}
-		case (.singleCharacter, _):
+		case (.singleCharacter, _, _):
 			guard name.first != options.pathSeparator else { return false }
 			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
 				return false
@@ -69,7 +71,7 @@ extension Pattern {
 				name.dropFirst(),
 				isAtStart: false
 			)
-		case let (.oneOf(ranges, isNegated: isNegated), _):
+		case let (.oneOf(ranges, isNegated: isNegated), _, _):
 			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
 				// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
 				// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
@@ -83,7 +85,7 @@ extension Pattern {
 				name.dropFirst(),
 				isAtStart: next == options.pathSeparator
 			)
-		case let (_, .constant(constant)):
+		case let (_, .constant(constant), false):
 			if let remaining = name.dropSuffix(constant) {
 				return match(
 					components: components.dropLast(),
@@ -93,27 +95,27 @@ extension Pattern {
 			} else {
 				return false
 			}
-		case (_, .singleCharacter):
+		case (_, .singleCharacter, false):
 			guard name.last != options.pathSeparator else { return false }
 			return match(
 				components: components.dropLast(),
 				name.dropLast(),
 				isAtStart: isAtStart
 			)
-		case let (_, .oneOf(ranges, isNegated: isNegated)):
+		case let (_, .oneOf(ranges, isNegated: isNegated), false):
 			guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 			return match(
 				components: components.dropLast(),
 				name.dropLast(),
 				isAtStart: isAtStart
 			)
-		case (.componentWildcard, _):
+		case (.componentWildcard, _, _):
 			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
 				return false
 			}
 
 			if components.count == 1 {
-				if let pathSeparator = options.pathSeparator {
+				if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
 					// the last component is a component level wildcard, which matches anything except for the path separator
 					return !name.contains(pathSeparator)
 				} else {
@@ -128,13 +130,13 @@ extension Pattern {
 				let next = name.first
 				return match(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
 			}
-		case (_, .componentWildcard):
+		case (_, .componentWildcard, false):
 			if match(components: components.dropLast(), name, isAtStart: isAtStart) {
 				return true
 			} else {
 				return match(components: components, name.dropLast(), isAtStart: isAtStart)
 			}
-		case (.pathWildcard, _):
+		case (.pathWildcard, _, _):
 			if components.count == 1 {
 				// the last component is a path level wildcard, which matches anything
 				return true
@@ -146,7 +148,11 @@ extension Pattern {
 				let next = name.first
 				return match(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
 			}
-		case (.none, _):
+		case (.none, _, _):
+			if options.matchLeadingDirectories && name.first == options.pathSeparator {
+				return true
+			}
+			
 			return name.isEmpty
 		}
 	}

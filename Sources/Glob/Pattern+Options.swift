@@ -1,4 +1,5 @@
 import Foundation
+import FNMDefinitions
 
 public extension Pattern {
 	/// Options to control how patterns are parsed and matched
@@ -35,6 +36,13 @@ public extension Pattern {
 		///
 		/// Equivalent to `FNM_PERIOD`.
 		public var requiresExplicitLeadingPeriods: Bool = true
+		
+		/// If a pattern should match if it matches a parent directory, as defined by `pathSeparator`
+		///
+		/// Ignore a trailing sequence of characters starting with a `/' in string; that is to say, test whether string starts with a directory name that pattern matches. If this flag is set, either `foo*` or `foobar` as a pattern would match the string `foobar/frobozz`. Equivalent to `FNM_LEADING_DIR`.`
+		///
+		/// If `pathSeparator` is `nil` this has no effect.
+		public var matchLeadingDirectories: Bool = false
 
 		/// The character used to specify when a range matches characters that aren't in the range.
 		public var rangeNegationCharacter: Character = "!"
@@ -83,13 +91,15 @@ public extension Pattern {
 		public static func fnmatch(
 			usePathnameBehavior: Bool = false,
 			allowEscapedCharacters: Bool = true,
-			requiresExplicitLeadingPeriods: Bool = false
+			requiresExplicitLeadingPeriods: Bool = false,
+			matchLeadingDirectories: Bool = false
 		) -> Self {
 			Options(
 				allowsPathLevelWildcards: false,
 				emptyRangeBehavior: .treatClosingBracketAsCharacter,
 				allowEscapedCharacters: allowEscapedCharacters,
 				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
+				matchLeadingDirectories: matchLeadingDirectories,
 				pathSeparator: usePathnameBehavior ? "/" : nil
 			)
 		}
@@ -98,7 +108,8 @@ public extension Pattern {
 			.fnmatch(
 				usePathnameBehavior: (flags & FNM_PATHNAME) != 0,
 				allowEscapedCharacters: (flags & FNM_NOESCAPE) == 0,
-				requiresExplicitLeadingPeriods: (flags & FNM_PERIOD) != 0
+				requiresExplicitLeadingPeriods: (flags & FNM_PERIOD) != 0,
+				matchLeadingDirectories: (flags & FNM_LEADING_DIR) != 0
 			)
 		}
 	}
