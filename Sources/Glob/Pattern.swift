@@ -119,7 +119,7 @@ public struct Pattern: Equatable, Sendable {
 	public var sections: [Section]
 	/// Options used for parsing and matching
 	public var options: Options
-	
+
 	init(sections: [Section], options: Options) {
 		self.sections = sections
 		self.options = options
