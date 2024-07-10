@@ -3,7 +3,7 @@ import Foundation
 
 public extension Pattern {
 	/// Options to control how patterns are parsed and matched
-	struct Options: Sendable {
+	struct Options: Equatable, Sendable {
 		/// If a double star/asterisk causes the pattern to match path separators.
 		///
 		/// If `pathSeparator` is `nil` this has no effect.
