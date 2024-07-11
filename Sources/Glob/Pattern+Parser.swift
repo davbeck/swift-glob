@@ -16,7 +16,13 @@ extension Pattern {
 			case dash // -
 			case asterisk // *
 			case colon // :
-			
+			case leftParen // (
+			case rightParen // )
+			case verticalLine // |
+			case at // @
+			case plus // +
+			case exclamationMark // !
+
 			init(_ character: Character) {
 				switch character {
 				case "]":
@@ -31,6 +37,18 @@ extension Pattern {
 					self = .asterisk
 				case ":":
 					self = .colon
+				case "(":
+					self = .leftParen
+				case ")":
+					self = .rightParen
+				case "|":
+					self = .verticalLine
+				case "@":
+					self = .at
+				case "+":
+					self = .plus
+				case "!":
+					self = .exclamationMark
 				default:
 					self = .character(character)
 				}
@@ -52,6 +70,18 @@ extension Pattern {
 					"*"
 				case .colon:
 					":"
+				case .leftParen:
+					"("
+				case .rightParen:
+					")"
+				case .verticalLine:
+					"|"
+				case .at:
+					"@"
+				case .plus:
+					"+"
+				case .exclamationMark:
+					"!"
 				}
 			}
 		}
@@ -79,9 +109,9 @@ extension Pattern {
 
 			return nil
 		}
-		
+
 		mutating func pop(_ token: Token) throws -> Bool {
-			try pop({ $0 == token }) != nil
+			try pop { $0 == token } != nil
 		}
 
 		mutating func parse() throws -> Pattern {
@@ -99,13 +129,15 @@ extension Pattern {
 			}
 		}
 
-		private mutating func parseSections(delimeters: some Collection<Character> = EmptyCollection()) throws -> [Section] {
+		private mutating func parseSections(delimeters: some Collection<Token> = EmptyCollection()) throws -> [Section] {
 			var sections: [Section] = []
 
-			while let next = try pop() {
+			while let next = try pop({ !delimeters.contains($0) }) {
 				switch next {
 				case .asterisk:
-					if sections.last == .componentWildcard {
+					if options.useExtendedMatching, let sectionList = try parsePatternList() {
+						sections.append(.patternList(.zeroOrMore, sectionList))
+					} else if sections.last == .componentWildcard {
 						if options.allowsPathLevelWildcards {
 							sections[sections.endIndex - 1] = .pathWildcard
 						} else {
@@ -117,7 +149,29 @@ extension Pattern {
 						sections.append(.componentWildcard)
 					}
 				case .questionMark:
-					sections.append(.singleCharacter)
+					if options.useExtendedMatching, let sectionList = try parsePatternList() {
+						sections.append(.patternList(.zeroOrOne, sectionList))
+					} else {
+						sections.append(.singleCharacter)
+					}
+				case .at:
+					if options.useExtendedMatching, let sectionsList = try parsePatternList() {
+						sections.append(.patternList(.one, sectionsList))
+					} else {
+						sections.append(constant: next.character)
+					}
+				case .plus:
+					if options.useExtendedMatching, let sectionsList = try parsePatternList() {
+						sections.append(.patternList(.oneOrMore, sectionsList))
+					} else {
+						sections.append(constant: next.character)
+					}
+				case .exclamationMark:
+					if options.useExtendedMatching, let sectionsList = try parsePatternList() {
+						sections.append(.patternList(.negated, sectionsList))
+					} else {
+						sections.append(constant: next.character)
+					}
 				case .leftSquareBracket:
 					let negated: Bool
 					if pattern.first == options.rangeNegationCharacter {
@@ -139,7 +193,7 @@ extension Pattern {
 						guard let next = try pop() else {
 							throw PatternParsingError.rangeNotClosed
 						}
-						
+
 						switch next {
 						case .righSquareBracket:
 							break loop
@@ -183,7 +237,7 @@ extension Pattern {
 									// One may include '-' in its literal meaning by making it the first or last character between the brackets.
 									ranges.append(.character(next.character))
 									ranges.append(.character("-"))
-									
+
 									break loop
 								} else {
 									// this is a range like a-z, find the upper limit of the range
@@ -211,12 +265,44 @@ extension Pattern {
 					sections.append(.oneOf(ranges, isNegated: negated))
 				case let .character(character):
 					sections.append(constant: character)
-				case .righSquareBracket, .dash, .colon:
+				case .righSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine:
 					sections.append(constant: next.character)
 				}
 			}
 
 			return sections
+		}
+
+		/// Parses a pattern list like `(abc|xyz)`
+		mutating func parsePatternList() throws -> [[Section]]? {
+			if options.useExtendedMatching, try pop(.leftParen) {
+				// start of pattern list
+				var sectionsList: [[Section]] = []
+
+				loop: while !pattern.isEmpty {
+					let subSections = try self.parseSections(delimeters: [.verticalLine, .rightParen])
+					guard !subSections.isEmpty else { throw PatternParsingError.emptyPatternList }
+
+					sectionsList.append(subSections)
+
+					switch try pop() {
+					case .verticalLine:
+						continue
+					case .rightParen:
+						break loop
+					default:
+						throw PatternParsingError.patternListNotClosed
+					}
+				}
+				
+				guard !sectionsList.isEmpty else {
+					throw PatternParsingError.emptyPatternList
+				}
+
+				return sectionsList
+			} else {
+				return nil
+			}
 		}
 	}
 }

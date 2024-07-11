@@ -21,15 +21,54 @@ public struct Pattern: Equatable, Sendable {
 		/// A range may be a single character (ie "a"..."a"). For instance the pattern [abc] will create 3 ranges that are each a single character.
 		case oneOf([CharacterClass], isNegated: Bool)
 
+		public enum PatternListStyle: Equatable, Sendable {
+			case zeroOrOne
+			case zeroOrMore
+			case oneOrMore
+			case one
+			case negated
+			
+			var allowsZero: Bool {
+				switch self {
+				case .zeroOrOne, .zeroOrMore, .negated:
+					true
+				case .oneOrMore, .one:
+					false
+				}
+			}
+			
+			var allowsMultiple: Bool {
+				switch self {
+				case .oneOrMore, .zeroOrMore:
+					true
+				case .zeroOrOne, .one, .negated:
+					false
+				}
+			}
+		}
+
+		case patternList(_ style: PatternListStyle, _ sections: [[Section]])
+
 		/// If the section can match a variable length of characters
 		///
 		/// When false, the section represents a fixed length match.
-		public var isWildcard: Bool {
+		public var matchesEmptyContent: Bool {
 			switch self {
 			case .constant, .singleCharacter, .oneOf:
 				false
 			case .componentWildcard, .pathWildcard:
 				true
+			case let .patternList(style, subSections):
+				switch style {
+				case .negated, .zeroOrOne, .zeroOrMore:
+					true
+				case .one, .oneOrMore:
+					subSections.contains(where: { subSection in
+						subSection.allSatisfy { section in
+							section.matchesEmptyContent
+						}
+					})
+				}
 			}
 		}
 	}

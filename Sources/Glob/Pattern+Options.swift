@@ -44,6 +44,22 @@ public extension Pattern {
 		/// If `pathSeparator` is `nil` this has no effect.
 		public var matchLeadingDirectories: Bool = false
 
+		/// Recognize beside the normal patterns also the extended patterns introduced in `ksh`.
+		///
+		/// The patterns are written in the form explained in the following table where pattern-list is a | separated list of patterns.
+		///
+		/// - ?(pattern-list)
+		/// 	The pattern matches if zero or one occurences of any of the patterns in the pattern-list allow matching the input string.
+		/// - *(pattern-list)
+		/// 	The pattern matches if zero or more occurences of any of the patterns in the pattern-list allow matching the input string.
+		/// - +(pattern-list)
+		/// 	The pattern matches if one or more occurences of any of the patterns in the pattern-list allow matching the input string.
+		/// - @(pattern-list)
+		/// 	The pattern matches if exactly one occurence of any of the patterns in the pattern-list allows matching the input string.
+		/// - !(pattern-list)
+		/// 	The pattern matches if the input string cannot be matched with any of the patterns in the pattern-list.
+		public var useExtendedMatching: Bool = false
+
 		/// The character used to specify when a range matches characters that aren't in the range.
 		public var rangeNegationCharacter: Character = "!"
 
@@ -92,7 +108,8 @@ public extension Pattern {
 			usePathnameBehavior: Bool = false,
 			allowEscapedCharacters: Bool = true,
 			requiresExplicitLeadingPeriods: Bool = false,
-			matchLeadingDirectories: Bool = false
+			matchLeadingDirectories: Bool = false,
+			useExtendedMatching: Bool = false
 		) -> Self {
 			Options(
 				allowsPathLevelWildcards: false,
@@ -100,6 +117,7 @@ public extension Pattern {
 				allowEscapedCharacters: allowEscapedCharacters,
 				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
 				matchLeadingDirectories: matchLeadingDirectories,
+				useExtendedMatching: useExtendedMatching,
 				pathSeparator: usePathnameBehavior ? "/" : nil
 			)
 		}
@@ -109,7 +127,8 @@ public extension Pattern {
 				usePathnameBehavior: (flags & FNM_PATHNAME) != 0,
 				allowEscapedCharacters: (flags & FNM_NOESCAPE) == 0,
 				requiresExplicitLeadingPeriods: (flags & FNM_PERIOD) != 0,
-				matchLeadingDirectories: (flags & FNM_LEADING_DIR) != 0
+				matchLeadingDirectories: (flags & FNM_LEADING_DIR) != 0,
+				useExtendedMatching: (flags & FNM_EXTMATCH) != 0
 			)
 		}
 	}
