@@ -1747,17 +1747,17 @@ final class PatternFNMatchTests: XCTestCase {
 			XCTAssertMatchesFNMatch("\u{d6}", pattern: "[A-Z]", flags: 0, result: 0)
 			// de_DE.ISO-8859-1 "\334"			"[A-Z]"		       0
 			XCTAssertMatchesFNMatch("\u{dc}", pattern: "[A-Z]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "a"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "z"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("z", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\366"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("\u{f6}", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\374"			"[[:lower:]]"	       0
-			XCTAssertMatchesFNMatch("\u{fc}", pattern: "[[:lower:]]", flags: 0, result: 0)
 		}
+		// de_DE.ISO-8859-1 "a"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "z"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("z", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\366"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("\u{f6}", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\374"			"[[:lower:]]"	       0
+		XCTAssertMatchesFNMatch("\u{fc}", pattern: "[[:lower:]]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "A"			"[[:lower:]]"	       NOMATCH
 		XCTAssertMatchesFNMatch("A", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
 		// de_DE.ISO-8859-1 "Z"			"[[:lower:]]"	       NOMATCH
@@ -1778,38 +1778,38 @@ final class PatternFNMatchTests: XCTestCase {
 		XCTAssertMatchesFNMatch("\u{f6}", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
 		// de_DE.ISO-8859-1 "\374"			"[[:upper:]]"	       NOMATCH
 		XCTAssertMatchesFNMatch("\u{fc}", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
-		XCTExpectFailure {
-			// de_DE.ISO-8859-1 "A"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "Z"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\304"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("\u{c4}", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\326"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("\u{d6}", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\334"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("\u{dc}", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "a"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "z"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("z", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\366"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("\u{f6}", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\374"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("\u{fc}", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "A"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "Z"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\304"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("\u{c4}", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\326"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("\u{d6}", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\334"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("\u{dc}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "A"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "Z"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\304"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("\u{c4}", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\326"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("\u{d6}", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\334"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("\u{dc}", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "a"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "z"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("z", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\366"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("\u{f6}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\374"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("\u{fc}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "A"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "Z"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\304"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("\u{c4}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\326"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("\u{d6}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\334"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("\u{dc}", pattern: "[[:alpha:]]", flags: 0, result: 0)
 
+		XCTExpectFailure {
 			// de_DE.ISO-8859-1 "a"			"[[=a=]b]"	       0
 			XCTAssertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
 			// de_DE.ISO-8859-1 "\342"			"[[=a=]b]"	       0
@@ -1984,38 +1984,38 @@ final class PatternFNMatchTests: XCTestCase {
 		XCTAssertMatchesFNMatch("ö", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
 		// de_DE.UTF-8	 "ü"			"[[:upper:]]"	       NOMATCH
 		XCTAssertMatchesFNMatch("ü", pattern: "[[:upper:]]", flags: 0, result: NOMATCH)
-		XCTExpectFailure {
-			// de_DE.UTF-8	 "A"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Z"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ä"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("Ä", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ö"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("Ö", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ü"			"[[:upper:]]"	       0
-			XCTAssertMatchesFNMatch("Ü", pattern: "[[:upper:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "a"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "z"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("z", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("ä", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ö"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("ö", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ü"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("ü", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "A"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("A", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Z"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("Z", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ä"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("Ä", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ö"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("Ö", pattern: "[[:alpha:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ü"			"[[:alpha:]]"	       0
-			XCTAssertMatchesFNMatch("Ü", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "A"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Z"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ä"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("Ä", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ö"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("Ö", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ü"			"[[:upper:]]"	       0
+		XCTAssertMatchesFNMatch("Ü", pattern: "[[:upper:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "a"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "z"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("z", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("ä", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ö"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("ö", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ü"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("ü", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "A"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("A", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Z"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("Z", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ä"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("Ä", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ö"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("Ö", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ü"			"[[:alpha:]]"	       0
+		XCTAssertMatchesFNMatch("Ü", pattern: "[[:alpha:]]", flags: 0, result: 0)
 
+		XCTExpectFailure {
 			// de_DE.UTF-8	 "a"			"[[=a=]b]"	       0
 			XCTAssertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
 			// de_DE.UTF-8	 "â"			"[[=a=]b]"	       0
