@@ -2486,9 +2486,7 @@ final class PatternFNMatchTests: XCTestCase {
 			XCTAssertMatchesFNMatch("abcd", pattern: "*!(|a)cd", flags: EXTMATCH, result: 0)
 		}
 		// C		"ab/.a"			"+([abc])/*"	       NOMATCH EXTMATCH|PATHNAME|PERIOD
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("ab/.a", pattern: "+([abc])/*", flags: EXTMATCH | PATHNAME | PERIOD, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("ab/.a", pattern: "+([abc])/*", flags: EXTMATCH | PATHNAME | PERIOD, result: NOMATCH)
 		// C		""			""		       0
 		XCTAssertMatchesFNMatch("", pattern: "", flags: 0, result: 0)
 		// C		""			""		       0       EXTMATCH

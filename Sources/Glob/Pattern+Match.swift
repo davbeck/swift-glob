@@ -25,14 +25,13 @@ extension Pattern {
 	/// - Parameter name: The string to match against
 	/// - Returns: true if the string matches the pattern
 	public func match(_ name: some StringProtocol) -> Bool {
-		match(components: .init(sections), .init(name), isAtStart: true)
+		match(components: .init(sections), .init(name))
 	}
 
 	// recursively matches against the pattern
 	private func match(
 		components: ArraySlice<Section>,
-		_ name: Substring,
-		isAtStart: Bool
+		_ name: Substring
 	) -> Bool {
 		if name.isEmpty {
 			if components.isEmpty || components.allSatisfy(\.matchesEmptyContent) {
@@ -54,25 +53,23 @@ extension Pattern {
 			if let remaining = name.dropPrefix(constant) {
 				return match(
 					components: components.dropFirst(),
-					remaining,
-					isAtStart: constant.last == options.pathSeparator
+					remaining
 				)
 			} else {
 				return false
 			}
 		case (.singleCharacter, _, _):
 			guard name.first != options.pathSeparator else { return false }
-			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+			if options.requiresExplicitLeadingPeriods && isAtStart(name) && name.first == "." {
 				return false
 			}
 
 			return match(
 				components: components.dropFirst(),
-				name.dropFirst(),
-				isAtStart: false
+				name.dropFirst()
 			)
 		case let (.oneOf(ranges, isNegated: isNegated), _, _):
-			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+			if options.requiresExplicitLeadingPeriods && isAtStart(name) && name.first == "." {
 				// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
 				// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
 				// in our implimentation, it will not match
@@ -82,15 +79,13 @@ extension Pattern {
 			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 			return match(
 				components: components.dropFirst(),
-				name.dropFirst(),
-				isAtStart: next == options.pathSeparator
+				name.dropFirst()
 			)
 		case let (_, .constant(constant), false):
 			if let remaining = name.dropSuffix(constant) {
 				return match(
 					components: components.dropLast(),
-					remaining,
-					isAtStart: isAtStart
+					remaining
 				)
 			} else {
 				return false
@@ -99,18 +94,16 @@ extension Pattern {
 			guard name.last != options.pathSeparator else { return false }
 			return match(
 				components: components.dropLast(),
-				name.dropLast(),
-				isAtStart: isAtStart
+				name.dropLast()
 			)
 		case let (_, .oneOf(ranges, isNegated: isNegated), false):
 			guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 			return match(
 				components: components.dropLast(),
-				name.dropLast(),
-				isAtStart: isAtStart
+				name.dropLast()
 			)
 		case (.componentWildcard, _, _):
-			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+			if options.requiresExplicitLeadingPeriods && isAtStart(name) && name.first == "." {
 				return false
 			}
 
@@ -124,17 +117,16 @@ extension Pattern {
 				}
 			}
 
-			if match(components: components.dropFirst(), name, isAtStart: isAtStart) {
+			if match(components: components.dropFirst(), name) {
 				return true
 			} else {
-				let next = name.first
-				return match(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
+				return match(components: components, name.dropFirst())
 			}
 		case (_, .componentWildcard, false):
-			if match(components: components.dropLast(), name, isAtStart: isAtStart) {
+			if match(components: components.dropLast(), name) {
 				return true
 			} else {
-				return match(components: components, name.dropLast(), isAtStart: isAtStart)
+				return match(components: components, name.dropLast())
 			}
 		case (.pathWildcard, _, _):
 			if components.count == 1 {
@@ -142,14 +134,13 @@ extension Pattern {
 				return true
 			}
 
-			if match(components: components.dropFirst(), name, isAtStart: isAtStart) {
+			if match(components: components.dropFirst(), name) {
 				return true
 			} else {
-				let next = name.first
-				return match(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
+				return match(components: components, name.dropFirst())
 			}
 		case (.patternList, _, _):
-			return matchPrefix(components: components, name, isAtStart: isAtStart)?.isEmpty == true
+			return matchPrefix(components: components, name)?.isEmpty == true
 		case (.none, _, _):
 			if options.matchLeadingDirectories && name.first == options.pathSeparator {
 				return true
@@ -162,12 +153,11 @@ extension Pattern {
 	/// Matches the beginning of the string and returns the rest. If a match cannot be made, returns nil.
 	private func matchPrefix(
 		components: ArraySlice<Section>,
-		_ name: Substring,
-		isAtStart: Bool
+		_ name: Substring
 	) -> Substring? {
 		if name.isEmpty {
 			if components.isEmpty || components.allSatisfy(\.matchesEmptyContent) {
-				return ""
+				return name.dropAll()
 			} else {
 				return nil
 			}
@@ -178,25 +168,23 @@ extension Pattern {
 			if let remaining = name.dropPrefix(constant) {
 				return matchPrefix(
 					components: components.dropFirst(),
-					remaining,
-					isAtStart: constant.last == options.pathSeparator
+					remaining
 				)
 			} else {
 				return nil
 			}
 		case .singleCharacter:
 			guard name.first != options.pathSeparator else { return nil }
-			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+			if options.requiresExplicitLeadingPeriods && isAtStart(name) {
 				return nil
 			}
 
 			return matchPrefix(
 				components: components.dropFirst(),
-				name.dropFirst(),
-				isAtStart: false
+				name.dropFirst()
 			)
 		case let .oneOf(ranges, isNegated: isNegated):
-			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+			if options.requiresExplicitLeadingPeriods && isAtStart(name) {
 				// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
 				// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
 				// in our implimentation, it will not match
@@ -206,11 +194,10 @@ extension Pattern {
 			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return nil }
 			return matchPrefix(
 				components: components.dropFirst(),
-				name.dropFirst(),
-				isAtStart: next == options.pathSeparator
+				name.dropFirst()
 			)
 		case .componentWildcard:
-			if options.requiresExplicitLeadingPeriods && isAtStart && name.first == "." {
+			if options.requiresExplicitLeadingPeriods && isAtStart(name){
 				return nil
 			}
 
@@ -220,38 +207,35 @@ extension Pattern {
 					if let index = name.firstIndex(of: pathSeparator) {
 						return name.suffix(from: index)
 					} else {
-						return ""
+						return name.dropAll()
 					}
 				} else {
 					// no special treatment for path separators
-					return ""
+					return name.dropAll()
 				}
 			}
 
-			if let remaining = matchPrefix(components: components.dropFirst(), name, isAtStart: isAtStart) {
+			if let remaining = matchPrefix(components: components.dropFirst(), name) {
 				return remaining
 			} else {
-				let next = name.first
-				return matchPrefix(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
+				return matchPrefix(components: components, name.dropFirst())
 			}
 		case .pathWildcard:
 			if components.count == 1 {
 				// the last component is a path level wildcard, which matches anything
-				return ""
+				return name.dropAll()
 			}
 
-			if let remaining = matchPrefix(components: components.dropFirst(), name, isAtStart: isAtStart) {
+			if let remaining = matchPrefix(components: components.dropFirst(), name) {
 				return remaining
 			} else {
-				let next = name.first
-				return matchPrefix(components: components, name.dropFirst(), isAtStart: next == options.pathSeparator)
+				return matchPrefix(components: components, name.dropFirst())
 			}
 		case let .patternList(style, subSections):
 			for sectionsOption in subSections {
 				if let remaining = matchPrefix(
 					components: ArraySlice(sectionsOption + components.dropFirst()),
-					name,
-					isAtStart: isAtStart
+					name
 				) {
 					// stop infinite recursion
 					guard remaining != name else { return remaining }
@@ -263,8 +247,7 @@ extension Pattern {
 						// switch to zeroOrMore since we've already fulfilled the "one" requirement
 						return matchPrefix(
 							components: [.patternList(.zeroOrMore, subSections)] + components.dropFirst(),
-							remaining,
-							isAtStart: remaining.previous() == options.pathSeparator
+							remaining
 						)
 					case .one, .zeroOrOne:
 						// already matched "one", can't match any more
@@ -274,13 +257,17 @@ extension Pattern {
 			}
 
 			if style.allowsZero {
-				return matchPrefix(components: components.dropFirst(), name, isAtStart: isAtStart)
+				return matchPrefix(components: components.dropFirst(), name)
 			} else {
 				return nil
 			}
 		case .none:
 			return name
 		}
+	}
+	
+	private func isAtStart(_ name: Substring) -> Bool {
+		name.startIndex == name.base.startIndex || name.previous() == options.pathSeparator
 	}
 }
 
@@ -291,5 +278,10 @@ private extension Substring {
 		let index = base.index(before: startIndex)
 
 		return base[index]
+	}
+	
+	/// returns an empty substring preserving endIndex
+	func dropAll() -> Substring {
+		return self.suffix(0)
 	}
 }
