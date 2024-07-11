@@ -8,26 +8,80 @@ extension Pattern {
 			self.options = options
 		}
 
-		mutating func getNext(_ condition: ((character: Character, isEscaped: Bool)) -> Bool = { _ in true }) throws -> (character: Character, isEscaped: Bool)? {
+		enum Token: Equatable {
+			case character(Character)
+			case leftSquareBracket // [
+			case righSquareBracket // ]
+			case questionMark // ?
+			case dash // -
+			case asterisk // *
+			case colon // :
+			
+			init(_ character: Character) {
+				switch character {
+				case "]":
+					self = .righSquareBracket
+				case "[":
+					self = .leftSquareBracket
+				case "?":
+					self = .questionMark
+				case "-":
+					self = .dash
+				case "*":
+					self = .asterisk
+				case ":":
+					self = .colon
+				default:
+					self = .character(character)
+				}
+			}
+
+			var character: Character {
+				switch self {
+				case let .character(character):
+					character
+				case .leftSquareBracket:
+					"["
+				case .righSquareBracket:
+					"]"
+				case .questionMark:
+					"?"
+				case .dash:
+					"-"
+				case .asterisk:
+					"*"
+				case .colon:
+					":"
+				}
+			}
+		}
+
+		mutating func pop(_ condition: (Token) -> Bool = { _ in true }) throws -> Token? {
 			if let next = pattern.first {
 				let updatedPattern = pattern.dropFirst()
 
 				if options.allowEscapedCharacters, next == .escape {
 					guard let escaped = updatedPattern.first else { throw PatternParsingError.invalidEscapeCharacter }
 
-					guard condition((escaped, true)) else { return nil }
+					guard condition(.character(escaped)) else { return nil }
 
 					pattern = updatedPattern.dropFirst()
-					return (escaped, true)
+					return .character(escaped)
 				} else {
-					guard condition((next, false)) else { return nil }
+					let token = Token(next)
+
+					guard condition(token) else { return nil }
 
 					pattern = updatedPattern
-					return (next, false)
+					return token
 				}
 			}
 
 			return nil
+		}
+		
+		mutating func pop(_ token: Token) throws -> Bool {
+			try pop({ $0 == token }) != nil
 		}
 
 		mutating func parse() throws -> Pattern {
@@ -48,9 +102,9 @@ extension Pattern {
 		private mutating func parseSections(delimeters: some Collection<Character> = EmptyCollection()) throws -> [Section] {
 			var sections: [Section] = []
 
-			while let next = try getNext() {
+			while let next = try pop() {
 				switch next {
-				case ("*", false):
+				case .asterisk:
 					if sections.last == .componentWildcard {
 						if options.allowsPathLevelWildcards {
 							sections[sections.endIndex - 1] = .pathWildcard
@@ -62,9 +116,9 @@ extension Pattern {
 					} else {
 						sections.append(.componentWildcard)
 					}
-				case ("?", false):
+				case .questionMark:
 					sections.append(.singleCharacter)
-				case ("[", false):
+				case .leftSquareBracket:
 					let negated: Bool
 					if pattern.first == options.rangeNegationCharacter {
 						negated = true
@@ -75,15 +129,22 @@ extension Pattern {
 
 					var ranges: [CharacterClass] = []
 
-					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, let closing = try getNext({ !$0.isEscaped && $0.character == "]" }) {
+					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.righSquareBracket) {
 						// https://man7.org/linux/man-pages/man7/glob.7.html
 						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
-						ranges.append(.character(closing.character))
+						ranges.append(.character("]"))
 					}
 
-					while let next = try getNext({ $0.isEscaped || $0.character != "]" }) {
-						if !next.isEscaped && next.character == "[" {
-							if try getNext({ !$0.isEscaped && $0.character == ":" }) != nil {
+					loop: while true {
+						guard let next = try pop() else {
+							throw PatternParsingError.rangeNotClosed
+						}
+						
+						switch next {
+						case .righSquareBracket:
+							break loop
+						case .leftSquareBracket:
+							if try pop(.colon) {
 								// Named character classes
 								guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
 
@@ -93,7 +154,7 @@ extension Pattern {
 									ranges.append(.named(name))
 									pattern = pattern[endIndex...].dropFirst()
 
-									if try getNext({ !$0.isEscaped && $0.character == "]" }) == nil {
+									if try !pop(.righSquareBracket) {
 										throw PatternParsingError.rangeNotClosed
 									}
 								} else {
@@ -102,7 +163,7 @@ extension Pattern {
 							} else {
 								ranges.append(.character("["))
 							}
-						} else if !next.isEscaped && next.character == "-" {
+						case .dash:
 							if !options.allowsRangeSeparatorInCharacterClasses {
 								throw PatternParsingError.rangeMissingBounds
 							}
@@ -110,9 +171,9 @@ extension Pattern {
 							// https://man7.org/linux/man-pages/man7/glob.7.html
 							// One may include '-' in its literal meaning by making it the first or last character between the brackets.
 							ranges.append(.character("-"))
-						} else {
-							if try getNext({ !$0.isEscaped && $0.character == "-" }) != nil {
-								if pattern.first == "]" {
+						default:
+							if try pop(.dash) {
+								if try pop(.righSquareBracket) {
 									if !options.allowsRangeSeparatorInCharacterClasses {
 										throw PatternParsingError.rangeNotClosed
 									}
@@ -122,10 +183,12 @@ extension Pattern {
 									// One may include '-' in its literal meaning by making it the first or last character between the brackets.
 									ranges.append(.character(next.character))
 									ranges.append(.character("-"))
+									
+									break loop
 								} else {
 									// this is a range like a-z, find the upper limit of the range
 									guard
-										let upper = try getNext()
+										let upper = try pop()
 									else { throw PatternParsingError.rangeNotClosed }
 
 									guard next.character <= upper.character else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
@@ -137,8 +200,6 @@ extension Pattern {
 						}
 					}
 
-					guard try getNext({ !$0.isEscaped && $0.character == "]" }) != nil else { throw PatternParsingError.rangeNotClosed }
-
 					guard !ranges.isEmpty else {
 						if options.emptyRangeBehavior == .error {
 							throw PatternParsingError.rangeIsEmpty
@@ -148,16 +209,24 @@ extension Pattern {
 					}
 
 					sections.append(.oneOf(ranges, isNegated: negated))
-				default:
-					if case let .constant(value) = sections.last {
-						sections[sections.endIndex - 1] = .constant(value + String(next.character))
-					} else {
-						sections.append(.constant(String(next.character)))
-					}
+				case let .character(character):
+					sections.append(constant: character)
+				case .righSquareBracket, .dash, .colon:
+					sections.append(constant: next.character)
 				}
 			}
 
 			return sections
+		}
+	}
+}
+
+private extension [Pattern.Section] {
+	mutating func append(constant character: Character) {
+		if case let .constant(value) = self.last {
+			self[self.endIndex - 1] = .constant(value + String(character))
+		} else {
+			self.append(.constant(String(character)))
 		}
 	}
 }
