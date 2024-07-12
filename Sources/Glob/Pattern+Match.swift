@@ -139,8 +139,15 @@ extension Pattern {
 			} else {
 				return match(components: components, name.dropFirst())
 			}
-		case (.patternList, _, _):
-			return matchPrefix(components: components, name)?.isEmpty == true
+		case let (.patternList(style, subSections), _, _):
+			let remaining = matchPatternListPrefix(
+				components: components,
+				name,
+				style: style,
+				subSections: subSections
+			)
+
+			return remaining?.isEmpty == true
 		case (.none, _, _):
 			if options.matchLeadingDirectories && name.first == options.pathSeparator {
 				return true
@@ -197,7 +204,7 @@ extension Pattern {
 				name.dropFirst()
 			)
 		case .componentWildcard:
-			if options.requiresExplicitLeadingPeriods && isAtStart(name){
+			if options.requiresExplicitLeadingPeriods && isAtStart(name) {
 				return nil
 			}
 
@@ -232,40 +239,57 @@ extension Pattern {
 				return matchPrefix(components: components, name.dropFirst())
 			}
 		case let .patternList(style, subSections):
-			for sectionsOption in subSections {
-				if let remaining = matchPrefix(
-					components: ArraySlice(sectionsOption + components.dropFirst()),
-					name
-				) {
-					// stop infinite recursion
-					guard remaining != name else { return remaining }
-
-					switch style {
-					case .negated:
-						return nil
-					case .oneOrMore, .zeroOrMore:
-						// switch to zeroOrMore since we've already fulfilled the "one" requirement
-						return matchPrefix(
-							components: [.patternList(.zeroOrMore, subSections)] + components.dropFirst(),
-							remaining
-						)
-					case .one, .zeroOrOne:
-						// already matched "one", can't match any more
-						return remaining
-					}
-				}
-			}
-
-			if style.allowsZero {
-				return matchPrefix(components: components.dropFirst(), name)
-			} else {
-				return nil
-			}
+			return matchPatternListPrefix(
+				components: components,
+				name,
+				style: style,
+				subSections: subSections
+			)
 		case .none:
 			return name
 		}
 	}
-	
+
+	private func matchPatternListPrefix(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		style: Section.PatternListStyle,
+		subSections: [[Section]]
+	) -> Substring? {
+		for sectionsOption in subSections {
+			if let remaining = matchPrefix(
+				components: ArraySlice(sectionsOption + components.dropFirst()),
+				name
+			) {
+				// stop infinite recursion
+				guard remaining != name else { return remaining }
+
+				switch style {
+				case .negated:
+					return nil
+				case .oneOrMore, .zeroOrMore:
+					// switch to zeroOrMore since we've already fulfilled the "one" requirement
+					return matchPrefix(
+						components: [.patternList(.zeroOrMore, subSections)] + components.dropFirst(),
+						remaining
+					)
+				case .one, .zeroOrOne:
+					// already matched "one", can't match any more
+					return remaining
+				}
+			}
+		}
+
+		switch style {
+		case .negated:
+			return matchPrefix(components: [.pathWildcard] + components.dropFirst(), name)
+		case .zeroOrMore, .zeroOrOne:
+			return matchPrefix(components: components.dropFirst(), name)
+		case .one, .oneOrMore:
+			return nil
+		}
+	}
+
 	private func isAtStart(_ name: Substring) -> Bool {
 		name.startIndex == name.base.startIndex || name.previous() == options.pathSeparator
 	}
@@ -279,9 +303,9 @@ private extension Substring {
 
 		return base[index]
 	}
-	
+
 	/// returns an empty substring preserving endIndex
 	func dropAll() -> Substring {
-		return self.suffix(0)
+		self.suffix(0)
 	}
 }

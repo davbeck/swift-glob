@@ -2186,21 +2186,15 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		"para987346523"		"para+([0-9])"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch("para987346523", pattern: "para+([0-9])", flags: EXTMATCH, result: 0)
 		// C		"paragraph"		"para!(*.[0-9])"       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("paragraph", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("paragraph", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
 		// C		"para.38"		"para!(*.[0-9])"       0       EXTMATCH
 		XCTExpectFailure {
 			XCTAssertMatchesFNMatch("para.38", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
 		}
 		// C		"para.graph"		"para!(*.[0-9])"       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("para.graph", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("para.graph", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
 		// C		"para39"		"para!(*.[0-9])"       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("para39", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("para39", pattern: "para!(*.[0-9])", flags: EXTMATCH, result: 0)
 		// C		""			"*(0|1|3|5|7|9)"       0       EXTMATCH
 		XCTAssertMatchesFNMatch("", pattern: "*(0|1|3|5|7|9)", flags: EXTMATCH, result: 0)
 		// C		"137577991"		"*(0|1|3|5|7|9)"       0       EXTMATCH
@@ -2218,15 +2212,11 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		"file.ccc"		"*.c?(c)"	       NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("file.ccc", pattern: "*.c?(c)", flags: EXTMATCH, result: NOMATCH)
 		// C		"parse.y"		"!(*.c|*.h|Makefile.in|config*|README)" 0 EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("parse.y", pattern: "!(*.c|*.h|Makefile.in|config*|README)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("parse.y", pattern: "!(*.c|*.h|Makefile.in|config*|README)", flags: EXTMATCH, result: 0)
 		// C		"shell.c"		"!(*.c|*.h|Makefile.in|config*|README)" NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("shell.c", pattern: "!(*.c|*.h|Makefile.in|config*|README)", flags: EXTMATCH, result: NOMATCH)
 		// C		"Makefile"		"!(*.c|*.h|Makefile.in|config*|README)" 0 EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("Makefile", pattern: "!(*.c|*.h|Makefile.in|config*|README)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("Makefile", pattern: "!(*.c|*.h|Makefile.in|config*|README)", flags: EXTMATCH, result: 0)
 		// C		"VMS.FILE;1"		"*\;[1-9]*([0-9])"     0       EXTMATCH
 		XCTAssertMatchesFNMatch("VMS.FILE;1", pattern: "*;[1-9]*([0-9])", flags: EXTMATCH, result: 0)
 		// C		"VMS.FILE;0"		"*\;[1-9]*([0-9])"     NOMATCH EXTMATCH
@@ -2351,16 +2341,12 @@ final class PatternFNMatchTests: XCTestCase {
 		}
 		// C		"oxfoxfox"		"*(oxf+(ox))"	       NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("oxfoxfox", pattern: "*(oxf+(ox))", flags: EXTMATCH, result: NOMATCH)
-		// C		"ofoofo"		"*(of+(o)|f)"	       0       EXTMATCH
 		XCTExpectFailure {
+			// C		"ofoofo"		"*(of+(o)|f)"	       0       EXTMATCH
 			XCTAssertMatchesFNMatch("ofoofo", pattern: "*(of+(o)|f)", flags: EXTMATCH, result: 0)
-		}
-		// C		"foofoofo"		"@(foo|f|fo)*(f|of+(o))" 0     EXTMATCH
-		XCTExpectFailure {
+			// C		"foofoofo"		"@(foo|f|fo)*(f|of+(o))" 0     EXTMATCH
 			XCTAssertMatchesFNMatch("foofoofo", pattern: "@(foo|f|fo)*(f|of+(o))", flags: EXTMATCH, result: 0)
-		}
-		// C		"oofooofo"		"*(of|oof+(o))"	       0       EXTMATCH
-		XCTExpectFailure {
+			// C		"oofooofo"		"*(of|oof+(o))"	       0       EXTMATCH
 			XCTAssertMatchesFNMatch("oofooofo", pattern: "*(of|oof+(o))", flags: EXTMATCH, result: 0)
 		}
 		// C		"fffooofoooooffoofffooofff" "*(*(f)*(o))"      0       EXTMATCH
@@ -2370,9 +2356,7 @@ final class PatternFNMatchTests: XCTestCase {
 			XCTAssertMatchesFNMatch("fofoofoofofoo", pattern: "*(fo|foo)", flags: EXTMATCH, result: 0)
 		}
 		// C		"foo"			"!(x)"		       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("foo", pattern: "!(x)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("foo", pattern: "!(x)", flags: EXTMATCH, result: 0)
 		// C		"foo"			"!(x)*"		       0       EXTMATCH
 		XCTAssertMatchesFNMatch("foo", pattern: "!(x)*", flags: EXTMATCH, result: 0)
 		// C		"foo"			"!(foo)"	       NOMATCH EXTMATCH
@@ -2386,39 +2370,27 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		"foobar"		"!(foo)*"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch("foobar", pattern: "!(foo)*", flags: EXTMATCH, result: 0)
 		// C		"moo.cow"		"!(*.*).!(*.*)"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("moo.cow", pattern: "!(*.*).!(*.*)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("moo.cow", pattern: "!(*.*).!(*.*)", flags: EXTMATCH, result: 0)
 		// C		"mad.moo.cow"		"!(*.*).!(*.*)"	       NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("mad.moo.cow", pattern: "!(*.*).!(*.*)", flags: EXTMATCH, result: NOMATCH)
 		// C		"mucca.pazza"		"mu!(*(c))?.pa!(*(z))?" NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("mucca.pazza", pattern: "mu!(*(c))?.pa!(*(z))?", flags: EXTMATCH, result: NOMATCH)
-		// C		"fff"			"!(f)"		       0       EXTMATCH
 		XCTExpectFailure {
+			// C		"fff"			"!(f)"		       0       EXTMATCH
 			XCTAssertMatchesFNMatch("fff", pattern: "!(f)", flags: EXTMATCH, result: 0)
-		}
-		// C		"fff"			"*(!(f))"	       0       EXTMATCH
-		XCTExpectFailure {
+			// C		"fff"			"*(!(f))"	       0       EXTMATCH
 			XCTAssertMatchesFNMatch("fff", pattern: "*(!(f))", flags: EXTMATCH, result: 0)
-		}
-		// C		"fff"			"+(!(f))"	       0       EXTMATCH
-		XCTExpectFailure {
+			// C		"fff"			"+(!(f))"	       0       EXTMATCH
 			XCTAssertMatchesFNMatch("fff", pattern: "+(!(f))", flags: EXTMATCH, result: 0)
 		}
 		// C		"ooo"			"!(f)"		       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("ooo", pattern: "!(f)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("ooo", pattern: "!(f)", flags: EXTMATCH, result: 0)
 		// C		"ooo"			"*(!(f))"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("ooo", pattern: "*(!(f))", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("ooo", pattern: "*(!(f))", flags: EXTMATCH, result: 0)
 		// C		"ooo"			"+(!(f))"	       0       EXTMATCH
+		XCTAssertMatchesFNMatch("ooo", pattern: "+(!(f))", flags: EXTMATCH, result: 0)
 		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("ooo", pattern: "+(!(f))", flags: EXTMATCH, result: 0)
-		}
-		// C		"foo"			"!(f)"		       0       EXTMATCH
-		XCTExpectFailure {
+			// C		"foo"			"!(f)"		       0       EXTMATCH
 			XCTAssertMatchesFNMatch("foo", pattern: "!(f)", flags: EXTMATCH, result: 0)
 		}
 		// C		"foo"			"*(!(f))"	       0       EXTMATCH
@@ -2436,15 +2408,11 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		"f"			"+(!(f))"	       NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("f", pattern: "+(!(f))", flags: EXTMATCH, result: NOMATCH)
 		// C		"foot"			"@(!(z*)|*x)"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("foot", pattern: "@(!(z*)|*x)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("foot", pattern: "@(!(z*)|*x)", flags: EXTMATCH, result: 0)
 		// C		"zoot"			"@(!(z*)|*x)"	       NOMATCH EXTMATCH
 		XCTAssertMatchesFNMatch("zoot", pattern: "@(!(z*)|*x)", flags: EXTMATCH, result: NOMATCH)
 		// C		"foox"			"@(!(z*)|*x)"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("foox", pattern: "@(!(z*)|*x)", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("foox", pattern: "@(!(z*)|*x)", flags: EXTMATCH, result: 0)
 		// C		"zoox"			"@(!(z*)|*x)"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch("zoox", pattern: "@(!(z*)|*x)", flags: EXTMATCH, result: 0)
 		// C		"foo"			"*(!(foo))"	       0       EXTMATCH
@@ -2470,21 +2438,15 @@ final class PatternFNMatchTests: XCTestCase {
 		// C		"]"			"*([!]a[]|[]])"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch("]", pattern: "*([!]a[]|[]])", flags: EXTMATCH, result: 0)
 		// C		"["			"!([!]a[])"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("[", pattern: "!([!]a[])", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("[", pattern: "!([!]a[])", flags: EXTMATCH, result: 0)
 		// C		"]"			"!([!]a[])"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("]", pattern: "!([!]a[])", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("]", pattern: "!([!]a[])", flags: EXTMATCH, result: 0)
 		// C		")"			"*([)])"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch(")", pattern: "*([)])", flags: EXTMATCH, result: 0)
 		// C		"*"			"*([*(])"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch("*", pattern: "*([*(])", flags: EXTMATCH, result: 0)
 		// C		"abcd"			"*!(|a)cd"	       0       EXTMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("abcd", pattern: "*!(|a)cd", flags: EXTMATCH, result: 0)
-		}
+		XCTAssertMatchesFNMatch("abcd", pattern: "*!(|a)cd", flags: EXTMATCH, result: 0)
 		// C		"ab/.a"			"+([abc])/*"	       NOMATCH EXTMATCH|PATHNAME|PERIOD
 		XCTAssertMatchesFNMatch("ab/.a", pattern: "+([abc])/*", flags: EXTMATCH | PATHNAME | PERIOD, result: NOMATCH)
 		// C		""			""		       0

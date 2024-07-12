@@ -281,7 +281,6 @@ extension Pattern {
 
 				loop: while !pattern.isEmpty {
 					let subSections = try self.parseSections(delimeters: [.verticalLine, .rightParen])
-					guard !subSections.isEmpty else { throw PatternParsingError.emptyPatternList }
 
 					sectionsList.append(subSections)
 
@@ -294,7 +293,7 @@ extension Pattern {
 						throw PatternParsingError.patternListNotClosed
 					}
 				}
-				
+
 				guard !sectionsList.isEmpty else {
 					throw PatternParsingError.emptyPatternList
 				}

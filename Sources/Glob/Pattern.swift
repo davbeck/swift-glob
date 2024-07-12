@@ -27,7 +27,7 @@ public struct Pattern: Equatable, Sendable {
 			case oneOrMore
 			case one
 			case negated
-			
+
 			var allowsZero: Bool {
 				switch self {
 				case .zeroOrOne, .zeroOrMore, .negated:
@@ -36,7 +36,7 @@ public struct Pattern: Equatable, Sendable {
 					false
 				}
 			}
-			
+
 			var allowsMultiple: Bool {
 				switch self {
 				case .oneOrMore, .zeroOrMore:
