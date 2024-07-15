@@ -1,6 +1,11 @@
 import FNMDefinitions
 import Foundation
 
+// naming philosophy
+
+// "allow" indicates that if it's not enabled, an error would be thrown
+// "supports" indicates that if it's not enabled, it will be ignored and treated as normal input
+
 public extension Pattern {
 	/// Options to control how patterns are parsed and matched
 	struct Options: Equatable, Sendable {
@@ -22,9 +27,9 @@ public extension Pattern {
 		/// How are empty ranges handled.
 		public var emptyRangeBehavior: EmptyRangeBehavior = .error
 
-		/// If the pattern supports escaping control characters with '\'
+		/// If the pattern supports escaping control characters with `\`
 		///
-		/// When true, a backslash character ( '\' ) in pattern followed by any other character shall match that second character in string. In particular, "\\" shall match a backslash in string. Otherwise a backslash character shall be treated as an ordinary character.
+		/// When true, a backslash character (`\`) in pattern followed by any other character shall match that second character in string. In particular, `\\` shall match a backslash in string. Otherwise a backslash character shall be treated as an ordinary character.
 		public var supportsEscapedCharacters: Bool = true
 
 		/// Allows the `-` character to be included in a character class if it is the first or last character (ie `[-abc]` or `[abc-]`)
@@ -79,10 +84,7 @@ public extension Pattern {
 		public var pathSeparator: Character? = "/"
 
 		/// Default options for parsing and matching patterns.
-		public static let `default`: Self = .init(
-			supportsPathLevelWildcards: true,
-			emptyRangeBehavior: .error
-		)
+		public static let `default`: Self = .init()
 
 		/// Attempts to match the behavior of [VSCode](https://code.visualstudio.com/docs/editor/glob-patterns).
 		public static let vscode: Self = Options(
@@ -103,41 +105,47 @@ public extension Pattern {
 		/// Attempts to match the behavior of [POSIX glob](https://man7.org/linux/man-pages/man7/glob.7.html).
 		/// - Returns: Options to use to create a Pattern.
 		public static func posix() -> Self {
-			Options(
-				supportsPathLevelWildcards: false,
-				emptyRangeBehavior: .allow,
+			.fnmatch(
+				usePathnameBehavior: true,
 				requiresExplicitLeadingPeriods: true
 			)
 		}
 
-		/// Attempts to match the behavior of `fnmatch`.
-		/// - Parameter usePathnameBehavior: When true, matches the behavior of FNM_PATHNAME. Namely, wildcards will not match path separators.
+		/// Attempts to match the behavior of [`fnmatch`](https://man7.org/linux/man-pages/man3/fnmatch.3.html).
+		/// - Parameter usePathnameBehavior: When true, matches the behavior of `FNM_PATHNAME`. Namely, wildcards will not match path separators.
+		/// - Parameter supportsEscapedCharacters: If the pattern supports escaping control characters with `\`. `false` is equivalent to `FNM_NOESCAPE`.
+		/// - Parameter requiresExplicitLeadingPeriods: If a period in the name is at the beginning of a component, don't match using wildcards. Equivalent to `FNM_PERIOD`.
+		/// - Parameter matchLeadingDirectories: If a pattern should match if it matches a parent directory. Equivalent to `FNM_LEADING_DIR`.
+		/// - Parameter supportsExtendedMatching: Enables `supportsPatternLists` equivalent to `FNM_EXTMATCH`.
 		/// - Returns: Options to use to create a Pattern.
 		public static func fnmatch(
 			usePathnameBehavior: Bool = false,
-			allowEscapedCharacters: Bool = true,
+			supportsEscapedCharacters: Bool = true,
 			requiresExplicitLeadingPeriods: Bool = false,
 			matchLeadingDirectories: Bool = false,
-			useExtendedMatching: Bool = false
+			supportsExtendedMatching: Bool = false
 		) -> Self {
 			Options(
 				supportsPathLevelWildcards: false,
 				emptyRangeBehavior: .treatClosingBracketAsCharacter,
-				supportsEscapedCharacters: allowEscapedCharacters,
+				supportsEscapedCharacters: supportsEscapedCharacters,
 				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
 				matchLeadingDirectories: matchLeadingDirectories,
-				supportsPatternLists: useExtendedMatching,
+				supportsPatternLists: supportsExtendedMatching,
 				pathSeparator: usePathnameBehavior ? "/" : nil
 			)
 		}
 
+		/// Attempts to match the behavior of `fnmatch`.
+		/// - Parameter flags: A list of `FNM_` flags to be converted. It is the bitwise OR of zero or more of the following flags: `FNM_PATHNAME`, `FNM_NOESCAPE`, `FNM_PERIOD`, `FNM_LEADING_DIR`, `FNM_EXTMATCH`.
+		/// - Returns: Options to use to create a Pattern.
 		public static func fnmatch(flags: Int32) -> Self {
 			.fnmatch(
 				usePathnameBehavior: (flags & FNM_PATHNAME) != 0,
-				allowEscapedCharacters: (flags & FNM_NOESCAPE) == 0,
+				supportsEscapedCharacters: (flags & FNM_NOESCAPE) == 0,
 				requiresExplicitLeadingPeriods: (flags & FNM_PERIOD) != 0,
 				matchLeadingDirectories: (flags & FNM_LEADING_DIR) != 0,
-				useExtendedMatching: (flags & FNM_EXTMATCH) != 0
+				supportsExtendedMatching: (flags & FNM_EXTMATCH) != 0
 			)
 		}
 	}
