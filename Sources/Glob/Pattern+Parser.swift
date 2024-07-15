@@ -324,9 +324,9 @@ extension Pattern.Options.RangeNegationCharacter {
 	var token: Pattern.Parser.Token {
 		switch self {
 		case .exclamationMark:
-			return .exclamationMark
+			.exclamationMark
 		case .caret:
-			return .caret
+			.caret
 		}
 	}
 }
