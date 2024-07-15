@@ -11,7 +11,7 @@ extension Pattern {
 		enum Token: Equatable {
 			case character(Character)
 			case leftSquareBracket // [
-			case righSquareBracket // ]
+			case rightSquareBracket // ]
 			case questionMark // ?
 			case dash // -
 			case asterisk // *
@@ -22,11 +22,12 @@ extension Pattern {
 			case at // @
 			case plus // +
 			case exclamationMark // !
+			case caret // ^
 
 			init(_ character: Character) {
 				switch character {
 				case "]":
-					self = .righSquareBracket
+					self = .rightSquareBracket
 				case "[":
 					self = .leftSquareBracket
 				case "?":
@@ -49,6 +50,8 @@ extension Pattern {
 					self = .plus
 				case "!":
 					self = .exclamationMark
+				case "^":
+					self = .caret
 				default:
 					self = .character(character)
 				}
@@ -60,7 +63,7 @@ extension Pattern {
 					character
 				case .leftSquareBracket:
 					"["
-				case .righSquareBracket:
+				case .rightSquareBracket:
 					"]"
 				case .questionMark:
 					"?"
@@ -82,6 +85,8 @@ extension Pattern {
 					"+"
 				case .exclamationMark:
 					"!"
+				case .caret:
+					"^"
 				}
 			}
 		}
@@ -90,7 +95,7 @@ extension Pattern {
 			if let next = pattern.first {
 				let updatedPattern = pattern.dropFirst()
 
-				if options.allowEscapedCharacters, next == .escape {
+				if options.supportsEscapedCharacters, next == .escape {
 					guard let escaped = updatedPattern.first else { throw PatternParsingError.invalidEscapeCharacter }
 
 					guard condition(.character(escaped)) else { return nil }
@@ -135,10 +140,10 @@ extension Pattern {
 			while let next = try pop({ !delimeters.contains($0) }) {
 				switch next {
 				case .asterisk:
-					if options.useExtendedMatching, let sectionList = try parsePatternList() {
+					if options.supportsPatternLists, let sectionList = try parsePatternList() {
 						sections.append(.patternList(.zeroOrMore, sectionList))
 					} else if sections.last == .componentWildcard {
-						if options.allowsPathLevelWildcards {
+						if options.supportsPathLevelWildcards {
 							sections[sections.endIndex - 1] = .pathWildcard
 						} else {
 							break // ignore repeated wildcards
@@ -149,41 +154,40 @@ extension Pattern {
 						sections.append(.componentWildcard)
 					}
 				case .questionMark:
-					if options.useExtendedMatching, let sectionList = try parsePatternList() {
+					if options.supportsPatternLists, let sectionList = try parsePatternList() {
 						sections.append(.patternList(.zeroOrOne, sectionList))
 					} else {
 						sections.append(.singleCharacter)
 					}
 				case .at:
-					if options.useExtendedMatching, let sectionsList = try parsePatternList() {
+					if options.supportsPatternLists, let sectionsList = try parsePatternList() {
 						sections.append(.patternList(.one, sectionsList))
 					} else {
 						sections.append(constant: next.character)
 					}
 				case .plus:
-					if options.useExtendedMatching, let sectionsList = try parsePatternList() {
+					if options.supportsPatternLists, let sectionsList = try parsePatternList() {
 						sections.append(.patternList(.oneOrMore, sectionsList))
 					} else {
 						sections.append(constant: next.character)
 					}
 				case .exclamationMark:
-					if options.useExtendedMatching, let sectionsList = try parsePatternList() {
+					if options.supportsPatternLists, let sectionsList = try parsePatternList() {
 						sections.append(.patternList(.negated, sectionsList))
 					} else {
 						sections.append(constant: next.character)
 					}
 				case .leftSquareBracket:
 					let negated: Bool
-					if pattern.first == options.rangeNegationCharacter {
+					if try pop(options.rangeNegationCharacter.token) {
 						negated = true
-						pattern = pattern.dropFirst()
 					} else {
 						negated = false
 					}
 
 					var ranges: [CharacterClass] = []
 
-					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.righSquareBracket) {
+					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.rightSquareBracket) {
 						// https://man7.org/linux/man-pages/man7/glob.7.html
 						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
 						ranges.append(.character("]"))
@@ -195,7 +199,7 @@ extension Pattern {
 						}
 
 						switch next {
-						case .righSquareBracket:
+						case .rightSquareBracket:
 							break loop
 						case .leftSquareBracket:
 							if try pop(.colon) {
@@ -208,7 +212,7 @@ extension Pattern {
 									ranges.append(.named(name))
 									pattern = pattern[endIndex...].dropFirst()
 
-									if try !pop(.righSquareBracket) {
+									if try !pop(.rightSquareBracket) {
 										throw PatternParsingError.rangeNotClosed
 									}
 								} else {
@@ -218,7 +222,7 @@ extension Pattern {
 								ranges.append(.character("["))
 							}
 						case .dash:
-							if !options.allowsRangeSeparatorInCharacterClasses {
+							if !options.supportsRangeSeparatorAtBeginningAndEnd {
 								throw PatternParsingError.rangeMissingBounds
 							}
 
@@ -227,8 +231,8 @@ extension Pattern {
 							ranges.append(.character("-"))
 						default:
 							if try pop(.dash) {
-								if try pop(.righSquareBracket) {
-									if !options.allowsRangeSeparatorInCharacterClasses {
+								if try pop(.rightSquareBracket) {
+									if !options.supportsRangeSeparatorAtBeginningAndEnd {
 										throw PatternParsingError.rangeNotClosed
 									}
 
@@ -265,7 +269,7 @@ extension Pattern {
 					sections.append(.oneOf(ranges, isNegated: negated))
 				case let .character(character):
 					sections.append(constant: character)
-				case .righSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine:
+				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret:
 					sections.append(constant: next.character)
 				}
 			}
@@ -275,7 +279,7 @@ extension Pattern {
 
 		/// Parses a pattern list like `(abc|xyz)`
 		mutating func parsePatternList() throws -> [[Section]]? {
-			if options.useExtendedMatching, try pop(.leftParen) {
+			if options.supportsPatternLists, try pop(.leftParen) {
 				// start of pattern list
 				var sectionsList: [[Section]] = []
 
@@ -312,6 +316,17 @@ private extension [Pattern.Section] {
 			self[self.endIndex - 1] = .constant(value + String(character))
 		} else {
 			self.append(.constant(String(character)))
+		}
+	}
+}
+
+extension Pattern.Options.RangeNegationCharacter {
+	var token: Pattern.Parser.Token {
+		switch self {
+		case .exclamationMark:
+			return .exclamationMark
+		case .caret:
+			return .caret
 		}
 	}
 }

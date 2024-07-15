@@ -27,13 +27,13 @@ final class PatternTests: XCTestCase {
 
 	func test_pathWildcard_pathComponentsOnly_doesNotMatchPath() throws {
 		var options = Pattern.Options.default
-		options.allowsPathLevelWildcards = false
+		options.supportsPathLevelWildcards = false
 		try XCTAssertDoesNotMatch("Target/Other/.build", pattern: "**/.build", options: options)
 	}
 
 	func test_componentWildcard_pathComponentsOnly_doesMatchSingleComponent() throws {
 		var options = Pattern.Options.default
-		options.allowsPathLevelWildcards = false
+		options.supportsPathLevelWildcards = false
 		try XCTAssertMatches("Target/.build", pattern: "*/.build", options: options)
 	}
 
