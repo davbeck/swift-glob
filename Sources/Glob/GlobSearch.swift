@@ -79,6 +79,9 @@ public func search(
 						var options: FileManager.DirectoryEnumerationOptions = []
 						if skipHiddenFiles {
 							options.insert(.skipsHiddenFiles)
+                            #if !os(Linux)
+                            options.insert(.producesRelativePathURLs)
+                            #endif
 						}
 						let contents = try FileManager.default.contentsOfDirectory(
 							at: directory,
@@ -93,7 +96,15 @@ public func search(
 								let matchResult = try matching(url, relativePath)
 
 								if matchResult.matches {
-									continuation.yield(url)
+                                    #if os(Linux)
+                                    continuation.yield(url)
+                                    #else
+                                    if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+                                        continuation.yield(directory.appending(path: url.relativePath))
+                                    } else {
+                                        continuation.yield(directory.appendingPathComponent(url.relativePath))
+                                    }
+                                    #endif
 								}
 
 								guard !matchResult.skipDescendents else { continue }
