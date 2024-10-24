@@ -79,10 +79,10 @@ public func search(
 						var options: FileManager.DirectoryEnumerationOptions = []
 						if skipHiddenFiles {
 							options.insert(.skipsHiddenFiles)
-                            #if !os(Linux)
-                            options.insert(.producesRelativePathURLs)
-                            #endif
 						}
+                        #if !os(Linux)
+                        options.insert(.producesRelativePathURLs)
+                        #endif
 						let contents = try FileManager.default.contentsOfDirectory(
 							at: directory,
 							includingPropertiesForKeys: keys + [.isDirectoryKey],
