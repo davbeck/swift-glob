@@ -134,10 +134,10 @@ extension Pattern {
 			}
 		}
 
-		private mutating func parseSections(delimeters: some Collection<Token> = EmptyCollection()) throws -> [Section] {
+		private mutating func parseSections(delimiters: some Collection<Token> = EmptyCollection()) throws -> [Section] {
 			var sections: [Section] = []
 
-			while let next = try pop({ !delimeters.contains($0) }) {
+			while let next = try pop({ !delimiters.contains($0) }) {
 				switch next {
 				case .asterisk:
 					if options.supportsPatternLists, let sectionList = try parsePatternList() {
@@ -268,7 +268,11 @@ extension Pattern {
 
 					sections.append(.oneOf(ranges, isNegated: negated))
 				case let .character(character):
-					sections.append(constant: character)
+					if character == options.pathSeparator {
+						sections.append(.pathSeparator)
+					} else {
+						sections.append(constant: character)
+					}
 				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret:
 					sections.append(constant: next.character)
 				}
@@ -284,7 +288,7 @@ extension Pattern {
 				var sectionsList: [[Section]] = []
 
 				loop: while !pattern.isEmpty {
-					let subSections = try self.parseSections(delimeters: [.verticalLine, .rightParen])
+					let subSections = try self.parseSections(delimiters: [.verticalLine, .rightParen])
 
 					sectionsList.append(subSections)
 

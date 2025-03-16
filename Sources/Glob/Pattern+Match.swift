@@ -43,6 +43,9 @@ extension Pattern {
 			if name.isEmpty {
 				if components.isEmpty || components.allSatisfy(\.matchesEmptyContent) {
 					return true
+				} else if components.contains(.pathWildcard) && components.allSatisfy({ $0 == .pathSeparator || $0.matchesEmptyContent }) {
+					// match foo/**/bar to foo/bar
+					return true
 				} else {
 					return false
 				}
@@ -56,6 +59,13 @@ extension Pattern {
 			// when matchLeadingDirectories is set, we can't match from the end
 
 			switch (components.first, components.last, options.matchLeadingDirectories) {
+			case (.pathSeparator, _, _):
+				if name.first == options.pathSeparator {
+					components = components.dropFirst()
+					name = name.dropFirst()
+				} else {
+					return false
+				}
 			case let (.constant(constant), _, _):
 				if let remaining = name.dropPrefix(constant) {
 					components = components.dropFirst()
@@ -83,6 +93,13 @@ extension Pattern {
 
 				components = components.dropFirst()
 				name = name.dropFirst()
+			case (_, .pathSeparator, false):
+				if name.last == options.pathSeparator {
+					components = components.dropLast()
+					name = name.dropLast()
+				} else {
+					return false
+				}
 			case let (_, .constant(constant), false):
 				if let remaining = name.dropSuffix(constant) {
 					components = components.dropLast()
@@ -136,6 +153,8 @@ extension Pattern {
 
 				if match(components: components.dropFirst(), name) {
 					return true
+				} else if components.dropFirst().first == .pathSeparator, match(components: components.dropFirst(2), name) {
+					return true
 				} else {
 					// components remain unchanged
 					name = name.dropFirst()
@@ -167,12 +186,23 @@ extension Pattern {
 		if name.isEmpty {
 			if components.isEmpty || components.allSatisfy(\.matchesEmptyContent) {
 				return name.dropAll()
+			} else if components.contains(.pathWildcard) && components.allSatisfy({ $0 == .pathSeparator || $0.matchesEmptyContent }) {
+				return name.dropAll()
 			} else {
 				return nil
 			}
 		}
 
 		switch components.first {
+		case .pathSeparator:
+			if name.first == options.pathSeparator {
+				return matchPrefix(
+					components: components.dropFirst(),
+					name.dropFirst()
+				)
+			} else {
+				return nil
+			}
 		case let .constant(constant):
 			if let remaining = name.dropPrefix(constant) {
 				return matchPrefix(
@@ -236,6 +266,8 @@ extension Pattern {
 			}
 
 			if let remaining = matchPrefix(components: components.dropFirst(), name) {
+				return remaining
+			} else if components.dropFirst().first == .pathSeparator, let remaining = matchPrefix(components: components.dropFirst(2), name) {
 				return remaining
 			} else {
 				return matchPrefix(components: components, name.dropFirst())

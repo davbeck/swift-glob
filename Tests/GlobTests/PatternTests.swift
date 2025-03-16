@@ -72,4 +72,13 @@ final class PatternTests: XCTestCase {
 		try XCTAssertDoesNotMatch("9", pattern: "[[:alpha:]]")
 		try XCTAssertDoesNotMatch("&", pattern: "[[:alpha:]]")
 	}
+
+	func test_nonNestedWildcards() throws {
+		// from https://fishshell.com/docs/3.4/language.html#expand-wildcard
+		// If ** is a segment by itself, that segment may match zero times, for compatibility with other shells.
+
+		try XCTAssertMatches("dir/File.swift", pattern: "dir/**/*.swift")
+		try XCTAssertMatches("dir/File.swift", pattern: "dir/**/File.swift")
+		try XCTAssertDoesNotMatch("dir/File.swift", pattern: "foo/File**/*.swift")
+	}
 }

@@ -21,6 +21,8 @@ public struct Pattern: Equatable, Sendable {
 		/// A range may be a single character (ie "a"..."a"). For instance the pattern [abc] will create 3 ranges that are each a single character.
 		case oneOf([CharacterClass], isNegated: Bool)
 
+		case pathSeparator
+
 		public enum PatternListStyle: Equatable, Sendable {
 			case zeroOrOne
 			case zeroOrMore
@@ -54,7 +56,7 @@ public struct Pattern: Equatable, Sendable {
 		/// When false, the section represents a fixed length match.
 		public var matchesEmptyContent: Bool {
 			switch self {
-			case .constant, .singleCharacter, .oneOf:
+			case .constant, .singleCharacter, .oneOf, .pathSeparator:
 				false
 			case .componentWildcard, .pathWildcard:
 				true
