@@ -268,7 +268,11 @@ extension Pattern {
 
 					sections.append(.oneOf(ranges, isNegated: negated))
 				case let .character(character):
-					sections.append(constant: character)
+					if character == options.pathSeparator {
+						sections.append(.pathSeparator)
+					} else {
+						sections.append(constant: character)
+					}
 				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret:
 					sections.append(constant: next.character)
 				}

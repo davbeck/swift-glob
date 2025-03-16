@@ -19,9 +19,7 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertMatches("qunit", pattern: "qunit", options: .vscode)
 		try XCTAssertDoesNotMatch("qunit.css", pattern: "qunit", options: .vscode)
 		try XCTAssertDoesNotMatch("test/qunit", pattern: "qunit", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("/DNXConsoleApp/Program.cs", pattern: "/DNXConsoleApp/**/*.cs", options: .vscode)
-		}
+		try XCTAssertMatches("/DNXConsoleApp/Program.cs", pattern: "/DNXConsoleApp/**/*.cs", options: .vscode)
 		try XCTAssertMatches("/DNXConsoleApp/foo/Program.cs", pattern: "/DNXConsoleApp/**/*.cs", options: .vscode)
 		try XCTExpectFailure {
 			try XCTAssertMatches("C:\\DNXConsoleApp\\Program.cs", pattern: "C:/DNXConsoleApp/**/*.cs", options: .vscode)
@@ -39,13 +37,9 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertDoesNotMatch("hidden.txt", pattern: ".*", options: .vscode)
 		try XCTAssertDoesNotMatch("path/.git", pattern: ".*", options: .vscode)
 		try XCTAssertDoesNotMatch("path/.hidden.txt", pattern: ".*", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches(".git", pattern: "**/.*", options: .vscode)
-		}
+		try XCTAssertMatches(".git", pattern: "**/.*", options: .vscode)
 		try XCTAssertMatches("/.git", pattern: "**/.*", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches(".hidden.txt", pattern: "**/.*", options: .vscode)
-		}
+		try XCTAssertMatches(".hidden.txt", pattern: "**/.*", options: .vscode)
 		try XCTAssertDoesNotMatch("git", pattern: "**/.*", options: .vscode)
 		try XCTAssertDoesNotMatch("hidden.txt", pattern: "**/.*", options: .vscode)
 		try XCTAssertMatches("path/.git", pattern: "**/.*", options: .vscode)
@@ -60,12 +54,8 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertDoesNotMatch("hidden.txt", pattern: "._*", options: .vscode)
 		try XCTAssertDoesNotMatch("path/._git", pattern: "._*", options: .vscode)
 		try XCTAssertDoesNotMatch("path/._hidden.txt", pattern: "._*", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("._git", pattern: "**/._*", options: .vscode)
-		}
-		try XCTExpectFailure {
-			try XCTAssertMatches("._hidden.txt", pattern: "**/._*", options: .vscode)
-		}
+		try XCTAssertMatches("._git", pattern: "**/._*", options: .vscode)
+		try XCTAssertMatches("._hidden.txt", pattern: "**/._*", options: .vscode)
 		try XCTAssertDoesNotMatch("git", pattern: "**/._*", options: .vscode)
 		try XCTAssertDoesNotMatch("hidden._txt", pattern: "**/._*", options: .vscode)
 		try XCTAssertMatches("path/._git", pattern: "**/._*", options: .vscode)
@@ -115,27 +105,15 @@ final class PatternVSCodeTests: XCTestCase {
 	}
 
 	func test_fileFolderMatch() throws {
-		try XCTExpectFailure {
-			try XCTAssertMatches("node_modules", pattern: "**/node_modules/**", options: .vscode)
-		}
-		try XCTExpectFailure {
-			try XCTAssertMatches("node_modules/", pattern: "**/node_modules/**", options: .vscode)
-		}
-		try XCTExpectFailure {
-			try XCTAssertMatches("a/node_modules", pattern: "**/node_modules/**", options: .vscode)
-		}
+		try XCTAssertMatches("node_modules", pattern: "**/node_modules/**", options: .vscode)
+		try XCTAssertMatches("node_modules/", pattern: "**/node_modules/**", options: .vscode)
+		try XCTAssertMatches("a/node_modules", pattern: "**/node_modules/**", options: .vscode)
 		try XCTAssertMatches("a/node_modules/", pattern: "**/node_modules/**", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("node_modules/foo", pattern: "**/node_modules/**", options: .vscode)
-		}
+		try XCTAssertMatches("node_modules/foo", pattern: "**/node_modules/**", options: .vscode)
 		try XCTAssertMatches("foo/node_modules/foo/bar", pattern: "**/node_modules/**", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("/node_modules", pattern: "**/node_modules/**", options: .vscode)
-		}
+		try XCTAssertMatches("/node_modules", pattern: "**/node_modules/**", options: .vscode)
 		try XCTAssertMatches("/node_modules/", pattern: "**/node_modules/**", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("/a/node_modules", pattern: "**/node_modules/**", options: .vscode)
-		}
+		try XCTAssertMatches("/a/node_modules", pattern: "**/node_modules/**", options: .vscode)
 		try XCTAssertMatches("/a/node_modules/", pattern: "**/node_modules/**", options: .vscode)
 		try XCTAssertMatches("/node_modules/foo", pattern: "**/node_modules/**", options: .vscode)
 		try XCTAssertMatches("/foo/node_modules/foo/bar", pattern: "**/node_modules/**", options: .vscode)
@@ -155,9 +133,7 @@ final class PatternVSCodeTests: XCTestCase {
 	}
 
 	func test_globstar() throws {
-		try XCTExpectFailure {
-			try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("/foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("folder/foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("/node_modules/foo.js", pattern: "**/*.js", options: .vscode)
@@ -165,9 +141,7 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertDoesNotMatch("some.js/test", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("/some.js/test", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("\\some.js\\test", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("project.json", pattern: "**/project.json", options: .vscode)
-		}
+		try XCTAssertMatches("project.json", pattern: "**/project.json", options: .vscode)
 		try XCTAssertMatches("/project.json", pattern: "**/project.json", options: .vscode)
 		try XCTAssertMatches("some/folder/project.json", pattern: "**/project.json", options: .vscode)
 		try XCTAssertMatches("/some/folder/project.json", pattern: "**/project.json", options: .vscode)
@@ -175,9 +149,7 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertDoesNotMatch("some/folder/fileproject.json", pattern: "**/project.json", options: .vscode)
 		try XCTAssertDoesNotMatch("some/rrproject.json", pattern: "**/project.json", options: .vscode)
 		try XCTAssertDoesNotMatch("some\\rrproject.json", pattern: "**/project.json", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("test", pattern: "test/**", options: .vscode)
-		}
+		try XCTAssertMatches("test", pattern: "test/**", options: .vscode)
 		try XCTAssertMatches("test/foo", pattern: "test/**", options: .vscode)
 		try XCTAssertMatches("test/foo/", pattern: "test/**", options: .vscode)
 		try XCTAssertMatches("test/foo.js", pattern: "test/**", options: .vscode)
@@ -190,29 +162,23 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertMatches("/node_modules/foo.js", pattern: "**", options: .vscode)
 		try XCTAssertMatches("foo.jss", pattern: "**", options: .vscode)
 		try XCTAssertMatches("some.js/test", pattern: "**", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("test/foo.js", pattern: "test/**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("test/foo.js", pattern: "test/**/*.js", options: .vscode)
 		try XCTAssertMatches("test/other/foo.js", pattern: "test/**/*.js", options: .vscode)
 		try XCTAssertMatches("test/other/more/foo.js", pattern: "test/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("test/foo.ts", pattern: "test/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("test/other/foo.ts", pattern: "test/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("test/other/more/foo.ts", pattern: "test/**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("foo.js", pattern: "**/**/*.js", options: .vscode)
-			try XCTAssertMatches("/foo.js", pattern: "**/**/*.js", options: .vscode)
-			try XCTAssertMatches("folder/foo.js", pattern: "**/**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("foo.js", pattern: "**/**/*.js", options: .vscode)
+		try XCTAssertMatches("/foo.js", pattern: "**/**/*.js", options: .vscode)
+		try XCTAssertMatches("folder/foo.js", pattern: "**/**/*.js", options: .vscode)
 		try XCTAssertMatches("/node_modules/foo.js", pattern: "**/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("foo.jss", pattern: "**/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("some.js/test", pattern: "**/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("folder/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("node_modules/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
-			try XCTAssertMatches("/node_modules/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
-			try XCTAssertMatches("node_modules/some/folder/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("node_modules/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
+		try XCTAssertMatches("/node_modules/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
+		try XCTAssertMatches("node_modules/some/folder/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
 		try XCTAssertMatches("/node_modules/some/folder/foo.js", pattern: "**/node_modules/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("node_modules/some/folder/foo.ts", pattern: "**/node_modules/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("foo.jss", pattern: "**/node_modules/**/*.js", options: .vscode)
@@ -260,15 +226,11 @@ final class PatternVSCodeTests: XCTestCase {
 	}
 
 	func test_issue41724() throws {
-		try XCTExpectFailure {
-			try XCTAssertMatches("some/foo.js", pattern: "some/**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("some/foo.js", pattern: "some/**/*.js", options: .vscode)
 		try XCTAssertMatches("some/folder/foo.js", pattern: "some/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("something/foo.js", pattern: "some/**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("something/folder/foo.js", pattern: "some/**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("some/foo.js", pattern: "some/**/*", options: .vscode)
-		}
+		try XCTAssertMatches("some/foo.js", pattern: "some/**/*", options: .vscode)
 		try XCTAssertMatches("some/folder/foo.js", pattern: "some/**/*", options: .vscode)
 		try XCTAssertDoesNotMatch("something/foo.js", pattern: "some/**/*", options: .vscode)
 		try XCTAssertDoesNotMatch("something/folder/foo.js", pattern: "some/**/*", options: .vscode)
@@ -401,24 +363,14 @@ final class PatternVSCodeTests: XCTestCase {
 	}
 
 	func test_prefixAgnostic() throws {
-		try XCTExpectFailure {
-			try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("testing/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("testing\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("/testing/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
-		try XCTExpectFailure {
-			try XCTAssertMatches("C:\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
+		try XCTAssertMatches("C:\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("foo.ts", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("testing/foo.ts", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("testing\\foo.ts", pattern: "**/*.js", options: .vscode)
@@ -436,9 +388,7 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertDoesNotMatch("/testing.js/foo", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("\\testing.js\\foo", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("C:\\testing.js\\foo", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("foo.js", pattern: "**/foo.js", options: .vscode)
-		}
+		try XCTAssertMatches("foo.js", pattern: "**/foo.js", options: .vscode)
 		try XCTAssertMatches("/foo.js", pattern: "**/foo.js", options: .vscode)
 		try XCTExpectFailure {
 			try XCTAssertMatches("\\foo.js", pattern: "**/foo.js", options: .vscode)
@@ -457,20 +407,12 @@ final class PatternVSCodeTests: XCTestCase {
 	}
 
 	func test_cachedProperly() throws {
-		try XCTExpectFailure {
-			try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("testing/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("testing\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("/testing/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
-		try XCTExpectFailure {
-			try XCTAssertMatches("C:\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
+		try XCTAssertMatches("C:\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("foo.ts", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("testing/foo.ts", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("testing\\foo.ts", pattern: "**/*.js", options: .vscode)
@@ -488,20 +430,12 @@ final class PatternVSCodeTests: XCTestCase {
 		try XCTAssertDoesNotMatch("/testing.js/foo", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("\\testing.js\\foo", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("C:\\testing.js\\foo", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("testing/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("testing\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertMatches("/testing/foo.js", pattern: "**/*.js", options: .vscode)
-		try XCTExpectFailure {
-			try XCTAssertMatches("\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
-		try XCTExpectFailure {
-			try XCTAssertMatches("C:\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
-		}
+		try XCTAssertMatches("\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
+		try XCTAssertMatches("C:\\testing\\foo.js", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("foo.ts", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("testing/foo.ts", pattern: "**/*.js", options: .vscode)
 		try XCTAssertDoesNotMatch("testing\\foo.ts", pattern: "**/*.js", options: .vscode)
