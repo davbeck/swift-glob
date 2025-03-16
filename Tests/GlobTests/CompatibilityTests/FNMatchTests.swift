@@ -38,7 +38,7 @@ private func XCTAssertMatchesFNMatch(
 	)
 }
 
-final class PatternFNMatchTests: XCTestCase {
+final class FNMatchTests: XCTestCase {
 	// derrived from https://github.com/bminor/glibc/blob/9fc639f654dc004736836613be703e6bed0c36a8/posix/tst-fnmatch.input
 
 	// Derived from the IEEE 2003.2 text.  The standard only contains some

@@ -4,7 +4,7 @@ import XCTest
 
 // from https://github.com/microsoft/vscode/blob/main/src/vs/base/test/common/glob.test.ts
 
-final class PatternVSCodeTests: XCTestCase {
+final class VSCodeTests: XCTestCase {
 	func test_simple() throws {
 		try XCTAssertMatches("node_modules", pattern: "node_modules", options: .vscode)
 		try XCTAssertDoesNotMatch("node_module", pattern: "node_modules", options: .vscode)
