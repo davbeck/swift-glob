@@ -41,8 +41,7 @@ struct FishShellTests {
 	private func search(_ pattern: String) async throws -> Set<String> {
 		try await Glob.search(
 			directory: directory,
-			include: [self.pattern(pattern)],
-			skipHiddenFiles: false // should we rely on pattern to handle this?
+			include: [self.pattern(pattern)]
 		)
 		.reduce(into: Set<String>()) { $0.insert($1.relativePath(from: directory)) }
 	}
@@ -58,12 +57,8 @@ struct FishShellTests {
 	@Test func trailingSlashMatchesOnlyDirectories() async throws {
 		try touch("abc1")
 		try mkdir("abc2")
-		try await #expect(search("*") == ["abc1", "abc2"])
-		await withKnownIssue {
-			// need to figure out how to handle this trailing path separator
-			// I'm not sure we want to match the behavior that it returns a trailing separator if the pattern includes it
-			try await #expect(search("*/") == ["abc2/"])
-		}
+		try await #expect(search("*") == ["abc1", "abc2/"])
+		try await #expect(search("*/") == ["abc2/"])
 	}
 
 	@Test func symlinksAreDescendedIntoIndependently() async throws {
@@ -99,29 +94,27 @@ struct FishShellTests {
 		try await #expect(search("**a3/file_*") == ["dir_a1/dir_a2/dir_a3/file_a"])
 		try await #expect(
 			search("**") == [
-				"dir_a1",
-				"dir_a1/dir_a2",
-				"dir_a1/dir_a2/dir_a3",
+				"dir_a1/",
+				"dir_a1/dir_a2/",
+				"dir_a1/dir_a2/dir_a3/",
 				"dir_a1/dir_a2/dir_a3/file_a",
-				"dir_b1",
-				"dir_b1/dir_b2",
-				"dir_b1/dir_b2/dir_b3",
+				"dir_b1/",
+				"dir_b1/dir_b2/",
+				"dir_b1/dir_b2/dir_b3/",
 				"dir_b1/dir_b2/dir_b3/file_b",
 			]
 		)
-		await withKnownIssue {
-			// same issue as ``trailingSlashMatchesOnlyDirectories``
-			try await #expect(
-				search("**/") == [
-					"dir_a1/",
-					"dir_a1/dir_a2/",
-					"dir_a1/dir_a2/dir_a3/",
-					"dir_b1/",
-					"dir_b1/dir_b2/",
-					"dir_b1/dir_b2/dir_b3/",
-				]
-			)
-		}
+		// same issue as ``trailingSlashMatchesOnlyDirectories``
+		try await #expect(
+			search("**/") == [
+				"dir_a1/",
+				"dir_a1/dir_a2/",
+				"dir_a1/dir_a2/dir_a3/",
+				"dir_b1/",
+				"dir_b1/dir_b2/",
+				"dir_b1/dir_b2/dir_b3/",
+			]
+		)
 		await withKnownIssue {
 			// "dir_a1/dir_a2" is also being matched
 			// so `/**/` should match an empty segment, but not a trailing `/**`
@@ -161,6 +154,12 @@ private extension URL {
 
 		var relComponents = Array(repeating: "..", count: baseComponents.count - componentsInCommon)
 		relComponents.append(contentsOf: destComponents.dropFirst(componentsInCommon))
-		return relComponents.joined(separator: "/")
+		var path = relComponents.joined(separator: "/")
+
+		if self.hasDirectoryPath {
+			path += "/"
+		}
+
+		return path
 	}
 }

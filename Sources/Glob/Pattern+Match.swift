@@ -125,7 +125,7 @@ extension Pattern {
 				if components.count == 1 {
 					if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
 						// the last component is a component level wildcard, which matches anything except for the path separator
-						return !name.contains(pathSeparator)
+						return !name.contains(pathSeparator) || (options.matchesTrailingPathSeparator && name.endIndex == name.base.endIndex && name.dropSuffix(String(pathSeparator))?.contains(pathSeparator) == false)
 					} else {
 						// no special treatment for path separators
 						return true

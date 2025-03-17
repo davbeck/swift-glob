@@ -2458,4 +2458,11 @@ final class FNMatchTests: XCTestCase {
 		// C		""			"?([abc])"	       0       EXTMATCH
 		XCTAssertMatchesFNMatch("", pattern: "?([abc])", flags: EXTMATCH, result: 0)
 	}
+
+	func test_other() throws {
+		XCTAssertMatchesFNMatch("abc2/", pattern: "*", flags: PATHNAME, result: NOMATCH)
+		XCTAssertEqual(fnmatch("*", "abc2/", PATHNAME), NOMATCH)
+		XCTAssertMatchesFNMatch("abc2/", pattern: "*/", flags: PATHNAME, result: 0)
+		XCTAssertEqual(fnmatch("*/", "abc2/", PATHNAME), 0)
+	}
 }
