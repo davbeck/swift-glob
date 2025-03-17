@@ -39,17 +39,20 @@ extension Pattern {
 		var components = components
 		var name = name
 
+		#if DEBUG
+			// used for infinite loop detection
+			var lastComponents: ArraySlice<Pattern.Section>?
+			var lastName: Substring?
+		#endif
+
 		while true {
-			if name.isEmpty {
-				if components.isEmpty || components.allSatisfy(\.matchesEmptyContent) {
-					return true
-				} else if components.contains(.pathWildcard) && components.allSatisfy({ $0 == .pathSeparator || $0.matchesEmptyContent }) {
-					// match foo/**/bar to foo/bar
-					return true
-				} else {
-					return false
+			#if DEBUG
+				if lastComponents == components && lastName == name {
+					fatalError("infinite loop!")
 				}
-			}
+				lastComponents = components
+				lastName = name
+			#endif
 
 			// this matches the value both from the beginning and the end, in order of what should be the most performant
 			// matching at the beginning of a string is faster than iterating over the end of a string
@@ -63,6 +66,8 @@ extension Pattern {
 				if name.first == options.pathSeparator {
 					components = components.dropFirst()
 					name = name.dropFirst()
+				} else if components.dropFirst().first == .pathWildcard {
+					components = components.dropFirst(2)
 				} else {
 					return false
 				}
@@ -75,14 +80,14 @@ extension Pattern {
 				}
 			case (.singleCharacter, _, _):
 				guard name.first != options.pathSeparator else { return false }
-				if options.requiresExplicitLeadingPeriods && isAtStart(name) && name.first == "." {
+				if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 					return false
 				}
 
 				components = components.dropFirst()
 				name = name.dropFirst()
 			case let (.oneOf(ranges, isNegated: isNegated), _, _):
-				if options.requiresExplicitLeadingPeriods && isAtStart(name) && name.first == "." {
+				if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 					// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
 					// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
 					// in our implimentation, it will not match
@@ -97,6 +102,8 @@ extension Pattern {
 				if name.last == options.pathSeparator {
 					components = components.dropLast()
 					name = name.dropLast()
+				} else if name.isEmpty && components.dropLast().last == .pathWildcard {
+					components = components.dropLast(2)
 				} else {
 					return false
 				}
@@ -118,14 +125,18 @@ extension Pattern {
 				components = components.dropLast()
 				name = name.dropLast()
 			case (.componentWildcard, _, _):
-				if options.requiresExplicitLeadingPeriods && isAtStart(name) && name.first == "." {
+				if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 					return false
 				}
 
 				if components.count == 1 {
 					if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
+						if options.matchesTrailingPathSeparator && name.isAtEnd && name.last == options.pathSeparator {
+							name = name.dropLast()
+						}
+
 						// the last component is a component level wildcard, which matches anything except for the path separator
-						return !name.contains(pathSeparator) || (options.matchesTrailingPathSeparator && name.endIndex == name.base.endIndex && name.dropSuffix(String(pathSeparator))?.contains(pathSeparator) == false)
+						return !name.contains(pathSeparator)
 					} else {
 						// no special treatment for path separators
 						return true
@@ -134,6 +145,8 @@ extension Pattern {
 
 				if match(components: components.dropFirst(), name) {
 					return true
+				} else if name.isEmpty {
+					return false
 				} else {
 					// components remain unchanged
 					name = name.dropFirst()
@@ -141,6 +154,8 @@ extension Pattern {
 			case (_, .componentWildcard, false):
 				if match(components: components.dropLast(), name) {
 					return true
+				} else if name.isEmpty {
+					return false
 				} else {
 					// components remain unchanged
 					name = name.dropLast()
@@ -155,6 +170,8 @@ extension Pattern {
 					return true
 				} else if components.dropFirst().first == .pathSeparator, match(components: components.dropFirst(2), name) {
 					return true
+				} else if name.isEmpty {
+					return false
 				} else {
 					// components remain unchanged
 					name = name.dropFirst()
@@ -214,7 +231,7 @@ extension Pattern {
 			}
 		case .singleCharacter:
 			guard name.first != options.pathSeparator else { return nil }
-			if options.requiresExplicitLeadingPeriods && isAtStart(name) {
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) {
 				return nil
 			}
 
@@ -223,7 +240,7 @@ extension Pattern {
 				name.dropFirst()
 			)
 		case let .oneOf(ranges, isNegated: isNegated):
-			if options.requiresExplicitLeadingPeriods && isAtStart(name) {
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) {
 				// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
 				// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
 				// in our implimentation, it will not match
@@ -236,7 +253,7 @@ extension Pattern {
 				name.dropFirst()
 			)
 		case .componentWildcard:
-			if options.requiresExplicitLeadingPeriods && isAtStart(name) {
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) {
 				return nil
 			}
 
@@ -324,8 +341,8 @@ extension Pattern {
 		}
 	}
 
-	private func isAtStart(_ name: Substring) -> Bool {
-		name.startIndex == name.base.startIndex || name.previous() == options.pathSeparator
+	private func isAtSegmentStart(_ name: Substring) -> Bool {
+		name.isAtStart || name.previous() == options.pathSeparator
 	}
 }
 
@@ -341,5 +358,13 @@ private extension Substring {
 	/// returns an empty substring preserving endIndex
 	func dropAll() -> Substring {
 		self.suffix(0)
+	}
+
+	var isAtStart: Bool {
+		startIndex == base.startIndex
+	}
+
+	var isAtEnd: Bool {
+		endIndex == base.endIndex
 	}
 }
