@@ -2,5 +2,12 @@
 
 set -e
 
+SEARCH_DIR=/private/tmp/swift-6.0-RELEASE
+
+if [ ! -d $SEARCH_DIR ]; then
+    echo "Search directory does not exist. Cloning..."
+    git clone --depth 1 -b swift-6.0-RELEASE https://github.com/swiftlang/swift.git $SEARCH_DIR
+fi
+
 cd Benchmark
-swift run -c release Benchmark $@
+swift run --quiet -c release Benchmark $@ $SEARCH_DIR
