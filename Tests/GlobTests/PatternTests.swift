@@ -76,6 +76,7 @@ final class PatternTests: XCTestCase {
 	func test_trailingPathSeparator() throws {
 		try XCTAssertMatches("abc/", pattern: "a*")
 		try XCTAssertDoesNotMatch("abc/", pattern: "a*", options: .init(matchesTrailingPathSeparator: false))
+		try XCTAssertMatches("dirB1/dirB2/", pattern: "**dirB2")
 	}
 
 	func test_nonNestedWildcards() throws {

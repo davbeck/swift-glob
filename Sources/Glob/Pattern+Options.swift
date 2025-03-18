@@ -82,12 +82,11 @@ public extension Pattern {
 		///
 		/// Defaults to "/" regardless of operating system.
 		public var pathSeparator: Character? = "/"
-		
+
 		/// If a trailing path separator in the search string will be ignored if it's not explicitly matched.
 		///
 		/// This allows patterns to match against a directory or a regular file. For instance "foo*" will match both "foo_file" and "foo_dir/" if this is enabled.
 		public var matchesTrailingPathSeparator: Bool = true
-		
 
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init()

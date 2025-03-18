@@ -25,7 +25,13 @@ extension Pattern {
 	/// - Parameter name: The string to match against
 	/// - Returns: true if the string matches the pattern
 	public func match(_ name: some StringProtocol) -> Bool {
-		match(components: .init(sections), .init(name))
+		if match(components: .init(sections), .init(name)) {
+			return true
+		} else if options.matchesTrailingPathSeparator && name.last == options.pathSeparator {
+			return match(components: .init(sections), .init(name).dropLast())
+		}
+
+		return false
 	}
 
 	// recursively matches against the pattern
@@ -131,10 +137,6 @@ extension Pattern {
 
 				if components.count == 1 {
 					if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
-						if options.matchesTrailingPathSeparator && name.isAtEnd && name.last == options.pathSeparator {
-							name = name.dropLast()
-						}
-
 						// the last component is a component level wildcard, which matches anything except for the path separator
 						return !name.contains(pathSeparator)
 					} else {
@@ -362,9 +364,5 @@ private extension Substring {
 
 	var isAtStart: Bool {
 		startIndex == base.startIndex
-	}
-
-	var isAtEnd: Bool {
-		endIndex == base.endIndex
 	}
 }
