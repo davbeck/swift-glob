@@ -32,16 +32,16 @@ public func search(
 	search(
 		directory: baseURL,
 		matching: { _, relativePath in
-			if !include.isEmpty {
-				guard include.contains(where: { $0.match(relativePath) }) else {
-					// for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendents or we won't find the files that do match
-					return .init(matches: false, skipDescendents: false)
-				}
-			}
-
 			for pattern in exclude {
 				if pattern.match(relativePath) {
 					return .init(matches: false, skipDescendents: true)
+				}
+			}
+
+			if !include.isEmpty {
+				guard include.contains(where: { $0.match(relativePath) }) else {
+					// for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendants or we won't find the files that do match
+					return .init(matches: false, skipDescendents: false)
 				}
 			}
 
@@ -82,7 +82,7 @@ public func search(
 						try await withThrowingTaskGroup(of: Void.self) { group in
 							for url in contents {
 								let isDirectory = try url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false
-								
+
 								var relativePath = relativeDirectoryPath + url.lastPathComponent
 								if isDirectory {
 									relativePath += "/"

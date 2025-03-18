@@ -3,36 +3,8 @@ import Testing
 
 @testable import Glob
 
-struct FishShellTests {
+class FishShellTests: SearchTestUtils {
 	// https://github.com/fish-shell/fish-shell/blob/master/tests/checks/glob.fish
-
-	private let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
-
-	init() throws {
-		try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-	}
-
-	private func touch(_ files: String...) throws {
-		for file in files {
-			try Data().write(to: directory.appending(path: file))
-		}
-	}
-
-	private func mkdir(_ files: String...) throws {
-		for file in files {
-			try FileManager.default.createDirectory(
-				at: directory.appending(path: file),
-				withIntermediateDirectories: true
-			)
-		}
-	}
-
-	private func ln(_ destination: String, _ source: String) throws {
-		try FileManager.default.createSymbolicLink(
-			at: directory.appending(path: source),
-			withDestinationURL: directory.appending(path: destination)
-		)
-	}
 
 	private func pattern(_ pattern: String) throws -> Pattern {
 		try Pattern(pattern, options: .default)
@@ -72,7 +44,7 @@ struct FishShellTests {
 		try ln("dir1/child1", "dir2/link2")
 
 		await withKnownIssue {
-			try await #expect(search("**/anyfile") == ["dir1/child1/anyfile", "dir2/link2/anyfile"])
+			try await #expect(self.search("**/anyfile") == ["dir1/child1/anyfile", "dir2/link2/anyfile"])
 		}
 	}
 
@@ -81,7 +53,7 @@ struct FishShellTests {
 		try touch("dir1/child2/grandchild1/differentfile")
 		try ln("dir1/child2/grandchild1", "dir1/child2/grandchild1/link2")
 
-		try await #expect(search("**/differentfile") == ["dir1/child2/grandchild1/differentfile"])
+		try await #expect(self.search("**/differentfile") == ["dir1/child2/grandchild1/differentfile"])
 	}
 
 	@Test func recursiveGlobsHandling() async throws {
@@ -90,10 +62,10 @@ struct FishShellTests {
 		try mkdir("dir_b1/dir_b2/dir_b3")
 		try touch("dir_b1/dir_b2/dir_b3/file_b")
 
-		try await #expect(search("**/file_*") == ["dir_a1/dir_a2/dir_a3/file_a", "dir_b1/dir_b2/dir_b3/file_b"])
-		try await #expect(search("**a3/file_*") == ["dir_a1/dir_a2/dir_a3/file_a"])
+		try await #expect(self.search("**/file_*") == ["dir_a1/dir_a2/dir_a3/file_a", "dir_b1/dir_b2/dir_b3/file_b"])
+		try await #expect(self.search("**a3/file_*") == ["dir_a1/dir_a2/dir_a3/file_a"])
 		try await #expect(
-			search("**") == [
+			self.search("**") == [
 				"dir_a1/",
 				"dir_a1/dir_a2/",
 				"dir_a1/dir_a2/dir_a3/",
@@ -106,7 +78,7 @@ struct FishShellTests {
 		)
 		// same issue as ``trailingSlashMatchesOnlyDirectories``
 		try await #expect(
-			search("**/") == [
+			self.search("**/") == [
 				"dir_a1/",
 				"dir_a1/dir_a2/",
 				"dir_a1/dir_a2/dir_a3/",
@@ -119,7 +91,7 @@ struct FishShellTests {
 			// "dir_a1/dir_a2" is also being matched
 			// so `/**/` should match an empty segment, but not a trailing `/**`
 			try await #expect(
-				search("**a2/**") == [
+				self.search("**a2/**") == [
 					"dir_a1/dir_a2/dir_a3",
 					"dir_a1/dir_a2/dir_a3/file_a",
 				]
@@ -135,7 +107,7 @@ struct FishShellTests {
 		try touch("bar", "foo/bar")
 
 		try await #expect(
-			search("**/bar") == [
+			self.search("**/bar") == [
 				"bar",
 				"foo/bar",
 			]
