@@ -9,7 +9,7 @@ import XCTest
 
 // from https://cs.opensource.google/go/go/+/refs/tags/go1.21.4:src/path/filepath/match_test.go
 
-final class PatternGoTests: XCTestCase {
+final class GoTests: XCTestCase {
 	func test() throws {
 		try XCTAssertMatches("abc", pattern: "abc", options: .go)
 		try XCTAssertMatches("abc", pattern: "*", options: .go)

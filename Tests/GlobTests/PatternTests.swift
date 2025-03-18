@@ -73,6 +73,12 @@ final class PatternTests: XCTestCase {
 		try XCTAssertDoesNotMatch("&", pattern: "[[:alpha:]]")
 	}
 
+	func test_trailingPathSeparator() throws {
+		try XCTAssertMatches("abc/", pattern: "a*")
+		try XCTAssertDoesNotMatch("abc/", pattern: "a*", options: .init(matchesTrailingPathSeparator: false))
+		try XCTAssertMatches("dirB1/dirB2/", pattern: "**dirB2")
+	}
+
 	func test_nonNestedWildcards() throws {
 		// from https://fishshell.com/docs/3.4/language.html#expand-wildcard
 		// If ** is a segment by itself, that segment may match zero times, for compatibility with other shells.

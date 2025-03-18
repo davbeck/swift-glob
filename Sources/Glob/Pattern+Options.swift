@@ -35,7 +35,7 @@ public extension Pattern {
 		/// Allows the `-` character to be included in a character class if it is the first or last character (ie `[-abc]` or `[abc-]`)
 		public var supportsRangeSeparatorAtBeginningAndEnd: Bool = true
 
-		/// If a period in the name is at the beginning of a component, don't match using wildcards.
+		/// If a period in the name is at the beginning of a component (ie hidden files), don't match using wildcards.
 		///
 		/// Treat the `.` character specially if it appears at the beginning of string. If this flag is set, wildcard constructs in pattern cannot match `.` as the first character of string. If you set both this and `pathSeparator`, then the special treatment applies to `.` following `pathSeparator` as well as to `.` at the beginning of string.
 		///
@@ -82,6 +82,11 @@ public extension Pattern {
 		///
 		/// Defaults to "/" regardless of operating system.
 		public var pathSeparator: Character? = "/"
+
+		/// If a trailing path separator in the search string will be ignored if it's not explicitly matched.
+		///
+		/// This allows patterns to match against a directory or a regular file. For instance "foo*" will match both "foo_file" and "foo_dir/" if this is enabled.
+		public var matchesTrailingPathSeparator: Bool = true
 
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init()
@@ -132,7 +137,8 @@ public extension Pattern {
 				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
 				matchLeadingDirectories: matchLeadingDirectories,
 				supportsPatternLists: supportsExtendedMatching,
-				pathSeparator: usePathnameBehavior ? "/" : nil
+				pathSeparator: usePathnameBehavior ? "/" : nil,
+				matchesTrailingPathSeparator: false
 			)
 		}
 

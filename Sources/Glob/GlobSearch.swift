@@ -27,29 +27,27 @@ public func search(
 	directory baseURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
 	include: [Pattern] = [],
 	exclude: [Pattern] = [],
-	includingPropertiesForKeys keys: [URLResourceKey] = [],
-	skipHiddenFiles: Bool = true
+	includingPropertiesForKeys keys: [URLResourceKey] = []
 ) -> AsyncThrowingStream<URL, any Error> {
 	search(
 		directory: baseURL,
 		matching: { _, relativePath in
-			if !include.isEmpty {
-				guard include.contains(where: { $0.match(relativePath) }) else {
-					// for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendents or we won't find the files that do match
-					return .init(matches: false, skipDescendents: false)
-				}
-			}
-
 			for pattern in exclude {
 				if pattern.match(relativePath) {
 					return .init(matches: false, skipDescendents: true)
 				}
 			}
 
+			if !include.isEmpty {
+				guard include.contains(where: { $0.match(relativePath) }) else {
+					// for patterns like `**/*.swift`, parent folders won't be matched but we don't want to skip those folder's descendants or we won't find the files that do match
+					return .init(matches: false, skipDescendents: false)
+				}
+			}
+
 			return .init(matches: true, skipDescendents: false)
 		},
-		includingPropertiesForKeys: keys,
-		skipHiddenFiles: skipHiddenFiles
+		includingPropertiesForKeys: keys
 	)
 }
 
@@ -68,27 +66,27 @@ public func search(
 public func search(
 	directory baseURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
 	matching: @escaping @Sendable (_ url: URL, _ relativePath: String) throws -> MatchResult,
-	includingPropertiesForKeys keys: [URLResourceKey] = [],
-	skipHiddenFiles: Bool = true
+	includingPropertiesForKeys keys: [URLResourceKey] = []
 ) -> AsyncThrowingStream<URL, any Error> {
 	AsyncThrowingStream(bufferingPolicy: .unbounded) { continuation in
 		let task = Task {
 			do {
 				@Sendable func enumerate(directory: URL, relativePath relativeDirectoryPath: String) async throws {
 					do {
-						var options: FileManager.DirectoryEnumerationOptions = []
-						if skipHiddenFiles {
-							options.insert(.skipsHiddenFiles)
-						}
 						let contents = try FileManager.default.contentsOfDirectory(
 							at: directory,
 							includingPropertiesForKeys: keys + [.isDirectoryKey],
-							options: options
+							options: []
 						)
 
 						try await withThrowingTaskGroup(of: Void.self) { group in
 							for url in contents {
-								let relativePath = relativeDirectoryPath + url.lastPathComponent
+								let isDirectory = try url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false
+
+								var relativePath = relativeDirectoryPath + url.lastPathComponent
+								if isDirectory {
+									relativePath += "/"
+								}
 
 								let matchResult = try matching(url, relativePath)
 
@@ -98,10 +96,9 @@ public func search(
 
 								guard !matchResult.skipDescendents else { continue }
 
-								let resourceValues = try url.resourceValues(forKeys: [.isDirectoryKey])
-								if resourceValues.isDirectory == true {
+								if isDirectory {
 									group.addTask {
-										try await enumerate(directory: url, relativePath: relativePath + "/")
+										try await enumerate(directory: url, relativePath: relativePath)
 									}
 								}
 							}
