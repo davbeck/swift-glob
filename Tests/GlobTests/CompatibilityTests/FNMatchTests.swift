@@ -197,22 +197,22 @@ final class FNMatchTests: XCTestCase {
 
 	//  B.6 012(C)
 	func test_b_6_012_c() throws {
-		XCTExpectFailure {
-			// C		 "a"			"[[.a.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.][.].]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
-			// C		 "-"			"[[.].][.-.]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.][=u=]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.][:alpha:]]"     0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
-			// C		 "a"			"[![.a.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
-		}
+		// C		 "a"			"[[.a.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
+//		XCTExpectFailure {
+//			// C		 "-"			"[[.-.]]"	       0
+//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
+//			// C		 "-"			"[[.-.][.].]]"	       0
+//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
+//			// C		 "-"			"[[.].][.-.]]"	       0
+//			XCTAssertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
+//			// C		 "-"			"[[.-.][=u=]]"	       0
+//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
+//			// C		 "-"			"[[.-.][:alpha:]]"     0
+//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
+//			// C		 "a"			"[![.a.]]"	       NOMATCH
+//			XCTAssertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
+//		}
 	}
 
 	//  B.6 013(C)
@@ -532,9 +532,7 @@ final class FNMatchTests: XCTestCase {
 		// C		 "a]"			"[[alpha:]]"	       0
 		XCTAssertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][.b.]]"     0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][=b=]]"     0
 		XCTExpectFailure {
 			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
@@ -596,24 +594,22 @@ final class FNMatchTests: XCTestCase {
 
 	//  B.6 019(C)
 	func test_b_6_019_c() throws {
-		XCTExpectFailure {
-			// C		 "a"			"[c-a]"		       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[.c.]-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[c-[.a.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[.c.]-[.a.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[c-a]"		       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[[.c.]-a]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[c-[.a.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[[.c.]-[.a.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
-		}
+		// C		 "a"			"[c-a]"		       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[.c.]-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[c-[.a.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[.c.]-[.a.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[c-a]"		       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[[.c.]-a]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[c-[.a.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[[.c.]-[.a.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 020(C)
@@ -1329,9 +1325,7 @@ final class FNMatchTests: XCTestCase {
 		// C.UTF-8		 "a]"			"[[alpha:]]"	       0
 		XCTAssertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][.b.]]"     0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][=b=]]"     0
 		XCTExpectFailure {
 			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
@@ -1393,27 +1387,19 @@ final class FNMatchTests: XCTestCase {
 	//  B.6 019(C) utf8
 	func test_b_6_019_c_utf8() throws {
 		// C.UTF-8		 "a"			"[c-a]"		       NOMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a"			"[[.c.]-a]"	       NOMATCH
 		XCTAssertMatchesFNMatch("a", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a"			"[c-[.a.]]"	       NOMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a"			"[[.c.]-[.a.]]"	       NOMATCH
 		XCTAssertMatchesFNMatch("a", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[c-a]"		       NOMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[[.c.]-a]"	       NOMATCH
 		XCTAssertMatchesFNMatch("c", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[c-[.a.]]"	       NOMATCH
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-		}
+		XCTAssertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[[.c.]-[.a.]]"	       NOMATCH
 		XCTAssertMatchesFNMatch("c", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
 	}

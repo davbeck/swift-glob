@@ -23,6 +23,7 @@ extension Pattern {
 			case plus // +
 			case exclamationMark // !
 			case caret // ^
+			case period // .
 
 			init(_ character: Character) {
 				switch character {
@@ -52,6 +53,8 @@ extension Pattern {
 					self = .exclamationMark
 				case "^":
 					self = .caret
+				case ".":
+					self = .period
 				default:
 					self = .character(character)
 				}
@@ -87,6 +90,8 @@ extension Pattern {
 					"!"
 				case .caret:
 					"^"
+				case .period:
+					"."
 				}
 			}
 		}
@@ -178,107 +183,135 @@ extension Pattern {
 						sections.append(constant: next.character)
 					}
 				case .leftSquareBracket:
-					let negated: Bool
-					if try pop(options.rangeNegationCharacter.token) {
-						negated = true
-					} else {
-						negated = false
-					}
-
-					var ranges: [CharacterClass] = []
-
-					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.rightSquareBracket) {
-						// https://man7.org/linux/man-pages/man7/glob.7.html
-						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
-						ranges.append(.character("]"))
-					}
-
-					loop: while true {
-						guard let next = try pop() else {
-							throw PatternParsingError.rangeNotClosed
-						}
-
-						switch next {
-						case .rightSquareBracket:
-							break loop
-						case .leftSquareBracket:
-							if try pop(.colon) {
-								// Named character classes
-								guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
-
-								let name = pattern.prefix(upTo: endIndex)
-
-								if let name = CharacterClass.Name(rawValue: String(name)) {
-									ranges.append(.named(name))
-									pattern = pattern[endIndex...].dropFirst()
-
-									if try !pop(.rightSquareBracket) {
-										throw PatternParsingError.rangeNotClosed
-									}
-								} else {
-									throw PatternParsingError.invalidNamedCharacterClass(String(name))
-								}
-							} else {
-								ranges.append(.character("["))
-							}
-						case .dash:
-							if !options.supportsRangeSeparatorAtBeginningAndEnd {
-								throw PatternParsingError.rangeMissingBounds
-							}
-
-							// https://man7.org/linux/man-pages/man7/glob.7.html
-							// One may include '-' in its literal meaning by making it the first or last character between the brackets.
-							ranges.append(.character("-"))
-						default:
-							if try pop(.dash) {
-								if try pop(.rightSquareBracket) {
-									if !options.supportsRangeSeparatorAtBeginningAndEnd {
-										throw PatternParsingError.rangeNotClosed
-									}
-
-									// `-` is the last character in the group, treat it as a character
-									// https://man7.org/linux/man-pages/man7/glob.7.html
-									// One may include '-' in its literal meaning by making it the first or last character between the brackets.
-									ranges.append(.character(next.character))
-									ranges.append(.character("-"))
-
-									break loop
-								} else {
-									// this is a range like a-z, find the upper limit of the range
-									guard
-										let upper = try pop()
-									else { throw PatternParsingError.rangeNotClosed }
-
-									guard next.character <= upper.character else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
-									ranges.append(.range(next.character ... upper.character))
-								}
-							} else {
-								ranges.append(.character(next.character))
-							}
-						}
-					}
-
-					guard !ranges.isEmpty else {
-						if options.emptyRangeBehavior == .error {
-							throw PatternParsingError.rangeIsEmpty
-						} else {
-							break
-						}
-					}
-
-					sections.append(.oneOf(ranges, isNegated: negated))
+					try sections.append(contentsOf: self.parseOneOf())
 				case let .character(character):
 					if character == options.pathSeparator {
 						sections.append(.pathSeparator)
 					} else {
 						sections.append(constant: character)
 					}
-				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret:
+				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret, .period:
 					sections.append(constant: next.character)
 				}
 			}
 
 			return sections
+		}
+
+		private mutating func parseOneOf() throws -> [Section] {
+			let negated: Bool
+			if try pop(options.rangeNegationCharacter.token) {
+				negated = true
+			} else {
+				negated = false
+			}
+
+			var ranges: [CharacterClass] = []
+
+			if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.rightSquareBracket) {
+				// https://man7.org/linux/man-pages/man7/glob.7.html
+				// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
+				ranges.append(.character("]"))
+			}
+
+			while true {
+				guard var next = try pop() else {
+					throw PatternParsingError.rangeNotClosed
+				}
+
+				if next == .rightSquareBracket {
+					break
+				}
+
+				if next == .dash {
+					if !options.supportsRangeSeparatorAtBeginningAndEnd {
+						throw PatternParsingError.rangeMissingBounds
+					}
+
+					// https://man7.org/linux/man-pages/man7/glob.7.html
+					// One may include '-' in its literal meaning by making it the first or last character between the brackets.
+					ranges.append(.character("-"))
+
+					continue
+				}
+
+				if next == .leftSquareBracket {
+					if try pop(.colon) {
+						// Named character classes
+						guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
+
+						let name = pattern.prefix(upTo: endIndex)
+
+						if let name = CharacterClass.Name(rawValue: String(name)) {
+							ranges.append(.named(name))
+							pattern = pattern[endIndex...].dropFirst()
+
+							if try !pop(.rightSquareBracket) {
+								throw PatternParsingError.rangeNotClosed
+							}
+						} else {
+							throw PatternParsingError.invalidNamedCharacterClass(String(name))
+						}
+
+						continue
+					} else if try pop(.period) {
+						// Named character classes
+						guard let endIndex = pattern.firstIndex(of: ".") else { throw PatternParsingError.rangeNotClosed }
+
+						let name = pattern.prefix(upTo: endIndex)
+
+						guard let character = name.first, name.count == 1 else {
+							throw PatternParsingError.multiCharacterCollatingElementsNotSupported
+						}
+
+						pattern = pattern[endIndex...].dropFirst()
+
+						if try !pop(.rightSquareBracket) {
+							throw PatternParsingError.rangeNotClosed
+						}
+
+						next = .character(character)
+					} else {
+						ranges.append(.character("["))
+						continue
+					}
+				}
+
+				if try pop(.dash) {
+					if try pop(.rightSquareBracket) {
+						if !options.supportsRangeSeparatorAtBeginningAndEnd {
+							throw PatternParsingError.rangeNotClosed
+						}
+
+						// `-` is the last character in the group, treat it as a character
+						// https://man7.org/linux/man-pages/man7/glob.7.html
+						// One may include '-' in its literal meaning by making it the first or last character between the brackets.
+						ranges.append(.character(next.character))
+						ranges.append(.character("-"))
+
+						break
+					} else {
+						// this is a range like a-z, find the upper limit of the range
+						guard
+							let upper = try pop()
+						else { throw PatternParsingError.rangeNotClosed }
+
+						ranges.append(.range(lower: next.character, upper: upper.character))
+					}
+				} else {
+					ranges.append(.character(next.character))
+				}
+			}
+
+			guard !ranges.isEmpty else {
+				if options.emptyRangeBehavior == .error {
+					throw PatternParsingError.rangeIsEmpty
+				} else {
+					return []
+				}
+			}
+
+			return [.oneOf(ranges, isNegated: negated)]
 		}
 
 		/// Parses a pattern list like `(abc|xyz)`

@@ -76,7 +76,9 @@ public struct Pattern: Equatable, Sendable {
 	}
 
 	public enum CharacterClass: Equatable, Sendable {
-		case range(ClosedRange<Character>)
+		// we don't use ClosedRange here because c-a is a valid range that should not match anything
+		// ClosedRange would crash if you tried to create that and would incorrectly match characters if you sorted the bounds
+		case range(lower: Character, upper: Character)
 
 		public enum Name: String, Equatable, Sendable {
 			// https://man7.org/linux/man-pages/man7/glob.7.html
@@ -143,13 +145,13 @@ public struct Pattern: Equatable, Sendable {
 		case named(Name)
 
 		static func character(_ character: Character) -> Self {
-			.range(character ... character)
+			.range(lower: character, upper: character)
 		}
 
 		public func contains(_ character: Character) -> Bool {
 			switch self {
-			case let .range(closedRange):
-				closedRange.contains(character)
+			case let .range(lower: lower, upper: upper):
+				character >= lower && character <= upper
 			case let .named(name):
 				name.contains(character)
 			}

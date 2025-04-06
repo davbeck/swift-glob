@@ -17,8 +17,6 @@ public enum PatternParsingError: Error {
 	case rangeIsEmpty
 	/// The range included a separator but no lower bound (ie "[-c]")
 	case rangeMissingBounds
-	/// The upper bound of a range is lower than the lower bound
-	case rangeBoundsAreOutOfOrder
 
 	/// An escape was started without an actual escaped character because the escape was at the end of the pattern
 	case invalidEscapeCharacter
@@ -29,4 +27,6 @@ public enum PatternParsingError: Error {
 	case patternListNotClosed
 
 	case emptyPatternList
+	
+	case multiCharacterCollatingElementsNotSupported
 }
