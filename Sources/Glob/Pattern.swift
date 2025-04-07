@@ -76,9 +76,34 @@ public struct Pattern: Equatable, Sendable {
 	}
 
 	public enum CharacterClass: Equatable, Sendable {
+		public struct CharacterBound: Equatable, Sendable {
+			public var character: Character
+			/// When true, equivalent characters will match in both directions (for instance "a" will match "â").
+			public var matchesEquivalent: Bool
+
+			public init(_ character: Character, matchesEquivalent: Bool = false) {
+				self.character = character
+				self.matchesEquivalent = matchesEquivalent
+			}
+
+			func compare(_ rhs: Character) -> ComparisonResult {
+				if matchesEquivalent {
+					String(character).compare(String(rhs), options: .diacriticInsensitive, locale: .current)
+				} else {
+					if character == rhs {
+						.orderedSame
+					} else if character < rhs {
+						.orderedAscending
+					} else {
+						.orderedDescending
+					}
+				}
+			}
+		}
+
 		// we don't use ClosedRange here because c-a is a valid range that should not match anything
 		// ClosedRange would crash if you tried to create that and would incorrectly match characters if you sorted the bounds
-		case range(lower: Character, upper: Character)
+		case range(lower: CharacterBound, upper: CharacterBound)
 
 		public enum Name: String, Equatable, Sendable {
 			// https://man7.org/linux/man-pages/man7/glob.7.html
@@ -144,14 +169,14 @@ public struct Pattern: Equatable, Sendable {
 
 		case named(Name)
 
-		static func character(_ character: Character) -> Self {
+		static func character(_ character: CharacterBound) -> Self {
 			.range(lower: character, upper: character)
 		}
 
 		public func contains(_ character: Character) -> Bool {
 			switch self {
 			case let .range(lower: lower, upper: upper):
-				character >= lower && character <= upper
+				lower.compare(character) != .orderedDescending && upper.compare(character) != .orderedAscending
 			case let .named(name):
 				name.contains(character)
 			}

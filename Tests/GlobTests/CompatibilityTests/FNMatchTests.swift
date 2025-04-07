@@ -199,20 +199,18 @@ final class FNMatchTests: XCTestCase {
 	func test_b_6_012_c() throws {
 		// C		 "a"			"[[.a.]]"	       0
 		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
-//		XCTExpectFailure {
-//			// C		 "-"			"[[.-.]]"	       0
-//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
-//			// C		 "-"			"[[.-.][.].]]"	       0
-//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
-//			// C		 "-"			"[[.].][.-.]]"	       0
-//			XCTAssertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
-//			// C		 "-"			"[[.-.][=u=]]"	       0
-//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
-//			// C		 "-"			"[[.-.][:alpha:]]"     0
-//			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
-//			// C		 "a"			"[![.a.]]"	       NOMATCH
-//			XCTAssertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
-//		}
+		// C		 "-"			"[[.-.]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.][.].]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
+		// C		 "-"			"[[.].][.-.]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.][=u=]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.][:alpha:]]"     0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
+		// C		 "a"			"[![.a.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 013(C)
@@ -227,20 +225,18 @@ final class FNMatchTests: XCTestCase {
 
 	//  B.6 015(C)
 	func test_b_6_015_c() throws {
-		XCTExpectFailure {
-			// C		 "a"			"[[=a=]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
-			// C		 "b"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// C		 "b"			"[[=a=][=b=]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C		 "a"			"[[=a=][=b=]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C		 "a"			"[[=a=][.b.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
-			// C		 "a"			"[[=a=][:digit:]]"     0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
-		}
+		// C		 "a"			"[[=a=]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
+		// C		 "b"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// C		 "b"			"[[=a=][=b=]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C		 "a"			"[[=a=][=b=]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C		 "a"			"[[=a=][.b.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
+		// C		 "a"			"[[=a=][:digit:]]"     0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
 	}
 
 	//  B.6 016(C)
@@ -534,9 +530,7 @@ final class FNMatchTests: XCTestCase {
 		// C		 "a"			"[[:alpha:][.b.]]"     0
 		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][=b=]]"     0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][:digit:]]" 0
 		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
 		// C		 "a"			"[[:digit:][:alpha:]]" 0
@@ -564,32 +558,30 @@ final class FNMatchTests: XCTestCase {
 		// C		 "as"			"[a-ca-z]"	       NOMATCH
 		XCTAssertMatchesFNMatch("as", pattern: "[a-ca-z]", flags: 0, result: NOMATCH)
 
-		XCTExpectFailure {
-			// C		 "a"			"[[.a.]-c]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C		 "a"			"[a-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C		 "a"			"[[.a.]-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C		 "b"			"[[.a.]-c]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C		 "b"			"[a-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C		 "b"			"[[.a.]-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C		 "c"			"[[.a.]-c]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C		 "c"			"[a-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C		 "c"			"[[.a.]-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C		 "d"			"[[.a.]-c]"	       NOMATCH
-			XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
-			// C		 "d"			"[a-[.c.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
-			// C		 "d"			"[[.a.]-[.c.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-[.c.]]", flags: 0, result: NOMATCH)
-		}
+		// C		 "a"			"[[.a.]-c]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C		 "a"			"[a-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C		 "a"			"[[.a.]-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C		 "b"			"[[.a.]-c]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C		 "b"			"[a-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C		 "b"			"[[.a.]-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C		 "c"			"[[.a.]-c]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C		 "c"			"[a-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C		 "c"			"[[.a.]-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C		 "d"			"[[.a.]-c]"	       NOMATCH
+		XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
+		// C		 "d"			"[a-[.c.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
+		// C		 "d"			"[[.a.]-[.c.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-[.c.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 019(C)
@@ -990,22 +982,20 @@ final class FNMatchTests: XCTestCase {
 
 	//  B.6 012(C) utf8
 	func test_b_6_012_c_utf8() throws {
-		XCTExpectFailure {
-			// C.UTF-8		 "a"			"[[.a.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.][.].]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.].][.-.]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.][=u=]]"	       0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.][:alpha:]]"     0
-			XCTAssertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[![.a.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		 "a"			"[[.a.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.][.].]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.].][.-.]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.][=u=]]"	       0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.][:alpha:]]"     0
+		XCTAssertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[![.a.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 013(C) utf8
@@ -1020,20 +1010,18 @@ final class FNMatchTests: XCTestCase {
 
 	//  B.6 015(C) utf8
 	func test_b_6_015_c_utf8() throws {
-		XCTExpectFailure {
-			// C.UTF-8		 "a"			"[[=a=]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[=a=][=b=]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[=a=][=b=]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[=a=][.b.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[=a=][:digit:]]"     0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
-		}
+		// C.UTF-8		 "a"			"[[=a=]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[=a=][=b=]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[=a=][=b=]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[=a=][.b.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[=a=][:digit:]]"     0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
 	}
 
 	//  B.6 016(C) utf8
@@ -1327,9 +1315,7 @@ final class FNMatchTests: XCTestCase {
 		// C.UTF-8		 "a"			"[[:alpha:][.b.]]"     0
 		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][=b=]]"     0
-		XCTExpectFailure {
-			XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
-		}
+		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][:digit:]]" 0
 		XCTAssertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:digit:][:alpha:]]" 0
@@ -1356,30 +1342,28 @@ final class FNMatchTests: XCTestCase {
 		XCTAssertMatchesFNMatch("", pattern: "[a-c]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "as"			"[a-ca-z]"	       NOMATCH
 		XCTAssertMatchesFNMatch("as", pattern: "[a-ca-z]", flags: 0, result: NOMATCH)
-		XCTExpectFailure {
-			// C.UTF-8		 "a"			"[[.a.]-c]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[a-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[.a.]-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[.a.]-c]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[a-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[.a.]-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[[.a.]-c]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[a-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[[.a.]-[.c.]]"	       0
-			XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "d"			"[[.a.]-c]"	       NOMATCH
-			XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "d"			"[a-[.c.]]"	       NOMATCH
-			XCTAssertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		 "a"			"[[.a.]-c]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[a-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[.a.]-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[.a.]-c]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[a-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[.a.]-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[[.a.]-c]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[a-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[[.a.]-[.c.]]"	       0
+		XCTAssertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "d"			"[[.a.]-c]"	       NOMATCH
+		XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "d"			"[a-[.c.]]"	       NOMATCH
+		XCTAssertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "d"			"[[.a.]-[.c.]]"	       NOMATCH
 		XCTAssertMatchesFNMatch("d", pattern: "[[.a.]-[.c.]]", flags: 0, result: NOMATCH)
 	}
@@ -1795,83 +1779,81 @@ final class FNMatchTests: XCTestCase {
 		// de_DE.ISO-8859-1 "\334"			"[[:alpha:]]"	       0
 		XCTAssertMatchesFNMatch("\u{dc}", pattern: "[[:alpha:]]", flags: 0, result: 0)
 
-		XCTExpectFailure {
-			// de_DE.ISO-8859-1 "a"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=a=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\342=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\342=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\342=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\342=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\342=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\342=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\342=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e2}=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\340=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\340=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\340=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\340=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\340=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\340=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\340=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e0}=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\341=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\341=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\341=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\341=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\341=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\341=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\341=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e1}=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\344=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\344=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\344=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\344=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\344=]b]"	       0
-			XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\344=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\344=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e4}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=a=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\342=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\342=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\342=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\342=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\342=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\342=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\342=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e2}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\340=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\340=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\340=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\340=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\340=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\340=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\340=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e0}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\341=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\341=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\341=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\341=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\341=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\341=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\341=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e1}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\344=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\344=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\344=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\344=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\344=]b]"	       0
+		XCTAssertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\344=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\344=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=\u{e4}=]b]", flags: 0, result: NOMATCH)
 
-			// de_DE.ISO-8859-1 "aa"			"[[.a.]]a"	       0
-			XCTAssertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "ba"			"[[.a.]]a"	       NOMATCH
-			XCTAssertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
-		}
+		// de_DE.ISO-8859-1 "aa"			"[[.a.]]a"	       0
+		XCTAssertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "ba"			"[[.a.]]a"	       NOMATCH
+		XCTAssertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
 	}
 
 	//  multibyte character set
@@ -2001,83 +1983,81 @@ final class FNMatchTests: XCTestCase {
 		// de_DE.UTF-8	 "Ü"			"[[:alpha:]]"	       0
 		XCTAssertMatchesFNMatch("Ü", pattern: "[[:alpha:]]", flags: 0, result: 0)
 
-		XCTExpectFailure {
-			// de_DE.UTF-8	 "a"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("â", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("à", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("á", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("ä", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=a=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=a=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=â=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=â=]b]"	       0
-			XCTAssertMatchesFNMatch("â", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=â=]b]"	       0
-			XCTAssertMatchesFNMatch("à", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=â=]b]"	       0
-			XCTAssertMatchesFNMatch("á", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=â=]b]"	       0
-			XCTAssertMatchesFNMatch("ä", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=â=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=â=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=â=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=à=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=à=]b]"	       0
-			XCTAssertMatchesFNMatch("â", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=à=]b]"	       0
-			XCTAssertMatchesFNMatch("à", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=à=]b]"	       0
-			XCTAssertMatchesFNMatch("á", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=à=]b]"	       0
-			XCTAssertMatchesFNMatch("ä", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=à=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=à=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=à=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=á=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=á=]b]"	       0
-			XCTAssertMatchesFNMatch("â", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=á=]b]"	       0
-			XCTAssertMatchesFNMatch("à", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=á=]b]"	       0
-			XCTAssertMatchesFNMatch("á", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=á=]b]"	       0
-			XCTAssertMatchesFNMatch("ä", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=á=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=á=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=á=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=ä=]b]"	       0
-			XCTAssertMatchesFNMatch("a", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=ä=]b]"	       0
-			XCTAssertMatchesFNMatch("â", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=ä=]b]"	       0
-			XCTAssertMatchesFNMatch("à", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=ä=]b]"	       0
-			XCTAssertMatchesFNMatch("á", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=ä=]b]"	       0
-			XCTAssertMatchesFNMatch("ä", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=ä=]b]"	       0
-			XCTAssertMatchesFNMatch("b", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=ä=]b]"	       NOMATCH
-			XCTAssertMatchesFNMatch("c", pattern: "[[=ä=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("â", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("à", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("á", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("ä", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=a=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=a=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=â=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=â=]b]"	       0
+		XCTAssertMatchesFNMatch("â", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=â=]b]"	       0
+		XCTAssertMatchesFNMatch("à", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=â=]b]"	       0
+		XCTAssertMatchesFNMatch("á", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=â=]b]"	       0
+		XCTAssertMatchesFNMatch("ä", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=â=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=â=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=â=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=à=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=à=]b]"	       0
+		XCTAssertMatchesFNMatch("â", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=à=]b]"	       0
+		XCTAssertMatchesFNMatch("à", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=à=]b]"	       0
+		XCTAssertMatchesFNMatch("á", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=à=]b]"	       0
+		XCTAssertMatchesFNMatch("ä", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=à=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=à=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=à=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=á=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=á=]b]"	       0
+		XCTAssertMatchesFNMatch("â", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=á=]b]"	       0
+		XCTAssertMatchesFNMatch("à", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=á=]b]"	       0
+		XCTAssertMatchesFNMatch("á", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=á=]b]"	       0
+		XCTAssertMatchesFNMatch("ä", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=á=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=á=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=á=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=ä=]b]"	       0
+		XCTAssertMatchesFNMatch("a", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=ä=]b]"	       0
+		XCTAssertMatchesFNMatch("â", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=ä=]b]"	       0
+		XCTAssertMatchesFNMatch("à", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=ä=]b]"	       0
+		XCTAssertMatchesFNMatch("á", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=ä=]b]"	       0
+		XCTAssertMatchesFNMatch("ä", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=ä=]b]"	       0
+		XCTAssertMatchesFNMatch("b", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=ä=]b]"	       NOMATCH
+		XCTAssertMatchesFNMatch("c", pattern: "[[=ä=]b]", flags: 0, result: NOMATCH)
 
-			// de_DE.UTF-8	 "aa"			"[[.a.]]a"	       0
-			XCTAssertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ba"			"[[.a.]]a"	       NOMATCH
-			XCTAssertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
-		}
+		// de_DE.UTF-8	 "aa"			"[[.a.]]a"	       0
+		XCTAssertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ba"			"[[.a.]]a"	       NOMATCH
+		XCTAssertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
 	}
 
 	//  GNU extensions.
