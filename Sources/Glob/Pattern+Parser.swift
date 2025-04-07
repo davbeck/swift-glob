@@ -138,7 +138,7 @@ extension Pattern {
 					return false
 				}
 			}
-			
+
 			return true
 		}
 

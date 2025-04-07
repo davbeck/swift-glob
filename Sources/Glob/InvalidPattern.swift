@@ -27,6 +27,6 @@ public enum PatternParsingError: Error {
 	case patternListNotClosed
 
 	case emptyPatternList
-	
+
 	case multiCharacterCollatingElementsNotSupported
 }
