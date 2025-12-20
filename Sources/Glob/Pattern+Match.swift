@@ -183,10 +183,11 @@ extension Pattern {
 					components: components,
 					name,
 					style: style,
-					subSections: subSections
+					subSections: subSections,
+					requiresCompleteMatch: true
 				)
 
-				return remaining?.isEmpty == true
+				return remaining != nil
 			case (.none, _, _):
 				if options.matchLeadingDirectories && name.first == options.pathSeparator {
 					return true
@@ -307,40 +308,149 @@ extension Pattern {
 		components: ArraySlice<Section>,
 		_ name: Substring,
 		style: Section.PatternListStyle,
-		subSections: [[Section]]
+		subSections: [[Section]],
+		requiresCompleteMatch: Bool = false
 	) -> Substring? {
-		for sectionsOption in subSections {
-			if let remaining = matchPrefix(
-				components: ArraySlice(sectionsOption + components.dropFirst()),
-				name
-			) {
-				// stop infinite recursion
-				guard remaining != name else { return remaining }
+		switch style {
+		case .negated:
+			return matchNegatedPatternListPrefix(
+				components: components,
+				name,
+				subSections: subSections,
+				requiresCompleteMatch: requiresCompleteMatch
+			)
+		case .one:
+			// Must match exactly one of the options
+			for sectionsOption in subSections {
+				if let afterOption = matchPrefix(components: ArraySlice(sectionsOption), name) {
+					if let remaining = matchPrefix(components: components.dropFirst(), afterOption) {
+						if !requiresCompleteMatch || remaining.isEmpty {
+							return remaining
+						}
+					}
+				}
+			}
+			return nil
+		case .zeroOrOne:
+			// Try matching one of the options first
+			for sectionsOption in subSections {
+				if let afterOption = matchPrefix(components: ArraySlice(sectionsOption), name) {
+					if let remaining = matchPrefix(components: components.dropFirst(), afterOption) {
+						if !requiresCompleteMatch || remaining.isEmpty {
+							return remaining
+						}
+					}
+				}
+			}
+			// Then try matching zero
+			if let remaining = matchPrefix(components: components.dropFirst(), name) {
+				if !requiresCompleteMatch || remaining.isEmpty {
+					return remaining
+				}
+			}
+			return nil
+		case .oneOrMore:
+			// Must match at least one, then try to match more
+			return matchRepeatingPatternListPrefix(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: true,
+				requiresCompleteMatch: requiresCompleteMatch
+			)
+		case .zeroOrMore:
+			// Can match zero or more
+			return matchRepeatingPatternListPrefix(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: false,
+				requiresCompleteMatch: requiresCompleteMatch
+			)
+		}
+	}
 
-				switch style {
-				case .negated:
-					return nil
-				case .oneOrMore, .zeroOrMore:
-					// switch to zeroOrMore since we've already fulfilled the "one" requirement
-					return matchPrefix(
-						components: [.patternList(.zeroOrMore, subSections)] + components.dropFirst(),
-						remaining
-					)
-				case .one, .zeroOrOne:
-					// already matched "one", can't match any more
+	private func matchRepeatingPatternListPrefix(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		subSections: [[Section]],
+		needsAtLeastOne: Bool,
+		requiresCompleteMatch: Bool = false
+	) -> Substring? {
+		// Try each option
+		for sectionsOption in subSections {
+			if let afterOption = matchPrefix(components: ArraySlice(sectionsOption), name) {
+				// Prevent infinite recursion when option matches empty
+				guard afterOption != name else { continue }
+
+				// After matching one, try to match more occurrences
+				if let remaining = matchRepeatingPatternListPrefix(
+					components: components,
+					afterOption,
+					subSections: subSections,
+					needsAtLeastOne: false,
+					requiresCompleteMatch: requiresCompleteMatch
+				) {
+					// Only accept if this leads to a complete match when required
+					if !requiresCompleteMatch || remaining.isEmpty {
+						return remaining
+					}
+				}
+
+				// Try using just this occurrence and matching the rest of the pattern
+				if let remaining = matchPrefix(components: components.dropFirst(), afterOption) {
+					if !requiresCompleteMatch || remaining.isEmpty {
+						return remaining
+					}
+				}
+			}
+		}
+
+		// If allowed, try matching zero occurrences
+		if !needsAtLeastOne {
+			if let remaining = matchPrefix(components: components.dropFirst(), name) {
+				if !requiresCompleteMatch || remaining.isEmpty {
 					return remaining
 				}
 			}
 		}
 
-		switch style {
-		case .negated:
-			return matchPrefix(components: [.pathWildcard] + components.dropFirst(), name)
-		case .zeroOrMore, .zeroOrOne:
-			return matchPrefix(components: components.dropFirst(), name)
-		case .one, .oneOrMore:
-			return nil
+		return nil
+	}
+
+	private func matchNegatedPatternListPrefix(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		subSections: [[Section]],
+		requiresCompleteMatch: Bool = false
+	) -> Substring? {
+		// !(pattern-list) matches any string that cannot be matched by any pattern in the list
+		// We try different prefix lengths (longest first) and check if any pattern matches that exact prefix
+
+		// Try consuming different lengths of the input (longest first for greedy matching)
+		for length in stride(from: name.count, through: 0, by: -1) {
+			let prefix = name.prefix(length)
+
+			// Check if this exact prefix matches any pattern completely
+			let matchesAnyPattern = subSections.contains { sections in
+				if let remaining = matchPrefix(components: ArraySlice(sections), Substring(prefix)) {
+					return remaining.isEmpty
+				}
+				return false
+			}
+
+			if !matchesAnyPattern {
+				// This prefix doesn't match any pattern exactly, it's a valid negation match
+				let afterNegation = name.dropFirst(length)
+				if let remaining = matchPrefix(components: components.dropFirst(), afterNegation) {
+					if !requiresCompleteMatch || remaining.isEmpty {
+						return remaining
+					}
+				}
+			}
 		}
+
+		return nil
 	}
 
 	private func isAtSegmentStart(_ name: Substring) -> Bool {
