@@ -1,90 +1,90 @@
-import XCTest
+import Testing
 
 @testable import Glob
 
-final class PatternTests: XCTestCase {
-	func test_pathWildcard_matchesSingleNestedFolders() throws {
-		try XCTAssertMatches("Target/AutoMockable.generated.swift", pattern: "**/*.generated.swift")
+struct PatternTests {
+	@Test func pathWildcard_matchesSingleNestedFolders() throws {
+		try assertMatches("Target/AutoMockable.generated.swift", pattern: "**/*.generated.swift")
 	}
 
-	func test_pathWildcard_matchesMultipleNestedFolders() throws {
-		try XCTAssertMatches("Target/Generated/AutoMockable.generated.swift", pattern: "**/*.generated.swift")
+	@Test func pathWildcard_matchesMultipleNestedFolders() throws {
+		try assertMatches("Target/Generated/AutoMockable.generated.swift", pattern: "**/*.generated.swift")
 	}
 
-	func test_componentWildcard_matchesNonNestedFiles() throws {
-		try XCTAssertMatches("AutoMockable.generated.swift", pattern: "*.generated.swift")
+	@Test func componentWildcard_matchesNonNestedFiles() throws {
+		try assertMatches("AutoMockable.generated.swift", pattern: "*.generated.swift")
 	}
 
-	func test_componentWildcard_doesNotMatchNestedPaths() throws {
-		try XCTAssertDoesNotMatch("Target/AutoMockable.generated.swift", pattern: "*.generated.swift")
+	@Test func componentWildcard_doesNotMatchNestedPaths() throws {
+		try assertDoesNotMatch("Target/AutoMockable.generated.swift", pattern: "*.generated.swift")
 	}
 
-	func test_multipleWildcards_matchesWithMultipleConstants() throws {
+	@Test func multipleWildcards_matchesWithMultipleConstants() throws {
 		// this can be tricky for some implementations because as they are parsing the first wildcard,
 		// it will see a match and move on and the remaining pattern and content will not match
-		try XCTAssertMatches("Target/AutoMockable/Sources/AutoMockable.generated.swift", pattern: "**/AutoMockable*.swift")
+		try assertMatches("Target/AutoMockable/Sources/AutoMockable.generated.swift", pattern: "**/AutoMockable*.swift")
 	}
 
-	func test_pathWildcard_pathComponentsOnly_doesNotMatchPath() throws {
+	@Test func pathWildcard_pathComponentsOnly_doesNotMatchPath() throws {
 		var options = Pattern.Options.default
 		options.supportsPathLevelWildcards = false
-		try XCTAssertDoesNotMatch("Target/Other/.build", pattern: "**/.build", options: options)
+		try assertDoesNotMatch("Target/Other/.build", pattern: "**/.build", options: options)
 	}
 
-	func test_componentWildcard_pathComponentsOnly_doesMatchSingleComponent() throws {
+	@Test func componentWildcard_pathComponentsOnly_doesMatchSingleComponent() throws {
 		var options = Pattern.Options.default
 		options.supportsPathLevelWildcards = false
-		try XCTAssertMatches("Target/.build", pattern: "*/.build", options: options)
+		try assertMatches("Target/.build", pattern: "*/.build", options: options)
 	}
 
-	func test_constant() throws {
-		try XCTAssertMatches("abc", pattern: "abc")
+	@Test func constant() throws {
+		try assertMatches("abc", pattern: "abc")
 	}
 
-	func test_ranges() throws {
-		try XCTAssertMatches("b", pattern: "[a-c]")
-		try XCTAssertMatches("B", pattern: "[A-C]")
-		try XCTAssertDoesNotMatch("n", pattern: "[a-c]")
+	@Test func ranges() throws {
+		try assertMatches("b", pattern: "[a-c]")
+		try assertMatches("B", pattern: "[A-C]")
+		try assertDoesNotMatch("n", pattern: "[a-c]")
 	}
 
-	func test_multipleRanges() throws {
-		try XCTAssertMatches("b", pattern: "[a-cA-C]")
-		try XCTAssertMatches("B", pattern: "[a-cA-C]")
-		try XCTAssertDoesNotMatch("n", pattern: "[a-cA-C]")
-		try XCTAssertDoesNotMatch("N", pattern: "[a-cA-C]")
-		try XCTAssertDoesNotMatch("n", pattern: "[a-cA-Z]")
-		try XCTAssertMatches("N", pattern: "[a-cA-Z]")
+	@Test func multipleRanges() throws {
+		try assertMatches("b", pattern: "[a-cA-C]")
+		try assertMatches("B", pattern: "[a-cA-C]")
+		try assertDoesNotMatch("n", pattern: "[a-cA-C]")
+		try assertDoesNotMatch("N", pattern: "[a-cA-C]")
+		try assertDoesNotMatch("n", pattern: "[a-cA-Z]")
+		try assertMatches("N", pattern: "[a-cA-Z]")
 	}
 
-	func test_negateRange() throws {
-		try XCTAssertDoesNotMatch("abc", pattern: "ab[^c]", options: .go)
+	@Test func negateRange() throws {
+		try assertDoesNotMatch("abc", pattern: "ab[^c]", options: .go)
 	}
 
-	func test_singleCharacter_doesNotMatchSeparator() throws {
-		try XCTAssertDoesNotMatch("a/b", pattern: "a?b")
+	@Test func singleCharacter_doesNotMatchSeparator() throws {
+		try assertDoesNotMatch("a/b", pattern: "a?b")
 	}
 
-	func test_namedCharacterClasses_alpha() throws {
-		try XCTAssertMatches("b", pattern: "[[:alpha:]]")
-		try XCTAssertMatches("B", pattern: "[[:alpha:]]")
-		try XCTAssertMatches("ē", pattern: "[[:alpha:]]")
-		try XCTAssertMatches("ž", pattern: "[[:alpha:]]")
-		try XCTAssertDoesNotMatch("9", pattern: "[[:alpha:]]")
-		try XCTAssertDoesNotMatch("&", pattern: "[[:alpha:]]")
+	@Test func namedCharacterClasses_alpha() throws {
+		try assertMatches("b", pattern: "[[:alpha:]]")
+		try assertMatches("B", pattern: "[[:alpha:]]")
+		try assertMatches("ē", pattern: "[[:alpha:]]")
+		try assertMatches("ž", pattern: "[[:alpha:]]")
+		try assertDoesNotMatch("9", pattern: "[[:alpha:]]")
+		try assertDoesNotMatch("&", pattern: "[[:alpha:]]")
 	}
 
-	func test_trailingPathSeparator() throws {
-		try XCTAssertMatches("abc/", pattern: "a*")
-		try XCTAssertDoesNotMatch("abc/", pattern: "a*", options: .init(matchesTrailingPathSeparator: false))
-		try XCTAssertMatches("dirB1/dirB2/", pattern: "**dirB2")
+	@Test func trailingPathSeparator() throws {
+		try assertMatches("abc/", pattern: "a*")
+		try assertDoesNotMatch("abc/", pattern: "a*", options: .init(matchesTrailingPathSeparator: false))
+		try assertMatches("dirB1/dirB2/", pattern: "**dirB2")
 	}
 
-	func test_nonNestedWildcards() throws {
+	@Test func nonNestedWildcards() throws {
 		// from https://fishshell.com/docs/3.4/language.html#expand-wildcard
 		// If ** is a segment by itself, that segment may match zero times, for compatibility with other shells.
 
-		try XCTAssertMatches("dir/File.swift", pattern: "dir/**/*.swift")
-		try XCTAssertMatches("dir/File.swift", pattern: "dir/**/File.swift")
-		try XCTAssertDoesNotMatch("dir/File.swift", pattern: "foo/File**/*.swift")
+		try assertMatches("dir/File.swift", pattern: "dir/**/*.swift")
+		try assertMatches("dir/File.swift", pattern: "dir/**/File.swift")
+		try assertDoesNotMatch("dir/File.swift", pattern: "foo/File**/*.swift")
 	}
 }
