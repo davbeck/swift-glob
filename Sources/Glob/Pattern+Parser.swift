@@ -23,6 +23,8 @@ extension Pattern {
 			case plus // +
 			case exclamationMark // !
 			case caret // ^
+			case period // .
+			case equals // =
 
 			init(_ character: Character) {
 				switch character {
@@ -52,6 +54,10 @@ extension Pattern {
 					self = .exclamationMark
 				case "^":
 					self = .caret
+				case ".":
+					self = .period
+				case "=":
+					self = .equals
 				default:
 					self = .character(character)
 				}
@@ -87,6 +93,10 @@ extension Pattern {
 					"!"
 				case .caret:
 					"^"
+				case .period:
+					"."
+				case .equals:
+					"="
 				}
 			}
 		}
@@ -218,6 +228,72 @@ extension Pattern {
 								} else {
 									throw PatternParsingError.invalidNamedCharacterClass(String(name))
 								}
+							} else if try pop(.period) {
+								// Collating symbols [.X.]
+								// In the C locale, collating symbols just represent the character itself
+								guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+								let collatingChar = charToken.character
+
+								// Expect closing .]
+								if try !pop(.period) {
+									throw PatternParsingError.invalidCollatingSymbol
+								}
+								if try !pop(.rightSquareBracket) {
+									throw PatternParsingError.invalidCollatingSymbol
+								}
+
+								// Check if this is the start of a range
+								if try pop(.dash) {
+									if try pop(.rightSquareBracket) {
+										if !options.supportsRangeSeparatorAtBeginningAndEnd {
+											throw PatternParsingError.rangeNotClosed
+										}
+										ranges.append(.character(collatingChar))
+										ranges.append(.character("-"))
+										break loop
+									} else {
+										let upper = try parseRangeUpperBound()
+										// If bounds are reversed, fnmatch treats this as a valid pattern that matches nothing
+										if collatingChar <= upper {
+											ranges.append(.range(collatingChar ... upper))
+										}
+									}
+								} else {
+									ranges.append(.character(collatingChar))
+								}
+							} else if try pop(.equals) {
+								// Equivalence classes [=X=]
+								// In the C locale, equivalence classes just match the character itself
+								guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+								let equivChar = charToken.character
+
+								// Expect closing =]
+								if try !pop(.equals) {
+									throw PatternParsingError.invalidEquivalenceClass
+								}
+								if try !pop(.rightSquareBracket) {
+									throw PatternParsingError.invalidEquivalenceClass
+								}
+
+								// Check if this is the start of a range
+								if try pop(.dash) {
+									if try pop(.rightSquareBracket) {
+										if !options.supportsRangeSeparatorAtBeginningAndEnd {
+											throw PatternParsingError.rangeNotClosed
+										}
+										ranges.append(.character(equivChar))
+										ranges.append(.character("-"))
+										break loop
+									} else {
+										let upper = try parseRangeUpperBound()
+										// If bounds are reversed, fnmatch treats this as a valid pattern that matches nothing
+										if equivChar <= upper {
+											ranges.append(.range(equivChar ... upper))
+										}
+									}
+								} else {
+									ranges.append(.character(equivChar))
+								}
 							} else {
 								ranges.append(.character("["))
 							}
@@ -245,12 +321,12 @@ extension Pattern {
 									break loop
 								} else {
 									// this is a range like a-z, find the upper limit of the range
-									guard
-										let upper = try pop()
-									else { throw PatternParsingError.rangeNotClosed }
+									let upper = try parseRangeUpperBound()
 
-									guard next.character <= upper.character else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
-									ranges.append(.range(next.character ... upper.character))
+									// If bounds are reversed, fnmatch treats this as a valid pattern that matches nothing
+									if next.character <= upper {
+										ranges.append(.range(next.character ... upper))
+									}
 								}
 							} else {
 								ranges.append(.character(next.character))
@@ -273,12 +349,51 @@ extension Pattern {
 					} else {
 						sections.append(constant: character)
 					}
-				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret:
+				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret, .period, .equals:
 					sections.append(constant: next.character)
 				}
 			}
 
 			return sections
+		}
+
+		/// Parses the upper bound of a range in a bracket expression.
+		/// The upper bound can be a regular character, collating symbol [.X.], or equivalence class [=X=].
+		mutating func parseRangeUpperBound() throws -> Character {
+			guard let token = try pop() else {
+				throw PatternParsingError.rangeNotClosed
+			}
+
+			if token == .leftSquareBracket {
+				if try pop(.period) {
+					// Collating symbol [.X.]
+					guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+					let char = charToken.character
+					if try !pop(.period) {
+						throw PatternParsingError.invalidCollatingSymbol
+					}
+					if try !pop(.rightSquareBracket) {
+						throw PatternParsingError.invalidCollatingSymbol
+					}
+					return char
+				} else if try pop(.equals) {
+					// Equivalence class [=X=]
+					guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+					let char = charToken.character
+					if try !pop(.equals) {
+						throw PatternParsingError.invalidEquivalenceClass
+					}
+					if try !pop(.rightSquareBracket) {
+						throw PatternParsingError.invalidEquivalenceClass
+					}
+					return char
+				} else {
+					// Just a literal '[' character as upper bound
+					return "["
+				}
+			} else {
+				return token.character
+			}
 		}
 
 		/// Parses a pattern list like `(abc|xyz)`

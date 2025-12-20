@@ -194,22 +194,20 @@ struct FNMatchTests {
 
 	//  B.6 012(C)
 	@Test func b_6_012_c() {
-		withKnownIssue {
-			// C		 "a"			"[[.a.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.][.].]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
-			// C		 "-"			"[[.].][.-.]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.][=u=]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
-			// C		 "-"			"[[.-.][:alpha:]]"     0
-			assertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
-			// C		 "a"			"[![.a.]]"	       NOMATCH
-			assertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
-		}
+		// C		 "a"			"[[.a.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.][.].]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
+		// C		 "-"			"[[.].][.-.]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.][=u=]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
+		// C		 "-"			"[[.-.][:alpha:]]"     0
+		assertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
+		// C		 "a"			"[![.a.]]"	       NOMATCH
+		assertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 013(C)
@@ -224,20 +222,18 @@ struct FNMatchTests {
 
 	//  B.6 015(C)
 	@Test func b_6_015_c() {
-		withKnownIssue {
-			// C		 "a"			"[[=a=]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
-			// C		 "b"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// C		 "b"			"[[=a=][=b=]]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C		 "a"			"[[=a=][=b=]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C		 "a"			"[[=a=][.b.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
-			// C		 "a"			"[[=a=][:digit:]]"     0
-			assertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
-		}
+		// C		 "a"			"[[=a=]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
+		// C		 "b"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// C		 "b"			"[[=a=][=b=]]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C		 "a"			"[[=a=][=b=]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C		 "a"			"[[=a=][.b.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
+		// C		 "a"			"[[=a=][:digit:]]"     0
+		assertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
 	}
 
 	//  B.6 016(C)
@@ -529,13 +525,9 @@ struct FNMatchTests {
 		// C		 "a]"			"[[alpha:]]"	       0
 		assertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][.b.]]"     0
-		withKnownIssue {
-			assertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
-		}
+		assertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][=b=]]"     0
-		withKnownIssue {
-			assertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
-		}
+		assertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
 		// C		 "a"			"[[:alpha:][:digit:]]" 0
 		assertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
 		// C		 "a"			"[[:digit:][:alpha:]]" 0
@@ -563,54 +555,50 @@ struct FNMatchTests {
 		// C		 "as"			"[a-ca-z]"	       NOMATCH
 		assertMatchesFNMatch("as", pattern: "[a-ca-z]", flags: 0, result: NOMATCH)
 
-		withKnownIssue {
-			// C		 "a"			"[[.a.]-c]"	       0
-			assertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C		 "a"			"[a-[.c.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C		 "a"			"[[.a.]-[.c.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C		 "b"			"[[.a.]-c]"	       0
-			assertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C		 "b"			"[a-[.c.]]"	       0
-			assertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C		 "b"			"[[.a.]-[.c.]]"	       0
-			assertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C		 "c"			"[[.a.]-c]"	       0
-			assertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C		 "c"			"[a-[.c.]]"	       0
-			assertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C		 "c"			"[[.a.]-[.c.]]"	       0
-			assertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C		 "d"			"[[.a.]-c]"	       NOMATCH
-			assertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
-			// C		 "d"			"[a-[.c.]]"	       NOMATCH
-			assertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
-			// C		 "d"			"[[.a.]-[.c.]]"	       NOMATCH
-			assertMatchesFNMatch("d", pattern: "[[.a.]-[.c.]]", flags: 0, result: NOMATCH)
-		}
+		// C		 "a"			"[[.a.]-c]"	       0
+		assertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C		 "a"			"[a-[.c.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C		 "a"			"[[.a.]-[.c.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C		 "b"			"[[.a.]-c]"	       0
+		assertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C		 "b"			"[a-[.c.]]"	       0
+		assertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C		 "b"			"[[.a.]-[.c.]]"	       0
+		assertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C		 "c"			"[[.a.]-c]"	       0
+		assertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C		 "c"			"[a-[.c.]]"	       0
+		assertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C		 "c"			"[[.a.]-[.c.]]"	       0
+		assertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C		 "d"			"[[.a.]-c]"	       NOMATCH
+		assertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
+		// C		 "d"			"[a-[.c.]]"	       NOMATCH
+		assertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
+		// C		 "d"			"[[.a.]-[.c.]]"	       NOMATCH
+		assertMatchesFNMatch("d", pattern: "[[.a.]-[.c.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 019(C)
 	@Test func b_6_019_c() {
-		withKnownIssue {
-			// C		 "a"			"[c-a]"		       NOMATCH
-			assertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[.c.]-a]"	       NOMATCH
-			assertMatchesFNMatch("a", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[c-[.a.]]"	       NOMATCH
-			assertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-			// C		 "a"			"[[.c.]-[.a.]]"	       NOMATCH
-			assertMatchesFNMatch("a", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[c-a]"		       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[[.c.]-a]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[c-[.a.]]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-			// C		 "c"			"[[.c.]-[.a.]]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
-		}
+		// C		 "a"			"[c-a]"		       NOMATCH
+		assertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[.c.]-a]"	       NOMATCH
+		assertMatchesFNMatch("a", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[c-[.a.]]"	       NOMATCH
+		assertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
+		// C		 "a"			"[[.c.]-[.a.]]"	       NOMATCH
+		assertMatchesFNMatch("a", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[c-a]"		       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[[.c.]-a]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[c-[.a.]]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
+		// C		 "c"			"[[.c.]-[.a.]]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 020(C)
@@ -991,22 +979,20 @@ struct FNMatchTests {
 
 	//  B.6 012(C) utf8
 	@Test func b_6_012_c_utf8() {
-		withKnownIssue {
-			// C.UTF-8		 "a"			"[[.a.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.][.].]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.].][.-.]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.][=u=]]"	       0
-			assertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
-			// C.UTF-8		 "-"			"[[.-.][:alpha:]]"     0
-			assertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[![.a.]]"	       NOMATCH
-			assertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		 "a"			"[[.a.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[.a.]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.-.]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.][.].]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.-.][.].]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.].][.-.]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.].][.-.]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.][=u=]]"	       0
+		assertMatchesFNMatch("-", pattern: "[[.-.][=u=]]", flags: 0, result: 0)
+		// C.UTF-8		 "-"			"[[.-.][:alpha:]]"     0
+		assertMatchesFNMatch("-", pattern: "[[.-.][:alpha:]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[![.a.]]"	       NOMATCH
+		assertMatchesFNMatch("a", pattern: "[![.a.]]", flags: 0, result: NOMATCH)
 	}
 
 	//  B.6 013(C) utf8
@@ -1021,20 +1007,18 @@ struct FNMatchTests {
 
 	//  B.6 015(C) utf8
 	@Test func b_6_015_c_utf8() {
-		withKnownIssue {
-			// C.UTF-8		 "a"			"[[=a=]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[=a=][=b=]]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[=a=][=b=]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[=a=][.b.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[=a=][:digit:]]"     0
-			assertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
-		}
+		// C.UTF-8		 "a"			"[[=a=]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[=a=][=b=]]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[=a=][=b=]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=][=b=]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[=a=][.b.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=][.b.]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[=a=][:digit:]]"     0
+		assertMatchesFNMatch("a", pattern: "[[=a=][:digit:]]", flags: 0, result: 0)
 	}
 
 	//  B.6 016(C) utf8
@@ -1326,13 +1310,9 @@ struct FNMatchTests {
 		// C.UTF-8		 "a]"			"[[alpha:]]"	       0
 		assertMatchesFNMatch("a]", pattern: "[[alpha:]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][.b.]]"     0
-		withKnownIssue {
-			assertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
-		}
+		assertMatchesFNMatch("a", pattern: "[[:alpha:][.b.]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][=b=]]"     0
-		withKnownIssue {
-			assertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
-		}
+		assertMatchesFNMatch("a", pattern: "[[:alpha:][=b=]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:alpha:][:digit:]]" 0
 		assertMatchesFNMatch("a", pattern: "[[:alpha:][:digit:]]", flags: 0, result: 0)
 		// C.UTF-8		 "a"			"[[:digit:][:alpha:]]" 0
@@ -1359,30 +1339,28 @@ struct FNMatchTests {
 		assertMatchesFNMatch("", pattern: "[a-c]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "as"			"[a-ca-z]"	       NOMATCH
 		assertMatchesFNMatch("as", pattern: "[a-ca-z]", flags: 0, result: NOMATCH)
-		withKnownIssue {
-			// C.UTF-8		 "a"			"[[.a.]-c]"	       0
-			assertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[a-[.c.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "a"			"[[.a.]-[.c.]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[.a.]-c]"	       0
-			assertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[a-[.c.]]"	       0
-			assertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "b"			"[[.a.]-[.c.]]"	       0
-			assertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[[.a.]-c]"	       0
-			assertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[a-[.c.]]"	       0
-			assertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "c"			"[[.a.]-[.c.]]"	       0
-			assertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
-			// C.UTF-8		 "d"			"[[.a.]-c]"	       NOMATCH
-			assertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
-			// C.UTF-8		 "d"			"[a-[.c.]]"	       NOMATCH
-			assertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
-		}
+		// C.UTF-8		 "a"			"[[.a.]-c]"	       0
+		assertMatchesFNMatch("a", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[a-[.c.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "a"			"[[.a.]-[.c.]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[.a.]-c]"	       0
+		assertMatchesFNMatch("b", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[a-[.c.]]"	       0
+		assertMatchesFNMatch("b", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "b"			"[[.a.]-[.c.]]"	       0
+		assertMatchesFNMatch("b", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[[.a.]-c]"	       0
+		assertMatchesFNMatch("c", pattern: "[[.a.]-c]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[a-[.c.]]"	       0
+		assertMatchesFNMatch("c", pattern: "[a-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "c"			"[[.a.]-[.c.]]"	       0
+		assertMatchesFNMatch("c", pattern: "[[.a.]-[.c.]]", flags: 0, result: 0)
+		// C.UTF-8		 "d"			"[[.a.]-c]"	       NOMATCH
+		assertMatchesFNMatch("d", pattern: "[[.a.]-c]", flags: 0, result: NOMATCH)
+		// C.UTF-8		 "d"			"[a-[.c.]]"	       NOMATCH
+		assertMatchesFNMatch("d", pattern: "[a-[.c.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "d"			"[[.a.]-[.c.]]"	       NOMATCH
 		assertMatchesFNMatch("d", pattern: "[[.a.]-[.c.]]", flags: 0, result: NOMATCH)
 	}
@@ -1390,27 +1368,19 @@ struct FNMatchTests {
 	//  B.6 019(C) utf8
 	@Test func b_6_019_c_utf8() {
 		// C.UTF-8		 "a"			"[c-a]"		       NOMATCH
-		withKnownIssue {
-			assertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
-		}
+		assertMatchesFNMatch("a", pattern: "[c-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a"			"[[.c.]-a]"	       NOMATCH
 		assertMatchesFNMatch("a", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a"			"[c-[.a.]]"	       NOMATCH
-		withKnownIssue {
-			assertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-		}
+		assertMatchesFNMatch("a", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "a"			"[[.c.]-[.a.]]"	       NOMATCH
 		assertMatchesFNMatch("a", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[c-a]"		       NOMATCH
-		withKnownIssue {
-			assertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
-		}
+		assertMatchesFNMatch("c", pattern: "[c-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[[.c.]-a]"	       NOMATCH
 		assertMatchesFNMatch("c", pattern: "[[.c.]-a]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[c-[.a.]]"	       NOMATCH
-		withKnownIssue {
-			assertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
-		}
+		assertMatchesFNMatch("c", pattern: "[c-[.a.]]", flags: 0, result: NOMATCH)
 		// C.UTF-8		 "c"			"[[.c.]-[.a.]]"	       NOMATCH
 		assertMatchesFNMatch("c", pattern: "[[.c.]-[.a.]]", flags: 0, result: NOMATCH)
 	}

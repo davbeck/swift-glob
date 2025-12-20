@@ -26,6 +26,12 @@ public enum PatternParsingError: Error {
 	/// A character class (like `[:alnum:]`) was used with an unrecognized name
 	case invalidNamedCharacterClass(String)
 
+	/// A collating symbol (like `[.a.]`) was malformed
+	case invalidCollatingSymbol
+
+	/// An equivalence class (like `[=a=]`) was malformed
+	case invalidEquivalenceClass
+
 	case patternListNotClosed
 
 	case emptyPatternList
