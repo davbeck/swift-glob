@@ -4,16 +4,17 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Current Status
 
-- **103 tests pass** with **147 known issues** (tests wrapped in `withKnownIssue`)
+- **103 tests pass** with **71 known issues** (tests wrapped in `withKnownIssue`)
 - Core glob matching is fully functional
 - ksh-style pattern lists (`@()`, `*()`, `+()`, `?()`, `!()`) are implemented with proper backtracking
+- Brace expansion (`{a,b,c}`) is implemented and working
 
 ## Test Suite Breakdown
 
 | Test Suite | Passing | Known Issues | Notes |
 |------------|---------|--------------|-------|
 | FNMatchTests | 64 | 54 | POSIX fnmatch compatibility |
-| VSCodeTests | varies | 91 | Brace expansion not implemented |
+| VSCodeTests | 15 | 15 | Windows path separators, bracket edge cases |
 | FishShellTests | varies | 2 | Symlink/recursive glob edge cases |
 | Other tests | all pass | 0 | Core functionality works |
 
@@ -21,36 +22,7 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Missing Features
 
-### 1. Brace Expansion (`{a,b,c}`)
-
-**Priority: High** | **Effort: Medium**
-
-VSCode and many shells support brace expansion, which is different from ksh-style pattern lists:
-
-```
-{a,b,c}     → matches "a", "b", or "c"
-{**/*.js,**/*.ts}  → matches JS or TS files
-foo.{1..5}  → matches foo.1 through foo.5 (numeric ranges)
-```
-
-**Current behavior:** Braces are treated as literal characters.
-
-**Implementation approach:**
-1. Add a `supportsBraceExpansion` option
-2. Expand braces during parsing (before pattern compilation)
-3. Create multiple patterns from a single input
-4. Match if any expanded pattern matches
-
-**Affected tests:** 91 VSCodeTests (51 in `braceExpansion()`, 40 in other tests)
-
-**Files to modify:**
-- `Sources/Glob/Pattern+Options.swift` - Add option
-- `Sources/Glob/Pattern+Parser.swift` - Add brace expansion logic
-- Could also be done as a pre-processing step before parsing
-
----
-
-### 2. Equivalence Classes (`[=a=]`)
+### 1. Equivalence Classes (`[=a=]`)
 
 **Priority: Low** | **Effort: High**
 
@@ -78,7 +50,7 @@ POSIX equivalence classes match characters that are considered equivalent in the
 
 ---
 
-### 3. Symlink Handling in Search
+### 2. Symlink Handling in Search
 
 **Priority: Medium** | **Effort: Low**
 
@@ -148,7 +120,7 @@ The file search functionality has edge cases with symlinks:
 
 ### Medium Effort
 
-3. **Implement brace expansion** - Would fix 91 VSCodeTests. Can be done as pattern pre-processing.
+3. **Windows path separator support** - VSCode tests expect `\` to be treated as a path separator on Windows paths.
 
 ### Larger Effort
 
@@ -174,6 +146,7 @@ swift test --filter "FNMatchTests/ksh_style_matching"
 
 ## Recent Changes
 
+- **Brace expansion** - Added `{a,b,c}` syntax support for VSCode compatibility
 - **Pattern list backtracking** - Fixed complex nested patterns like `@(foo|f|fo)*(f|of+(o))`
 - **Collating symbols** - Added `[.X.]` syntax support
 - **Equivalence class parsing** - Added `[=X=]` syntax (literal matching only)
