@@ -322,8 +322,18 @@ extension Pattern {
 		case .one:
 			// Must match exactly one of the options
 			for sectionsOption in subSections {
-				if let afterOption = matchPrefix(components: ArraySlice(sectionsOption), name) {
-					if let remaining = matchPrefix(components: components.dropFirst(), afterOption) {
+				// Get all possible matches for this option (enables backtracking)
+				let optionMatches = allPossiblePrefixMatches(
+					components: ArraySlice(sectionsOption),
+					name
+				)
+				for afterOption in optionMatches {
+					// Get all possible matches for the rest of the pattern
+					let restMatches = allPossiblePrefixMatches(
+						components: components.dropFirst(),
+						afterOption
+					)
+					for remaining in restMatches {
 						if !requiresCompleteMatch || remaining.isEmpty {
 							return remaining
 						}
@@ -334,8 +344,16 @@ extension Pattern {
 		case .zeroOrOne:
 			// Try matching one of the options first
 			for sectionsOption in subSections {
-				if let afterOption = matchPrefix(components: ArraySlice(sectionsOption), name) {
-					if let remaining = matchPrefix(components: components.dropFirst(), afterOption) {
+				let optionMatches = allPossiblePrefixMatches(
+					components: ArraySlice(sectionsOption),
+					name
+				)
+				for afterOption in optionMatches {
+					let restMatches = allPossiblePrefixMatches(
+						components: components.dropFirst(),
+						afterOption
+					)
+					for remaining in restMatches {
 						if !requiresCompleteMatch || remaining.isEmpty {
 							return remaining
 						}
@@ -343,7 +361,8 @@ extension Pattern {
 				}
 			}
 			// Then try matching zero
-			if let remaining = matchPrefix(components: components.dropFirst(), name) {
+			let zeroMatches = allPossiblePrefixMatches(components: components.dropFirst(), name)
+			for remaining in zeroMatches {
 				if !requiresCompleteMatch || remaining.isEmpty {
 					return remaining
 				}
@@ -434,9 +453,9 @@ extension Pattern {
 		let hasVariableLengthSections = components.contains { section in
 			switch section {
 			case .componentWildcard, .pathWildcard, .patternList:
-				return true
+				true
 			default:
-				return false
+				false
 			}
 		}
 
@@ -454,7 +473,7 @@ extension Pattern {
 
 		// Sort by remaining length descending (shortest match first = longest remaining)
 		// and deduplicate
-		let unique = Set(results.map { $0.startIndex })
+		let unique = Set(results.map(\.startIndex))
 		return unique.sorted { $0 > $1 }.compactMap { index in
 			results.first { $0.startIndex == index }
 		}
@@ -581,7 +600,7 @@ extension Pattern {
 
 		case .negated:
 			// For negated patterns, try all prefix lengths that don't match any sub-pattern
-			for length in 0...name.count {
+			for length in 0 ... name.count {
 				let prefix = name.prefix(length)
 				let matchesAnyPattern = subSections.contains { sections in
 					if let remaining = matchPrefix(components: ArraySlice(sections), Substring(prefix)) {

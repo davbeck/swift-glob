@@ -2274,14 +2274,12 @@ struct FNMatchTests {
 		assertMatchesFNMatch("oxfoxoxfox", pattern: "*(oxf+(ox))", flags: EXTMATCH, result: 0)
 		// C		"oxfoxfox"		"*(oxf+(ox))"	       NOMATCH EXTMATCH
 		assertMatchesFNMatch("oxfoxfox", pattern: "*(oxf+(ox))", flags: EXTMATCH, result: NOMATCH)
-		withKnownIssue {
-			// C		"ofoofo"		"*(of+(o)|f)"	       0       EXTMATCH
-			assertMatchesFNMatch("ofoofo", pattern: "*(of+(o)|f)", flags: EXTMATCH, result: 0)
-			// C		"foofoofo"		"@(foo|f|fo)*(f|of+(o))" 0     EXTMATCH
-			assertMatchesFNMatch("foofoofo", pattern: "@(foo|f|fo)*(f|of+(o))", flags: EXTMATCH, result: 0)
-			// C		"oofooofo"		"*(of|oof+(o))"	       0       EXTMATCH
-			assertMatchesFNMatch("oofooofo", pattern: "*(of|oof+(o))", flags: EXTMATCH, result: 0)
-		}
+		// C		"ofoofo"		"*(of+(o)|f)"	       0       EXTMATCH
+		assertMatchesFNMatch("ofoofo", pattern: "*(of+(o)|f)", flags: EXTMATCH, result: 0)
+		// C		"foofoofo"		"@(foo|f|fo)*(f|of+(o))" 0     EXTMATCH
+		assertMatchesFNMatch("foofoofo", pattern: "@(foo|f|fo)*(f|of+(o))", flags: EXTMATCH, result: 0)
+		// C		"oofooofo"		"*(of|oof+(o))"	       0       EXTMATCH
+		assertMatchesFNMatch("oofooofo", pattern: "*(of|oof+(o))", flags: EXTMATCH, result: 0)
 		// C		"fffooofoooooffoofffooofff" "*(*(f)*(o))"      0       EXTMATCH
 		assertMatchesFNMatch("fffooofoooooffoofffooofff", pattern: "*(*(f)*(o))", flags: EXTMATCH, result: 0)
 		// C		"fofoofoofofoo"		"*(fo|foo)"	       0       EXTMATCH
