@@ -75,6 +75,22 @@ public struct Pattern: Equatable, Sendable {
 		}
 	}
 
+	/// Represents a character class for use in bracket expressions.
+	///
+	/// Character classes can be:
+	/// - A range of characters (e.g., `a-z` becomes `.range("a"..."z")`)
+	/// - A named POSIX class (e.g., `[:alpha:]` becomes `.named(.alpha)`)
+	///
+	/// ## Limitations
+	///
+	/// ### Equivalence Classes
+	/// POSIX equivalence classes (e.g., `[[=a=]]`) are parsed but only match the literal character.
+	/// Full locale-aware equivalence matching (where `[[=a=]]` would match 'a', 'á', 'à', 'ä', etc.)
+	/// is not supported. This matches behavior in the C locale.
+	///
+	/// ### Collating Symbols
+	/// Collating symbols (e.g., `[[.ch.]]`) are parsed but only match single characters.
+	/// Multi-character collating elements are not supported.
 	public enum CharacterClass: Equatable, Sendable {
 		case range(ClosedRange<Character>)
 

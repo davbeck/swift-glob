@@ -90,7 +90,7 @@ extension Pattern {
 					return false
 				}
 			case (.singleCharacter, _, _):
-				guard !options.isPathSeparator(name.first) else { return false }
+				guard !name.isEmpty, !options.isPathSeparator(name.first) else { return false }
 				if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 					return false
 				}
@@ -129,7 +129,7 @@ extension Pattern {
 					return false
 				}
 			case (_, .singleCharacter, false):
-				guard !options.isPathSeparator(name.last) else { return false }
+				guard !name.isEmpty, !options.isPathSeparator(name.last) else { return false }
 
 				components = components.dropLast()
 				name = name.dropLast()
