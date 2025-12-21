@@ -2269,13 +2269,9 @@ struct FNMatchTests {
 		// C		"egz"			"@(b+(c)d|e+(f)g?|?(h)i@(j|k))" NOMATCH EXTMATCH
 		assertMatchesFNMatch("egz", pattern: "@(b+(c)d|e+(f)g?|?(h)i@(j|k))", flags: EXTMATCH, result: NOMATCH)
 		// C		"ofoofo"		"*(of+(o))"	       0       EXTMATCH
-		withKnownIssue {
-			assertMatchesFNMatch("ofoofo", pattern: "*(of+(o))", flags: EXTMATCH, result: 0)
-		}
+		assertMatchesFNMatch("ofoofo", pattern: "*(of+(o))", flags: EXTMATCH, result: 0)
 		// C		"oxfoxoxfox"		"*(oxf+(ox))"	       0       EXTMATCH
-		withKnownIssue {
-			assertMatchesFNMatch("oxfoxoxfox", pattern: "*(oxf+(ox))", flags: EXTMATCH, result: 0)
-		}
+		assertMatchesFNMatch("oxfoxoxfox", pattern: "*(oxf+(ox))", flags: EXTMATCH, result: 0)
 		// C		"oxfoxfox"		"*(oxf+(ox))"	       NOMATCH EXTMATCH
 		assertMatchesFNMatch("oxfoxfox", pattern: "*(oxf+(ox))", flags: EXTMATCH, result: NOMATCH)
 		withKnownIssue {

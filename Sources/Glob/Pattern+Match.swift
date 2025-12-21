@@ -379,7 +379,13 @@ extension Pattern {
 	) -> Substring? {
 		// Try each option
 		for sectionsOption in subSections {
-			if let afterOption = matchPrefix(components: ArraySlice(sectionsOption), name) {
+			// Get all possible prefix matches for this option (shortest first for backtracking)
+			let possibleMatches = allPossiblePrefixMatches(
+				components: ArraySlice(sectionsOption),
+				name
+			)
+
+			for afterOption in possibleMatches {
 				// Prevent infinite recursion when option matches empty
 				guard afterOption != name else { continue }
 
@@ -416,6 +422,213 @@ extension Pattern {
 		}
 
 		return nil
+	}
+
+	/// Returns all possible prefix matches for a pattern, sorted by match length (shortest first).
+	/// This enables backtracking by trying shorter matches when longer ones don't work.
+	private func allPossiblePrefixMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring
+	) -> [Substring] {
+		// Check if the pattern contains any variable-length sections that need exploration
+		let hasVariableLengthSections = components.contains { section in
+			switch section {
+			case .componentWildcard, .pathWildcard, .patternList:
+				return true
+			default:
+				return false
+			}
+		}
+
+		// For simple patterns without wildcards or pattern lists, just use matchPrefix
+		if !hasVariableLengthSections {
+			if let result = matchPrefix(components: components, name) {
+				return [result]
+			}
+			return []
+		}
+
+		// Collect all possible matches
+		var results: [Substring] = []
+		collectAllPrefixMatches(components: components, name, into: &results)
+
+		// Sort by remaining length descending (shortest match first = longest remaining)
+		// and deduplicate
+		let unique = Set(results.map { $0.startIndex })
+		return unique.sorted { $0 > $1 }.compactMap { index in
+			results.first { $0.startIndex == index }
+		}
+	}
+
+	private func collectAllPrefixMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		into results: inout [Substring]
+	) {
+		guard let first = components.first else {
+			results.append(name)
+			return
+		}
+
+		let rest = components.dropFirst()
+
+		switch first {
+		case .pathSeparator:
+			if name.first == options.pathSeparator {
+				collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
+			}
+
+		case let .constant(constant):
+			if let remaining = name.dropPrefix(constant) {
+				collectAllPrefixMatches(components: rest, remaining, into: &results)
+			}
+
+		case .singleCharacter:
+			guard !name.isEmpty, name.first != options.pathSeparator else { return }
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
+
+		case let .oneOf(ranges, isNegated: isNegated):
+			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return }
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
+
+		case .componentWildcard:
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			// Try matching 0, 1, 2, ... characters
+			var remaining = name
+			while true {
+				collectAllPrefixMatches(components: rest, remaining, into: &results)
+				guard !remaining.isEmpty, remaining.first != options.pathSeparator else { break }
+				remaining = remaining.dropFirst()
+			}
+
+		case .pathWildcard:
+			// Try matching 0, 1, 2, ... characters (including path separators)
+			var remaining = name
+			while true {
+				collectAllPrefixMatches(components: rest, remaining, into: &results)
+				guard !remaining.isEmpty else { break }
+				remaining = remaining.dropFirst()
+			}
+
+		case let .patternList(style, subSections):
+			collectPatternListMatches(
+				components: components,
+				name,
+				style: style,
+				subSections: subSections,
+				into: &results
+			)
+		}
+	}
+
+	private func collectPatternListMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		style: Section.PatternListStyle,
+		subSections: [[Section]],
+		into results: inout [Substring]
+	) {
+		let rest = components.dropFirst()
+
+		switch style {
+		case .one:
+			// Match exactly one option
+			for option in subSections {
+				var optionMatches: [Substring] = []
+				collectAllPrefixMatches(components: ArraySlice(option), name, into: &optionMatches)
+				for afterOption in optionMatches {
+					collectAllPrefixMatches(components: rest, afterOption, into: &results)
+				}
+			}
+
+		case .zeroOrOne:
+			// Try zero first
+			collectAllPrefixMatches(components: rest, name, into: &results)
+			// Then try one
+			for option in subSections {
+				var optionMatches: [Substring] = []
+				collectAllPrefixMatches(components: ArraySlice(option), name, into: &optionMatches)
+				for afterOption in optionMatches {
+					collectAllPrefixMatches(components: rest, afterOption, into: &results)
+				}
+			}
+
+		case .oneOrMore:
+			collectRepeatingMatches(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: true,
+				into: &results
+			)
+
+		case .zeroOrMore:
+			collectRepeatingMatches(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: false,
+				into: &results
+			)
+
+		case .negated:
+			// For negated patterns, try all prefix lengths that don't match any sub-pattern
+			for length in 0...name.count {
+				let prefix = name.prefix(length)
+				let matchesAnyPattern = subSections.contains { sections in
+					if let remaining = matchPrefix(components: ArraySlice(sections), Substring(prefix)) {
+						return remaining.isEmpty
+					}
+					return false
+				}
+				if !matchesAnyPattern {
+					let afterNegation = name.dropFirst(length)
+					collectAllPrefixMatches(components: rest, afterNegation, into: &results)
+				}
+			}
+		}
+	}
+
+	private func collectRepeatingMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		subSections: [[Section]],
+		needsAtLeastOne: Bool,
+		into results: inout [Substring]
+	) {
+		let rest = components.dropFirst()
+
+		// Try zero if allowed
+		if !needsAtLeastOne {
+			collectAllPrefixMatches(components: rest, name, into: &results)
+		}
+
+		// Try matching one or more
+		for option in subSections {
+			var optionMatches: [Substring] = []
+			collectAllPrefixMatches(components: ArraySlice(option), name, into: &optionMatches)
+
+			for afterOption in optionMatches {
+				guard afterOption != name else { continue } // Prevent infinite recursion
+
+				// After one match, try matching more (with zero allowed) or finishing
+				collectRepeatingMatches(
+					components: components,
+					afterOption,
+					subSections: subSections,
+					needsAtLeastOne: false,
+					into: &results
+				)
+			}
+		}
 	}
 
 	private func matchNegatedPatternListPrefix(
