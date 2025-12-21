@@ -112,7 +112,7 @@ public extension Pattern {
 		/// Attempts to match the behavior of [VSCode](https://code.visualstudio.com/docs/editor/glob-patterns).
 		public static let vscode: Self = Options(
 			supportsPathLevelWildcards: true,
-			emptyRangeBehavior: .error,
+			emptyRangeBehavior: .treatClosingBracketAsCharacter,
 			supportsPatternLists: false,
 			supportsBraceExpansion: true,
 			rangeNegationCharacter: .both

@@ -334,14 +334,12 @@ struct VSCodeTests {
 			try assertDoesNotMatch("foo/bar", pattern: "foo[/]bar", options: .vscode)
 		}
 		try assertMatches("foo.[", pattern: "foo.[[]", options: .vscode)
-		withKnownIssue {
-			try assertMatches("foo.]", pattern: "foo.[]]", options: .vscode)
-			try assertMatches("foo.]", pattern: "foo.[][!]", options: .vscode)
-			try assertMatches("foo.[", pattern: "foo.[][!]", options: .vscode)
-			try assertMatches("foo.!", pattern: "foo.[][!]", options: .vscode)
-			try assertMatches("foo.]", pattern: "foo.[]-]", options: .vscode)
-			try assertMatches("foo.-", pattern: "foo.[]-]", options: .vscode)
-		}
+		try assertMatches("foo.]", pattern: "foo.[]]", options: .vscode)
+		try assertMatches("foo.]", pattern: "foo.[][!]", options: .vscode)
+		try assertMatches("foo.[", pattern: "foo.[][!]", options: .vscode)
+		try assertMatches("foo.!", pattern: "foo.[][!]", options: .vscode)
+		try assertMatches("foo.]", pattern: "foo.[]-]", options: .vscode)
+		try assertMatches("foo.-", pattern: "foo.[]-]", options: .vscode)
 	}
 
 	@Test func fullPath() throws {
