@@ -4,17 +4,18 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Current Status
 
-- **103 tests pass** with **71 known issues** (tests wrapped in `withKnownIssue`)
+- **103 tests pass** with **56 known issues** (tests wrapped in `withKnownIssue`)
 - Core glob matching is fully functional
 - ksh-style pattern lists (`@()`, `*()`, `+()`, `?()`, `!()`) are implemented with proper backtracking
 - Brace expansion (`{a,b,c}`) is implemented and working
+- VSCode compatibility is fully implemented
 
 ## Test Suite Breakdown
 
 | Test Suite | Passing | Known Issues | Notes |
 |------------|---------|--------------|-------|
-| FNMatchTests | 64 | 54 | POSIX fnmatch compatibility |
-| VSCodeTests | 15 | 15 | Windows path separators, bracket edge cases |
+| FNMatchTests | 64 | 54 | POSIX fnmatch compatibility (mostly equivalence classes) |
+| VSCodeTests | 15 | 0 | Full VSCode compatibility |
 | FishShellTests | varies | 2 | Symlink/recursive glob edge cases |
 | Other tests | all pass | 0 | Core functionality works |
 
@@ -28,7 +29,7 @@ This document summarizes the remaining issues, missing features, and context for
 
 POSIX equivalence classes match characters that are considered equivalent in the current locale. For example, `[[=a=]]` should match 'a', 'á', 'à', 'ä', 'â', etc.
 
-**Current behavior:** Only matches the literal character (e.g., `[[=a=]]` only matches 'a').
+**Current behavior:** Only matches the literal character (e.g., `[[=a=]]` only matches 'a'). This limitation is documented in the `CharacterClass` enum.
 
 **Implementation challenges:**
 - Requires Unicode normalization (NFD decomposition)
@@ -112,21 +113,11 @@ The file search functionality has edge cases with symlinks:
 
 ## Suggested Next Steps
 
-### Quick Wins
-
-1. **Fix VSCode `!` negation** - VSCode uses `!` for negation in ranges but current `.vscode` options use `^`. Simple option change.
-
-2. **Document equivalence class limitation** - Add documentation noting that `[=X=]` only matches the literal character.
-
-### Medium Effort
-
-3. **Windows path separator support** - VSCode tests expect `\` to be treated as a path separator on Windows paths.
-
 ### Larger Effort
 
-4. **Locale-aware equivalence classes** - Would require significant work for proper Unicode support.
+1. **Locale-aware equivalence classes** - Would require significant work for proper Unicode support.
 
-5. **Symlink handling improvements** - Need to understand the expected behavior better.
+2. **Symlink handling improvements** - Need to understand the expected behavior better.
 
 ---
 
@@ -146,8 +137,12 @@ swift test --filter "FNMatchTests/ksh_style_matching"
 
 ## Recent Changes
 
+- **VSCode full compatibility** - All VSCode tests now pass:
+  - Windows path separator support (`\` treated as path separator in input)
+  - Bracket expressions cannot match path separators (`foo[/]bar` doesn't match `foo/bar`)
+  - Both `!` and `^` supported for range negation
 - **Brace expansion** - Added `{a,b,c}` syntax support for VSCode compatibility
 - **Pattern list backtracking** - Fixed complex nested patterns like `@(foo|f|fo)*(f|of+(o))`
 - **Collating symbols** - Added `[.X.]` syntax support
-- **Equivalence class parsing** - Added `[=X=]` syntax (literal matching only)
+- **Equivalence class parsing** - Added `[=X=]` syntax (literal matching only, documented)
 - **Named character classes** - Full support for `[:alpha:]`, `[:digit:]`, etc.
