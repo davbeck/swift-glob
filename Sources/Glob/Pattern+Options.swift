@@ -27,6 +27,20 @@ public extension Pattern {
 		/// How are empty ranges handled.
 		public var emptyRangeBehavior: EmptyRangeBehavior = .error
 
+		/// How unclosed bracket expressions (e.g., `[abc` with no closing `]`) are treated
+		public enum UnclosedBracketBehavior: Sendable {
+			/// Treat an unclosed bracket as a parsing error
+			case error
+			/// Treat an unclosed bracket as a literal `[` character
+			case treatAsLiteral
+		}
+
+		/// How are unclosed brackets handled.
+		///
+		/// In fnmatch, an unclosed `[` is treated as a literal character. For example, the pattern `a[b`
+		/// would match the string `a[b` literally.
+		public var unclosedBracketBehavior: UnclosedBracketBehavior = .error
+
 		/// If the pattern supports escaping control characters with `\`
 		///
 		/// When true, a backslash character (`\`) in pattern followed by any other character shall match that second character in string. In particular, `\\` shall match a backslash in string. Otherwise a backslash character shall be treated as an ordinary character.
@@ -177,6 +191,7 @@ public extension Pattern {
 			Options(
 				supportsPathLevelWildcards: false,
 				emptyRangeBehavior: .treatClosingBracketAsCharacter,
+				unclosedBracketBehavior: .treatAsLiteral,
 				supportsEscapedCharacters: supportsEscapedCharacters,
 				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
 				matchLeadingDirectories: matchLeadingDirectories,

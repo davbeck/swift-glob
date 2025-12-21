@@ -732,10 +732,7 @@ struct FNMatchTests {
 		// C		 "/["			"\\/\\["	       0
 		assertMatchesFNMatch("/[", pattern: "\\/\\[", flags: 0, result: 0)
 		// C		 "/["			"\\/["		       0
-		withKnownIssue {
-			// Apple's implimentation of fnmatch doesn't produce this result
-			assertMatchesFNMatch("/[", pattern: "\\/[", flags: 0, result: 0)
-		}
+		assertMatchesFNMatch("/[", pattern: "\\/[", flags: 0, result: 0)
 		// C		 "/[]"			"\\/\\[]"	       0
 		assertMatchesFNMatch("/[]", pattern: "\\/\\[]", flags: 0, result: 0)
 	}
@@ -1515,10 +1512,8 @@ struct FNMatchTests {
 		assertMatchesFNMatch("/$", pattern: "\\/\\$", flags: 0, result: 0)
 		// C.UTF-8		 "/["			"\\/\\["	       0
 		assertMatchesFNMatch("/[", pattern: "\\/\\[", flags: 0, result: 0)
-		withKnownIssue {
-			// C.UTF-8		 "/["			"\\/["		       0
-			assertMatchesFNMatch("/[", pattern: "\\/[", flags: 0, result: 0)
-		}
+		// C.UTF-8		 "/["			"\\/["		       0
+		assertMatchesFNMatch("/[", pattern: "\\/[", flags: 0, result: 0)
 		// C.UTF-8		 "/[]"			"\\/\\[]"	       0
 		assertMatchesFNMatch("/[]", pattern: "\\/\\[]", flags: 0, result: 0)
 	}
