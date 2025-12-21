@@ -154,6 +154,9 @@ extension Pattern {
 					return true
 				} else if name.isEmpty {
 					return false
+				} else if name.first == options.pathSeparator {
+					// componentWildcard cannot match path separators
+					return false
 				} else {
 					// components remain unchanged
 					name = name.dropFirst()
@@ -162,6 +165,9 @@ extension Pattern {
 				if match(components: components.dropLast(), name) {
 					return true
 				} else if name.isEmpty {
+					return false
+				} else if name.last == options.pathSeparator {
+					// componentWildcard cannot match path separators
 					return false
 				} else {
 					// components remain unchanged

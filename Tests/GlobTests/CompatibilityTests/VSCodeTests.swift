@@ -78,12 +78,8 @@ struct VSCodeTests {
 		try assertMatches("html.js", pattern: "*.*", options: .vscode)
 		try assertMatches("html.txt", pattern: "*.*", options: .vscode)
 		try assertMatches("htm.txt", pattern: "*.*", options: .vscode)
-		withKnownIssue {
-			try assertDoesNotMatch("folder/foo.js", pattern: "*.*", options: .vscode)
-		}
-		withKnownIssue {
-			try assertDoesNotMatch("/node_modules/foo.js", pattern: "*.*", options: .vscode)
-		}
+		try assertDoesNotMatch("folder/foo.js", pattern: "*.*", options: .vscode)
+		try assertDoesNotMatch("/node_modules/foo.js", pattern: "*.*", options: .vscode)
 		try assertMatches("node_modules/test/foo.js", pattern: "node_modules/test/*.js", options: .vscode)
 		try assertDoesNotMatch("folder/foo.js", pattern: "node_modules/test/*.js", options: .vscode)
 		try assertDoesNotMatch("/node_module/test/foo.js", pattern: "node_modules/test/*.js", options: .vscode)
