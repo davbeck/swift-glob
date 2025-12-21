@@ -21,12 +21,8 @@ struct VSCodeTests {
 		try assertDoesNotMatch("test/qunit", pattern: "qunit", options: .vscode)
 		try assertMatches("/DNXConsoleApp/Program.cs", pattern: "/DNXConsoleApp/**/*.cs", options: .vscode)
 		try assertMatches("/DNXConsoleApp/foo/Program.cs", pattern: "/DNXConsoleApp/**/*.cs", options: .vscode)
-		withKnownIssue {
-			try assertMatches("C:\\DNXConsoleApp\\Program.cs", pattern: "C:/DNXConsoleApp/**/*.cs", options: .vscode)
-		}
-		withKnownIssue {
-			try assertMatches("C:\\DNXConsoleApp\\foo\\Program.cs", pattern: "C:/DNXConsoleApp/**/*.cs", options: .vscode)
-		}
+		try assertMatches("C:\\DNXConsoleApp\\Program.cs", pattern: "C:/DNXConsoleApp/**/*.cs", options: .vscode)
+		try assertMatches("C:\\DNXConsoleApp\\foo\\Program.cs", pattern: "C:/DNXConsoleApp/**/*.cs", options: .vscode)
 		try assertMatches("", pattern: "*", options: .vscode)
 	}
 
@@ -179,33 +175,31 @@ struct VSCodeTests {
 		try assertDoesNotMatch("node_modules/some/folder/foo.ts", pattern: "**/node_modules/**/*.js", options: .vscode)
 		try assertDoesNotMatch("foo.jss", pattern: "**/node_modules/**/*.js", options: .vscode)
 		try assertDoesNotMatch("some.js/test", pattern: "**/node_modules/**/*.js", options: .vscode)
-		withKnownIssue {
-			try assertMatches("node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/node_modules/more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("some/test/node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("some\\test\\node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/some/test/node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("\\some\\test\\node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("C:\\\\some\\test\\node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("C:\\\\some\\test\\node_modules\\more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("bower_components/more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("some/test/bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("some\\test\\bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/some/test/bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("\\some\\test\\bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("C:\\\\some\\test\\bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("C:\\\\some\\test\\bower_components\\more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches(".git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("some/test/.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("some\\test\\.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("/some/test/.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("\\some\\test\\.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-			try assertMatches("C:\\\\some\\test\\.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
-		}
+		try assertMatches("node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/node_modules/more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("some/test/node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("some\\test\\node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/some/test/node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("\\some\\test\\node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("C:\\\\some\\test\\node_modules", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("C:\\\\some\\test\\node_modules\\more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("bower_components/more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("some/test/bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("some\\test\\bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/some/test/bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("\\some\\test\\bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("C:\\\\some\\test\\bower_components", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("C:\\\\some\\test\\bower_components\\more", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches(".git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("some/test/.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("some\\test\\.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("/some/test/.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("\\some\\test\\.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
+		try assertMatches("C:\\\\some\\test\\.git", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
 		try assertDoesNotMatch("tempting", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
 		try assertDoesNotMatch("/tempting", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
 		try assertDoesNotMatch("some/test/tempting", pattern: "{**/node_modules/**,**/.git/**,**/bower_components/**}", options: .vscode)
@@ -374,20 +368,12 @@ struct VSCodeTests {
 		try assertDoesNotMatch("C:\\testing.js\\foo", pattern: "**/*.js", options: .vscode)
 		try assertMatches("foo.js", pattern: "**/foo.js", options: .vscode)
 		try assertMatches("/foo.js", pattern: "**/foo.js", options: .vscode)
-		withKnownIssue {
-			try assertMatches("\\foo.js", pattern: "**/foo.js", options: .vscode)
-		}
+		try assertMatches("\\foo.js", pattern: "**/foo.js", options: .vscode)
 		try assertMatches("testing/foo.js", pattern: "**/foo.js", options: .vscode)
-		withKnownIssue {
-			try assertMatches("testing\\foo.js", pattern: "**/foo.js", options: .vscode)
-		}
+		try assertMatches("testing\\foo.js", pattern: "**/foo.js", options: .vscode)
 		try assertMatches("/testing/foo.js", pattern: "**/foo.js", options: .vscode)
-		withKnownIssue {
-			try assertMatches("\\testing\\foo.js", pattern: "**/foo.js", options: .vscode)
-		}
-		withKnownIssue {
-			try assertMatches("C:\\testing\\foo.js", pattern: "**/foo.js", options: .vscode)
-		}
+		try assertMatches("\\testing\\foo.js", pattern: "**/foo.js", options: .vscode)
+		try assertMatches("C:\\testing\\foo.js", pattern: "**/foo.js", options: .vscode)
 	}
 
 	@Test func cachedProperly() throws {

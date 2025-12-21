@@ -29,7 +29,7 @@ extension Pattern {
 		for sections in alternatives {
 			if match(components: .init(sections), .init(name)) {
 				return true
-			} else if options.matchesTrailingPathSeparator && name.last == options.pathSeparator {
+			} else if options.matchesTrailingPathSeparator && options.isPathSeparator(name.last) {
 				if match(components: .init(sections), .init(name).dropLast()) {
 					return true
 				}
@@ -74,7 +74,7 @@ extension Pattern {
 
 			switch (components.first, components.last, options.matchLeadingDirectories) {
 			case (.pathSeparator, _, _):
-				if name.first == options.pathSeparator {
+				if options.isPathSeparator(name.first) {
 					components = components.dropFirst()
 					name = name.dropFirst()
 				} else if components.dropFirst().first == .pathWildcard {
@@ -90,7 +90,7 @@ extension Pattern {
 					return false
 				}
 			case (.singleCharacter, _, _):
-				guard name.first != options.pathSeparator else { return false }
+				guard !options.isPathSeparator(name.first) else { return false }
 				if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 					return false
 				}
@@ -110,7 +110,7 @@ extension Pattern {
 				components = components.dropFirst()
 				name = name.dropFirst()
 			case (_, .pathSeparator, false):
-				if name.last == options.pathSeparator {
+				if options.isPathSeparator(name.last) {
 					components = components.dropLast()
 					name = name.dropLast()
 				} else if name.isEmpty && components.dropLast().last == .pathWildcard {
@@ -126,7 +126,7 @@ extension Pattern {
 					return false
 				}
 			case (_, .singleCharacter, false):
-				guard name.last != options.pathSeparator else { return false }
+				guard !options.isPathSeparator(name.last) else { return false }
 
 				components = components.dropLast()
 				name = name.dropLast()
@@ -141,9 +141,9 @@ extension Pattern {
 				}
 
 				if components.count == 1 {
-					if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
+					if options.pathSeparator != nil, !options.matchLeadingDirectories {
 						// the last component is a component level wildcard, which matches anything except for the path separator
-						return !name.contains(pathSeparator)
+						return !name.contains(where: { options.isPathSeparator($0) })
 					} else {
 						// no special treatment for path separators
 						return true
@@ -154,7 +154,7 @@ extension Pattern {
 					return true
 				} else if name.isEmpty {
 					return false
-				} else if name.first == options.pathSeparator {
+				} else if options.isPathSeparator(name.first) {
 					// componentWildcard cannot match path separators
 					return false
 				} else {
@@ -166,7 +166,7 @@ extension Pattern {
 					return true
 				} else if name.isEmpty {
 					return false
-				} else if name.last == options.pathSeparator {
+				} else if options.isPathSeparator(name.last) {
 					// componentWildcard cannot match path separators
 					return false
 				} else {
@@ -200,7 +200,7 @@ extension Pattern {
 
 				return remaining != nil
 			case (.none, _, _):
-				if options.matchLeadingDirectories && name.first == options.pathSeparator {
+				if options.matchLeadingDirectories && options.isPathSeparator(name.first) {
 					return true
 				}
 
@@ -226,7 +226,7 @@ extension Pattern {
 
 		switch components.first {
 		case .pathSeparator:
-			if name.first == options.pathSeparator {
+			if options.isPathSeparator(name.first) {
 				return matchPrefix(
 					components: components.dropFirst(),
 					name.dropFirst()
@@ -244,7 +244,7 @@ extension Pattern {
 				return nil
 			}
 		case .singleCharacter:
-			guard name.first != options.pathSeparator else { return nil }
+			guard !options.isPathSeparator(name.first) else { return nil }
 			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) {
 				return nil
 			}
@@ -272,9 +272,9 @@ extension Pattern {
 			}
 
 			if components.count == 1 {
-				if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
+				if options.pathSeparator != nil, !options.matchLeadingDirectories {
 					// the last component is a component level wildcard, which matches anything except for the path separator
-					if let index = name.firstIndex(of: pathSeparator) {
+					if let index = name.firstIndex(where: { options.isPathSeparator($0) }) {
 						return name.suffix(from: index)
 					} else {
 						return name.dropAll()
@@ -504,7 +504,7 @@ extension Pattern {
 
 		switch first {
 		case .pathSeparator:
-			if name.first == options.pathSeparator {
+			if options.isPathSeparator(name.first) {
 				collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
 			}
 
@@ -514,7 +514,7 @@ extension Pattern {
 			}
 
 		case .singleCharacter:
-			guard !name.isEmpty, name.first != options.pathSeparator else { return }
+			guard !name.isEmpty, !options.isPathSeparator(name.first) else { return }
 			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 				return
 			}
@@ -535,7 +535,7 @@ extension Pattern {
 			var remaining = name
 			while true {
 				collectAllPrefixMatches(components: rest, remaining, into: &results)
-				guard !remaining.isEmpty, remaining.first != options.pathSeparator else { break }
+				guard !remaining.isEmpty, !options.isPathSeparator(remaining.first) else { break }
 				remaining = remaining.dropFirst()
 			}
 
@@ -697,7 +697,7 @@ extension Pattern {
 	}
 
 	private func isAtSegmentStart(_ name: Substring) -> Bool {
-		name.isAtStart || name.previous() == options.pathSeparator
+		name.isAtStart || options.isPathSeparator(name.previous())
 	}
 }
 

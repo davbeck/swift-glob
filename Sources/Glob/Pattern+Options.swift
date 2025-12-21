@@ -101,6 +101,22 @@ public extension Pattern {
 		/// Defaults to "/" regardless of operating system.
 		public var pathSeparator: Character? = "/"
 
+		/// Additional characters that should be treated as path separators in the input string.
+		///
+		/// This is useful for matching Windows-style paths where both `/` and `\` should be treated as path separators.
+		/// Note: These characters are only recognized as path separators in the input string being matched,
+		/// not in the pattern itself.
+		public var additionalPathSeparators: Set<Character> = []
+
+		/// Returns true if the given character is a path separator (either the primary or an additional one)
+		public func isPathSeparator(_ character: Character?) -> Bool {
+			guard let character else { return false }
+			if let pathSeparator, character == pathSeparator {
+				return true
+			}
+			return additionalPathSeparators.contains(character)
+		}
+
 		/// If a trailing path separator in the search string will be ignored if it's not explicitly matched.
 		///
 		/// This allows patterns to match against a directory or a regular file. For instance "foo*" will match both "foo_file" and "foo_dir/" if this is enabled.
@@ -115,7 +131,8 @@ public extension Pattern {
 			emptyRangeBehavior: .treatClosingBracketAsCharacter,
 			supportsPatternLists: false,
 			supportsBraceExpansion: true,
-			rangeNegationCharacter: .both
+			rangeNegationCharacter: .both,
+			additionalPathSeparators: ["\\"]
 		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
