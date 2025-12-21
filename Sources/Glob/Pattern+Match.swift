@@ -23,12 +23,17 @@ extension Substring {
 extension Pattern {
 	/// Test if a given string matches the pattern
 	/// - Parameter name: The string to match against
-	/// - Returns: true if the string matches the pattern
+	/// - Returns: true if the string matches the pattern (or any alternative if brace expansion was used)
 	public func match(_ name: some StringProtocol) -> Bool {
-		if match(components: .init(sections), .init(name)) {
-			return true
-		} else if options.matchesTrailingPathSeparator && name.last == options.pathSeparator {
-			return match(components: .init(sections), .init(name).dropLast())
+		// Try each alternative (from brace expansion)
+		for sections in alternatives {
+			if match(components: .init(sections), .init(name)) {
+				return true
+			} else if options.matchesTrailingPathSeparator && name.last == options.pathSeparator {
+				if match(components: .init(sections), .init(name).dropLast()) {
+					return true
+				}
+			}
 		}
 
 		return false

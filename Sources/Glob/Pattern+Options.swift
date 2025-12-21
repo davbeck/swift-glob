@@ -65,6 +65,22 @@ public extension Pattern {
 		/// 	The pattern matches if the input string cannot be matched with any of the patterns in the pattern-list.
 		public var supportsPatternLists: Bool = true
 
+		/// Recognize brace expansion syntax like `{a,b,c}`.
+		///
+		/// When enabled, patterns containing braces are expanded into multiple alternative patterns.
+		/// For example, `*.{js,ts}` expands to match either `*.js` or `*.ts`.
+		///
+		/// Examples:
+		/// - `{a,b,c}` matches "a", "b", or "c"
+		/// - `*.{html,js}` matches files ending in ".html" or ".js"
+		/// - `{foo,bar}/**` matches anything under "foo/" or "bar/"
+		/// - `{**/*.js,**/*.ts}` matches any .js or .ts file
+		///
+		/// Note: This is different from ksh-style pattern lists (`@(a|b)`) which are handled by `supportsPatternLists`.
+		/// Brace expansion is a pre-processing step that creates multiple patterns, while pattern lists are
+		/// evaluated during matching.
+		public var supportsBraceExpansion: Bool = false
+
 		/// The character used to invert a character class.
 		public enum RangeNegationCharacter: Equatable, Sendable {
 			/// Use the `!` character to denote an inverse character class.
@@ -96,6 +112,7 @@ public extension Pattern {
 			supportsPathLevelWildcards: true,
 			emptyRangeBehavior: .error,
 			supportsPatternLists: false,
+			supportsBraceExpansion: true,
 			rangeNegationCharacter: .caret
 		)
 
