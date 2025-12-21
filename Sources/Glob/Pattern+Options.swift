@@ -87,6 +87,8 @@ public extension Pattern {
 			case exclamationMark
 			/// Use the `^` character to denote an inverse character class.
 			case caret
+			/// Use either `!` or `^` to denote an inverse character class.
+			case both
 		}
 
 		/// The character used to specify when a range matches characters that aren't in the range.
@@ -113,7 +115,7 @@ public extension Pattern {
 			emptyRangeBehavior: .error,
 			supportsPatternLists: false,
 			supportsBraceExpansion: true,
-			rangeNegationCharacter: .caret
+			rangeNegationCharacter: .both
 		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).

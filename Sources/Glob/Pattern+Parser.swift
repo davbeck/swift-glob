@@ -189,7 +189,8 @@ extension Pattern {
 					}
 				case .leftSquareBracket:
 					let negated: Bool
-					if try pop(options.rangeNegationCharacter.token) {
+					let negationCharacter = options.rangeNegationCharacter
+					if try pop({ negationCharacter.matches($0) }) != nil {
 						negated = true
 					} else {
 						negated = false
@@ -440,12 +441,18 @@ private extension [Pattern.Section] {
 }
 
 extension Pattern.Options.RangeNegationCharacter {
-	var token: Pattern.Parser.Token {
+	var tokens: [Pattern.Parser.Token] {
 		switch self {
 		case .exclamationMark:
-			.exclamationMark
+			[.exclamationMark]
 		case .caret:
-			.caret
+			[.caret]
+		case .both:
+			[.exclamationMark, .caret]
 		}
+	}
+
+	func matches(_ token: Pattern.Parser.Token) -> Bool {
+		tokens.contains(token)
 	}
 }

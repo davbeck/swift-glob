@@ -319,16 +319,10 @@ struct VSCodeTests {
 		try assertDoesNotMatch("foo.8", pattern: "foo.[^0-9]", options: .vscode)
 		try assertDoesNotMatch("bar.5", pattern: "foo.[^0-9]", options: .vscode)
 		try assertMatches("foo.f", pattern: "foo.[^0-9]", options: .vscode)
-		withKnownIssue {
-			try assertDoesNotMatch("foo.5", pattern: "foo.[!0-9]", options: .vscode)
-		}
-		withKnownIssue {
-			try assertDoesNotMatch("foo.8", pattern: "foo.[!0-9]", options: .vscode)
-		}
+		try assertDoesNotMatch("foo.5", pattern: "foo.[!0-9]", options: .vscode)
+		try assertDoesNotMatch("foo.8", pattern: "foo.[!0-9]", options: .vscode)
 		try assertDoesNotMatch("bar.5", pattern: "foo.[!0-9]", options: .vscode)
-		withKnownIssue {
-			try assertMatches("foo.f", pattern: "foo.[!0-9]", options: .vscode)
-		}
+		try assertMatches("foo.f", pattern: "foo.[!0-9]", options: .vscode)
 		try assertDoesNotMatch("foo.5", pattern: "foo.[0!^*?]", options: .vscode)
 		try assertDoesNotMatch("foo.8", pattern: "foo.[0!^*?]", options: .vscode)
 		try assertMatches("foo.0", pattern: "foo.[0!^*?]", options: .vscode)
