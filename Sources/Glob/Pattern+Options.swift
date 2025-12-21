@@ -117,6 +117,13 @@ public extension Pattern {
 			return additionalPathSeparators.contains(character)
 		}
 
+		/// If true, bracket expressions cannot match path separators even if they explicitly contain them.
+		///
+		/// For example, with this option enabled, `foo[/]bar` will NOT match `foo/bar` because
+		/// path separators cannot be matched within bracket expressions.
+		/// This matches VSCode's glob behavior.
+		public var bracketExpressionsCannotMatchPathSeparators: Bool = false
+
 		/// If a trailing path separator in the search string will be ignored if it's not explicitly matched.
 		///
 		/// This allows patterns to match against a directory or a regular file. For instance "foo*" will match both "foo_file" and "foo_dir/" if this is enabled.
@@ -132,7 +139,8 @@ public extension Pattern {
 			supportsPatternLists: false,
 			supportsBraceExpansion: true,
 			rangeNegationCharacter: .both,
-			additionalPathSeparators: ["\\"]
+			additionalPathSeparators: ["\\"],
+			bracketExpressionsCannotMatchPathSeparators: true
 		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).

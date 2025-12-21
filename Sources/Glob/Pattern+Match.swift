@@ -104,6 +104,9 @@ extension Pattern {
 					// in our implimentation, it will not match
 					return false
 				}
+				if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.first) {
+					return false
+				}
 
 				guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 
@@ -131,6 +134,9 @@ extension Pattern {
 				components = components.dropLast()
 				name = name.dropLast()
 			case let (_, .oneOf(ranges, isNegated: isNegated), false):
+				if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.last) {
+					return false
+				}
 				guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
 
 				components = components.dropLast()
@@ -258,6 +264,9 @@ extension Pattern {
 				// https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_13_01
 				// It is unspecified whether an explicit <period> in a bracket expression matching list, such as "[.abc]", can match a leading <period> in a filename.
 				// in our implimentation, it will not match
+				return nil
+			}
+			if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.first) {
 				return nil
 			}
 
@@ -523,6 +532,9 @@ extension Pattern {
 		case let .oneOf(ranges, isNegated: isNegated):
 			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return }
 			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.first) {
 				return
 			}
 			collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)

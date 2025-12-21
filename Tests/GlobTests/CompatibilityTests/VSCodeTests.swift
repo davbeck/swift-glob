@@ -320,9 +320,7 @@ struct VSCodeTests {
 		try assertMatches("foo.^", pattern: "foo.[0!^*?]", options: .vscode)
 		try assertMatches("foo.*", pattern: "foo.[0!^*?]", options: .vscode)
 		try assertMatches("foo.?", pattern: "foo.[0!^*?]", options: .vscode)
-		withKnownIssue {
-			try assertDoesNotMatch("foo/bar", pattern: "foo[/]bar", options: .vscode)
-		}
+		try assertDoesNotMatch("foo/bar", pattern: "foo[/]bar", options: .vscode)
 		try assertMatches("foo.[", pattern: "foo.[[]", options: .vscode)
 		try assertMatches("foo.]", pattern: "foo.[]]", options: .vscode)
 		try assertMatches("foo.]", pattern: "foo.[][!]", options: .vscode)
