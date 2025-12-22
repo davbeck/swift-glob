@@ -31,7 +31,7 @@ struct SearchOptionsView: View {
 		.onAppear {
 			do {
 				guard let bookmarkData = UserDefaults.standard.data(forKey: "searchDirectory") else { return }
-				var bookmarkDataIsStale: Bool = false
+				var bookmarkDataIsStale = false
 				self.searchURL = try URL(resolvingBookmarkData: bookmarkData, options: [], relativeTo: nil, bookmarkDataIsStale: &bookmarkDataIsStale)
 			} catch {
 				print("unable to load bookmark", error)
