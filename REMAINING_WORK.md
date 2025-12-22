@@ -4,12 +4,13 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Current Status
 
-- **103 tests pass** with **14 known issues** (tests wrapped in `withKnownIssue`)
+- **103 tests pass** with **13 known issues** (tests wrapped in `withKnownIssue`)
 - Core glob matching is fully functional
 - ksh-style pattern lists (`@()`, `*()`, `+()`, `?()`, `!()`) are implemented with proper backtracking
 - Brace expansion (`{a,b,c}`) is implemented and working
 - VSCode compatibility is fully implemented
 - Equivalence classes (`[[=a=]]`) are implemented using Unicode NFD decomposition
+- Trailing `/**` behavior is configurable (Fish shell vs VSCode semantics)
 
 ## Test Suite Breakdown
 
@@ -17,7 +18,7 @@ This document summarizes the remaining issues, missing features, and context for
 |------------|---------|--------------|-------|
 | FNMatchTests | 64 | 12 | POSIX fnmatch compatibility (locale-dependent ranges) |
 | VSCodeTests | 15 | 0 | Full VSCode compatibility |
-| FishShellTests | varies | 2 | Symlink/recursive glob edge cases |
+| FishShellTests | varies | 1 | Symlink edge case |
 | Other tests | all pass | 0 | Core functionality works |
 
 ---
@@ -47,18 +48,14 @@ In some locales (e.g., German `de_DE`), character ranges like `[a-z]` should inc
 
 **Priority: Medium** | **Effort: Medium**
 
-The file search functionality has edge cases with symlinks:
+The file search functionality has an edge case with symlinks:
 
-1. **Symlinks not descended independently** - When the same directory is reachable via multiple symlinks, only one path is explored.
+**Symlinks not descended independently** - When the same directory is reachable via multiple symlinks, only one path is explored.
 
-2. **Recursive glob boundary matching** - Pattern `**a2/**` should match `dir_a1/dir_a2/dir_a3` but currently includes extra results (`dir_a1/dir_a2/` itself). This is a semantic difference from Fish shell where trailing `/**` requires at least one component, vs VSCode where it can match empty.
-
-**Affected tests:** 2 FishShellTests
+**Affected tests:** 1 FishShellTests (`symlinksAreDescendedIntoIndependently`)
 
 **Files to modify:**
 - `Sources/Glob/GlobSearch.swift`
-
-**Note:** The `**a2/**` issue cannot be easily fixed without breaking VSCode compatibility, which expects `**/foo/**` to match `bar/foo`.
 
 ---
 
@@ -105,6 +102,7 @@ swift test --filter "FNMatchTests/ksh_style_matching"
 
 ## Recent Changes
 
+- **Trailing path wildcard control** - Added `trailingPathWildcardRequiresComponent` option to control whether trailing `/**` patterns require at least one path component (Fish shell behavior) or can match empty (VSCode behavior)
 - **Equivalence classes** - Full support for `[[=a=]]` syntax using Unicode NFD decomposition to match accented characters (e.g., `[[=a=]]` matches 'a', 'á', 'à', 'ä', 'â', etc.)
 - **Unclosed bracket handling** - Added `unclosedBracketBehavior` option; in fnmatch mode, unclosed `[` is treated as a literal character
 - **VSCode full compatibility** - All VSCode tests pass:
