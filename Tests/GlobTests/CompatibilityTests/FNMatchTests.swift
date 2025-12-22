@@ -1770,84 +1770,81 @@ struct FNMatchTests {
 		assertMatchesFNMatch("\u{d6}", pattern: "[[:alpha:]]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "\334"			"[[:alpha:]]"	       0
 		assertMatchesFNMatch("\u{dc}", pattern: "[[:alpha:]]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "a"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("\u{e2}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("\u{e0}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("\u{e1}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("\u{e4}", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=a=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\342=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\342=]b]"	       0
+		assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\342=]b]"	       0
+		assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\342=]b]"	       0
+		assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\342=]b]"	       0
+		assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\342=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\342=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=\u{e2}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\340=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\340=]b]"	       0
+		assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\340=]b]"	       0
+		assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\340=]b]"	       0
+		assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\340=]b]"	       0
+		assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\340=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\340=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=\u{e0}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\341=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\341=]b]"	       0
+		assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\341=]b]"	       0
+		assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\341=]b]"	       0
+		assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\341=]b]"	       0
+		assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\341=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\341=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=\u{e1}=]b]", flags: 0, result: NOMATCH)
+		// de_DE.ISO-8859-1 "a"			"[[=\344=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\342"			"[[=\344=]b]"	       0
+		assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\340"			"[[=\344=]b]"	       0
+		assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\341"			"[[=\344=]b]"	       0
+		assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\344"			"[[=\344=]b]"	       0
+		assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "b"			"[[=\344=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "c"			"[[=\344=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=\u{e4}=]b]", flags: 0, result: NOMATCH)
 
-		withKnownIssue {
-			// de_DE.ISO-8859-1 "a"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("\u{e2}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("\u{e0}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("\u{e1}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("\u{e4}", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=a=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\342=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\342=]b]"	       0
-			assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\342=]b]"	       0
-			assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\342=]b]"	       0
-			assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\342=]b]"	       0
-			assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\342=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=\u{e2}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\342=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=\u{e2}=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\340=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\340=]b]"	       0
-			assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\340=]b]"	       0
-			assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\340=]b]"	       0
-			assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\340=]b]"	       0
-			assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\340=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=\u{e0}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\340=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=\u{e0}=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\341=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\341=]b]"	       0
-			assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\341=]b]"	       0
-			assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\341=]b]"	       0
-			assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\341=]b]"	       0
-			assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\341=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=\u{e1}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\341=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=\u{e1}=]b]", flags: 0, result: NOMATCH)
-			// de_DE.ISO-8859-1 "a"			"[[=\344=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\342"			"[[=\344=]b]"	       0
-			assertMatchesFNMatch("\u{e2}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\340"			"[[=\344=]b]"	       0
-			assertMatchesFNMatch("\u{e0}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\341"			"[[=\344=]b]"	       0
-			assertMatchesFNMatch("\u{e1}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\344"			"[[=\344=]b]"	       0
-			assertMatchesFNMatch("\u{e4}", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "b"			"[[=\344=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=\u{e4}=]b]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "c"			"[[=\344=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=\u{e4}=]b]", flags: 0, result: NOMATCH)
-
-			// de_DE.ISO-8859-1 "aa"			"[[.a.]]a"	       0
-			assertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "ba"			"[[.a.]]a"	       NOMATCH
-			assertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
-		}
+		// de_DE.ISO-8859-1 "aa"			"[[.a.]]a"	       0
+		assertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "ba"			"[[.a.]]a"	       NOMATCH
+		assertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
 	}
 
 	//  multibyte character set
@@ -1977,83 +1974,81 @@ struct FNMatchTests {
 		// de_DE.UTF-8	 "Ü"			"[[:alpha:]]"	       0
 		assertMatchesFNMatch("Ü", pattern: "[[:alpha:]]", flags: 0, result: 0)
 
-		withKnownIssue {
-			// de_DE.UTF-8	 "a"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("â", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("à", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("á", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("ä", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=a=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=a=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=â=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=â=]b]"	       0
-			assertMatchesFNMatch("â", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=â=]b]"	       0
-			assertMatchesFNMatch("à", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=â=]b]"	       0
-			assertMatchesFNMatch("á", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=â=]b]"	       0
-			assertMatchesFNMatch("ä", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=â=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=â=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=â=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=â=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=à=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=à=]b]"	       0
-			assertMatchesFNMatch("â", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=à=]b]"	       0
-			assertMatchesFNMatch("à", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=à=]b]"	       0
-			assertMatchesFNMatch("á", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=à=]b]"	       0
-			assertMatchesFNMatch("ä", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=à=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=à=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=à=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=à=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=á=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=á=]b]"	       0
-			assertMatchesFNMatch("â", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=á=]b]"	       0
-			assertMatchesFNMatch("à", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=á=]b]"	       0
-			assertMatchesFNMatch("á", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=á=]b]"	       0
-			assertMatchesFNMatch("ä", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=á=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=á=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=á=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=á=]b]", flags: 0, result: NOMATCH)
-			// de_DE.UTF-8	 "a"			"[[=ä=]b]"	       0
-			assertMatchesFNMatch("a", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "â"			"[[=ä=]b]"	       0
-			assertMatchesFNMatch("â", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "à"			"[[=ä=]b]"	       0
-			assertMatchesFNMatch("à", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "á"			"[[=ä=]b]"	       0
-			assertMatchesFNMatch("á", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[=ä=]b]"	       0
-			assertMatchesFNMatch("ä", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "b"			"[[=ä=]b]"	       0
-			assertMatchesFNMatch("b", pattern: "[[=ä=]b]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "c"			"[[=ä=]b]"	       NOMATCH
-			assertMatchesFNMatch("c", pattern: "[[=ä=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("â", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("à", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("á", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("ä", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=a=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=a=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=a=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=a=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=â=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=â=]b]"	       0
+		assertMatchesFNMatch("â", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=â=]b]"	       0
+		assertMatchesFNMatch("à", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=â=]b]"	       0
+		assertMatchesFNMatch("á", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=â=]b]"	       0
+		assertMatchesFNMatch("ä", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=â=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=â=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=â=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=â=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=à=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=à=]b]"	       0
+		assertMatchesFNMatch("â", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=à=]b]"	       0
+		assertMatchesFNMatch("à", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=à=]b]"	       0
+		assertMatchesFNMatch("á", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=à=]b]"	       0
+		assertMatchesFNMatch("ä", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=à=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=à=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=à=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=à=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=á=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=á=]b]"	       0
+		assertMatchesFNMatch("â", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=á=]b]"	       0
+		assertMatchesFNMatch("à", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=á=]b]"	       0
+		assertMatchesFNMatch("á", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=á=]b]"	       0
+		assertMatchesFNMatch("ä", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=á=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=á=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=á=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=á=]b]", flags: 0, result: NOMATCH)
+		// de_DE.UTF-8	 "a"			"[[=ä=]b]"	       0
+		assertMatchesFNMatch("a", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "â"			"[[=ä=]b]"	       0
+		assertMatchesFNMatch("â", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "à"			"[[=ä=]b]"	       0
+		assertMatchesFNMatch("à", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "á"			"[[=ä=]b]"	       0
+		assertMatchesFNMatch("á", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[=ä=]b]"	       0
+		assertMatchesFNMatch("ä", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "b"			"[[=ä=]b]"	       0
+		assertMatchesFNMatch("b", pattern: "[[=ä=]b]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "c"			"[[=ä=]b]"	       NOMATCH
+		assertMatchesFNMatch("c", pattern: "[[=ä=]b]", flags: 0, result: NOMATCH)
 
-			// de_DE.UTF-8	 "aa"			"[[.a.]]a"	       0
-			assertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ba"			"[[.a.]]a"	       NOMATCH
-			assertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
-		}
+		// de_DE.UTF-8	 "aa"			"[[.a.]]a"	       0
+		assertMatchesFNMatch("aa", pattern: "[[.a.]]a", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ba"			"[[.a.]]a"	       NOMATCH
+		assertMatchesFNMatch("ba", pattern: "[[.a.]]a", flags: 0, result: NOMATCH)
 	}
 
 	//  GNU extensions.

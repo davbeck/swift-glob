@@ -266,7 +266,7 @@ extension Pattern {
 									}
 								} else if try pop(.equals) {
 									// Equivalence classes [=X=]
-									// In the C locale, equivalence classes just match the character itself
+									// Matches characters with the same base character after removing combining marks
 									guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
 									let equivChar = charToken.character
 
@@ -284,7 +284,7 @@ extension Pattern {
 											if !options.supportsRangeSeparatorAtBeginningAndEnd {
 												throw PatternParsingError.rangeNotClosed
 											}
-											ranges.append(.character(equivChar))
+											ranges.append(.equivalence(equivChar))
 											ranges.append(.character("-"))
 											break loop
 										} else {
@@ -295,7 +295,7 @@ extension Pattern {
 											}
 										}
 									} else {
-										ranges.append(.character(equivChar))
+										ranges.append(.equivalence(equivChar))
 									}
 								} else {
 									ranges.append(.character("["))

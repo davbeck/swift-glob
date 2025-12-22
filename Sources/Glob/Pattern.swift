@@ -158,6 +158,12 @@ public struct Pattern: Equatable, Sendable {
 
 		case named(Name)
 
+		/// An equivalence class that matches characters with the same base character.
+		///
+		/// For example, `.equivalence("a")` matches 'a', 'á', 'à', 'ä', 'â', etc.
+		/// This is used for the `[[=X=]]` syntax in bracket expressions.
+		case equivalence(Character)
+
 		static func character(_ character: Character) -> Self {
 			.range(character ... character)
 		}
@@ -168,7 +174,45 @@ public struct Pattern: Equatable, Sendable {
 				closedRange.contains(character)
 			case let .named(name):
 				name.contains(character)
+			case let .equivalence(baseChar):
+				Self.areEquivalent(character, baseChar)
 			}
+		}
+
+		/// Returns true if two characters are considered equivalent.
+		///
+		/// Characters are equivalent if they have the same base character after
+		/// removing combining marks (diacritics). For example, 'a', 'á', 'à', 'ä'
+		/// are all equivalent because they share the base character 'a'.
+		private static func areEquivalent(_ char1: Character, _ char2: Character) -> Bool {
+			// Quick check for exact match
+			if char1 == char2 { return true }
+
+			// Get base characters by decomposing and taking only the base
+			let base1 = baseCharacter(of: char1)
+			let base2 = baseCharacter(of: char2)
+
+			return base1 == base2
+		}
+
+		/// Returns the base character after removing combining marks.
+		///
+		/// For example, 'á' (U+00E1) decomposes to 'a' + combining acute accent,
+		/// so this returns 'a'.
+		private static func baseCharacter(of character: Character) -> Character {
+			// Decompose to NFD (Canonical Decomposition)
+			let decomposed = String(character).decomposedStringWithCanonicalMapping
+
+			// The first scalar is the base character
+			if let firstScalar = decomposed.unicodeScalars.first {
+				// Check if it's a combining mark - if so, the original was a combining character
+				if firstScalar.properties.generalCategory.isCombiningMark {
+					return character
+				}
+				return Character(firstScalar)
+			}
+
+			return character
 		}
 	}
 

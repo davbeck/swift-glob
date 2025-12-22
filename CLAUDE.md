@@ -57,4 +57,10 @@ Tests use Swift Testing framework (not XCTest). Tests are in `Tests/GlobTests/`.
 - `CompatibilityTests/`: Tests comparing behavior against other implementations (fnmatch, VSCode, Go, Fish shell)
 - `FNMatchTests.swift`: Comprehensive compatibility tests against C fnmatch (many are wrapped in `withKnownIssue`)
 
-When fixing compatibility issues, add or update tests in the appropriate compatibility test file. Always run the full test suite before committing.
+When fixing compatibility issues, add or update tests in the appropriate compatibility test file.
+
+## Git
+
+Before committing any changes:
+- Run the full test suite with `swift test` and only commit if all tests pass.
+- Run `bin/format`.
