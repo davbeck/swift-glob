@@ -143,6 +143,18 @@ public extension Pattern {
 		/// This allows patterns to match against a directory or a regular file. For instance "foo*" will match both "foo_file" and "foo_dir/" if this is enabled.
 		public var matchesTrailingPathSeparator: Bool = true
 
+		/// If a trailing `/**` in a pattern requires at least one path component to match.
+		///
+		/// When true (Fish shell behavior), the pattern `foo/**` will NOT match `foo` or `foo/` because
+		/// the trailing `/**` must match at least one component.
+		///
+		/// When false (VSCode behavior), the pattern `foo/**` will match `foo`, `foo/`, and `foo/bar`
+		/// because the trailing `/**` can match zero or more path components.
+		///
+		/// This only affects trailing `/**` patterns. Mid-pattern `/**/` (like `foo/**/bar`) can always
+		/// match zero path components regardless of this setting.
+		public var trailingPathWildcardRequiresComponent: Bool = true
+
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init()
 
@@ -154,7 +166,8 @@ public extension Pattern {
 			supportsBraceExpansion: true,
 			rangeNegationCharacter: .both,
 			additionalPathSeparators: ["\\"],
-			bracketExpressionsCannotMatchPathSeparators: true
+			bracketExpressionsCannotMatchPathSeparators: true,
+			trailingPathWildcardRequiresComponent: false
 		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).

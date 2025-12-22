@@ -87,16 +87,14 @@ class FishShellTests: SearchTestUtils {
 				"dir_b1/dir_b2/dir_b3/",
 			]
 		)
-		await withKnownIssue {
-			// "dir_a1/dir_a2" is also being matched
-			// so `/**/` should match an empty segment, but not a trailing `/**`
-			try await #expect(
-				self.search("**a2/**") == [
-					"dir_a1/dir_a2/dir_a3",
-					"dir_a1/dir_a2/dir_a3/file_a",
-				]
-			)
-		}
+		// Trailing `/**` must match at least one component
+		// So `**a2/**` should NOT match `dir_a1/dir_a2/` itself
+		try await #expect(
+			self.search("**a2/**") == [
+				"dir_a1/dir_a2/dir_a3/",
+				"dir_a1/dir_a2/dir_a3/file_a",
+			]
+		)
 	}
 
 	@Test func theLiteralSegmentPathWildcardMatchesInTheSameDirectory() async throws {

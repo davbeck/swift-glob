@@ -27,10 +27,10 @@ extension Pattern {
 	public func match(_ name: some StringProtocol) -> Bool {
 		// Try each alternative (from brace expansion)
 		for sections in alternatives {
-			if match(components: .init(sections), .init(name)) {
+			if match(components: .init(sections), .init(name), originalEndIndex: sections.count) {
 				return true
 			} else if options.matchesTrailingPathSeparator && options.isPathSeparator(name.last) {
-				if match(components: .init(sections), .init(name).dropLast()) {
+				if match(components: .init(sections), .init(name).dropLast(), originalEndIndex: sections.count) {
 					return true
 				}
 			}
@@ -42,7 +42,8 @@ extension Pattern {
 	// recursively matches against the pattern
 	private func match(
 		components: ArraySlice<Section>,
-		_ name: Substring
+		_ name: Substring,
+		originalEndIndex: Int
 	) -> Bool {
 		// we use a loop to avoid unbounded recursion on arbitrarily long search strings
 		// this method still recurses for wildcard matching, but it is bounded by the number of wildcards in the pattern, not the size of the search string
@@ -78,6 +79,14 @@ extension Pattern {
 					components = components.dropFirst()
 					name = name.dropFirst()
 				} else if components.dropFirst().first == .pathWildcard {
+					// Check if this /** is at the trailing position and name is empty
+					let nextWildcardIndex = components.index(after: components.startIndex)
+					let wildcardEndIndex = components.index(after: nextWildcardIndex)
+					let isTrailingPathWildcard = wildcardEndIndex == originalEndIndex
+					if options.trailingPathWildcardRequiresComponent && isTrailingPathWildcard && name.isEmpty {
+						// Trailing /** must match at least one component
+						return false
+					}
 					components = components.dropFirst(2)
 				} else {
 					return false
@@ -117,6 +126,13 @@ extension Pattern {
 					components = components.dropLast()
 					name = name.dropLast()
 				} else if name.isEmpty && components.dropLast().last == .pathWildcard {
+					// Check if this /**/ is at the END of the original pattern (trailing)
+					// vs at the BEGINNING (leading, which should match empty)
+					let isTrailingPathWildcard = components.endIndex == originalEndIndex
+					if options.trailingPathWildcardRequiresComponent && isTrailingPathWildcard {
+						// Trailing /**  must match at least one component
+						return false
+					}
 					components = components.dropLast(2)
 				} else {
 					return false
@@ -156,7 +172,7 @@ extension Pattern {
 					}
 				}
 
-				if match(components: components.dropFirst(), name) {
+				if match(components: components.dropFirst(), name, originalEndIndex: originalEndIndex) {
 					return true
 				} else if name.isEmpty {
 					return false
@@ -168,7 +184,7 @@ extension Pattern {
 					name = name.dropFirst()
 				}
 			case (_, .componentWildcard, false):
-				if match(components: components.dropLast(), name) {
+				if match(components: components.dropLast(), name, originalEndIndex: originalEndIndex) {
 					return true
 				} else if name.isEmpty {
 					return false
@@ -182,12 +198,17 @@ extension Pattern {
 			case (.pathWildcard, _, _):
 				if components.count == 1 {
 					// the last component is a path level wildcard, which matches anything
+					let isTrailingPathWildcard = components.endIndex == originalEndIndex
+					if options.trailingPathWildcardRequiresComponent && isTrailingPathWildcard && name.isEmpty {
+						// Trailing /** must match at least one character
+						return false
+					}
 					return true
 				}
 
-				if match(components: components.dropFirst(), name) {
+				if match(components: components.dropFirst(), name, originalEndIndex: originalEndIndex) {
 					return true
-				} else if components.dropFirst().first == .pathSeparator, match(components: components.dropFirst(2), name) {
+				} else if components.dropFirst().first == .pathSeparator, match(components: components.dropFirst(2), name, originalEndIndex: originalEndIndex) {
 					return true
 				} else if name.isEmpty {
 					return false
