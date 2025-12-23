@@ -30,7 +30,7 @@ struct Benchmark: AsyncParsableCommand {
 
 		let start = clock.now
 
-		_ = try await Glob.search(
+		let count = try await Glob.search(
 			directory: directory,
 			include: include.map { try Pattern($0) },
 			exclude: exclude.map { try Pattern($0) }
@@ -47,7 +47,7 @@ struct Benchmark: AsyncParsableCommand {
 			.compactMap { $0 }
 			.joined(separator: ", ")
 
-		print("\(description): \(duration.milliseconds)ms")
+		print("\(description) (\(count) files): \(duration.milliseconds)ms")
 	}
 
 	mutating func run() async throws {
