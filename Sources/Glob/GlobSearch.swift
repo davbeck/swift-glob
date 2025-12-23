@@ -1,4 +1,7 @@
-import Foundation
+public import struct Foundation.URL
+public import struct Foundation.URLResourceKey
+public import class Foundation.FileManager
+import struct ObjectiveC.ObjCBool
 
 /// The result of a custom matcher for searching directory components
 public struct MatchResult {

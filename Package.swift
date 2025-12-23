@@ -28,6 +28,13 @@ let package = Package(
 				"FNMDefinitions",
 			],
 			swiftSettings: [
+				.enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+				.enableUpcomingFeature("InferIsolatedConformances"),
+
+				.enableUpcomingFeature("ExistentialAny"),
+
+				.enableUpcomingFeature("MemberImportVisibility"),
+				.enableUpcomingFeature("InternalImportsByDefault"),
 			]
 		),
 		.testTarget(
