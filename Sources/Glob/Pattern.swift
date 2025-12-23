@@ -267,7 +267,7 @@ public struct Pattern: Equatable, Sendable {
 	public init(
 		_ pattern: some StringProtocol,
 		options: Options = .default
-	) throws {
+	) throws(InvalidPatternError) {
 		if options.supportsBraceExpansion {
 			let expandedPatterns = BraceExpansion.expand(
 				String(pattern),

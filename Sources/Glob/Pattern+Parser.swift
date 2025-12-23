@@ -101,7 +101,7 @@ extension Pattern {
 			}
 		}
 
-		mutating func pop(_ condition: (Token) -> Bool = { _ in true }) throws -> Token? {
+		mutating func pop(_ condition: (Token) -> Bool = { _ in true }) throws(PatternParsingError) -> Token? {
 			if let next = pattern.first {
 				let updatedPattern = pattern.dropFirst()
 
@@ -125,16 +125,16 @@ extension Pattern {
 			return nil
 		}
 
-		mutating func pop(_ token: Token) throws -> Bool {
+		mutating func pop(_ token: Token) throws(PatternParsingError) -> Bool {
 			try pop { $0 == token } != nil
 		}
 
-		mutating func parse() throws -> Pattern {
+		mutating func parse() throws(InvalidPatternError) -> Pattern {
 			do {
 				let sections = try self.parseSections()
 
 				return Pattern(sections: sections, options: options)
-			} catch let error as PatternParsingError {
+			} catch let error{
 				// add information about where the error was encountered by including the original pattern and our current location
 				throw InvalidPatternError(
 					pattern: pattern.base,
@@ -144,7 +144,7 @@ extension Pattern {
 			}
 		}
 
-		private mutating func parseSections(delimiters: some Collection<Token> = EmptyCollection()) throws -> [Section] {
+		private mutating func parseSections(delimiters: some Collection<Token> = EmptyCollection()) throws(PatternParsingError) -> [Section] {
 			var sections: [Section] = []
 
 			while let next = try pop({ !delimiters.contains($0) }) {
@@ -189,7 +189,7 @@ extension Pattern {
 					}
 				case .leftSquareBracket:
 					let savedPattern = pattern
-					do {
+					do throws(PatternParsingError) {
 						let negated: Bool
 						let negationCharacter = options.rangeNegationCharacter
 						if try pop({ negationCharacter.matches($0) }) != nil {
@@ -371,7 +371,7 @@ extension Pattern {
 
 		/// Parses the upper bound of a range in a bracket expression.
 		/// The upper bound can be a regular character, collating symbol [.X.], or equivalence class [=X=].
-		mutating func parseRangeUpperBound() throws -> Character {
+		mutating func parseRangeUpperBound() throws(PatternParsingError) -> Character {
 			guard let token = try pop() else {
 				throw PatternParsingError.rangeNotClosed
 			}
@@ -409,7 +409,7 @@ extension Pattern {
 		}
 
 		/// Parses a pattern list like `(abc|xyz)`
-		mutating func parsePatternList() throws -> [[Section]]? {
+		mutating func parsePatternList() throws(PatternParsingError) -> [[Section]]? {
 			if options.supportsPatternLists, try pop(.leftParen) {
 				// start of pattern list
 				var sectionsList: [[Section]] = []
