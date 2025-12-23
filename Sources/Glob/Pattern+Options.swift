@@ -189,6 +189,28 @@ public extension Pattern {
 			supportsRangeSeparatorAtBeginningAndEnd: false,
 			rangeNegationCharacter: .caret
 		)
+		
+		/// Options matching bash shell behavior with extglob enabled.
+		///
+		/// Note: Bash `**` is just multiple wildcards unless `shopt -s globstar` is set.
+		/// To match bash globstar behavior, use `.bashGlobstar`.
+		static let bash: Self = {
+			var options = Pattern.Options.default
+			options.supportsPatternLists = true
+			options.emptyRangeBehavior = .treatClosingBracketAsCharacter
+			options.unclosedBracketBehavior = .treatAsLiteral
+			options.rangeNegationCharacter = .both
+			// In bash, ** is just multiple * unless globstar is set
+			options.supportsPathLevelWildcards = false
+			return options
+		}()
+
+		/// Options matching bash shell behavior with extglob and globstar enabled.
+		static let bashGlobstar: Self = {
+			var options = bash
+			options.supportsPathLevelWildcards = true
+			return options
+		}()
 
 		/// Options matching [zsh shell behavior](https://zsh.sourceforge.io/Doc/Release/Expansion.html).
 		static let zsh: Self = {
