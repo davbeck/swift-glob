@@ -73,6 +73,37 @@ var options = Glob.Pattern.Options.default
 options.pathSeparator = #"\"# // use windows path separator
 ```
 
+### fnmatch Compatibility
+
+The `.fnmatch()` preset provides compatibility with the POSIX `fnmatch` function. However, there is one notable difference related to locale-dependent character ranges.
+
+#### Character Range Behavior
+
+In C's `fnmatch`, character ranges like `[a-z]` use locale-aware collation. In locales like `de_DE` (German), this means `[a-z]` matches accented characters like ä, ö, ü because they sort between a and z in the German collation order.
+
+This library uses Unicode scalar comparison by default, which does not include accented characters in `[a-z]`. To approximate locale-like behavior, use the `diacriticInsensitiveRanges` option:
+
+```swift
+// Default behavior: [a-z] does NOT match ä
+let pattern1 = try Glob.Pattern("[a-z]", options: .fnmatch())
+pattern1.match("ä") // false
+
+// With diacriticInsensitiveRanges: [a-z] DOES match ä
+let pattern2 = try Glob.Pattern("[a-z]", options: .fnmatch(diacriticInsensitiveRanges: true))
+pattern2.match("ä") // true
+pattern2.match("Ä") // false (case is still respected)
+```
+
+**Technical difference:** The `diacriticInsensitiveRanges` option uses Swift's `String.compare(_:options: .diacriticInsensitive)` which strips diacritical marks before comparison. This means ä is compared as "a", ö as "o", etc. This differs from true locale collation in subtle ways:
+
+| Character | glibc `fnmatch` (de_DE) | `diacriticInsensitiveRanges` |
+|-----------|-------------------------|------------------------------|
+| ä in [a-z] | Match (collation order) | Match (ä → a) |
+| ø in [a-z] | Match (collation order) | No match (ø has no base in a-z) |
+| ß in [a-z] | Match (collation order) | No match (ß is its own character) |
+
+For most use cases involving Western European languages, `diacriticInsensitiveRanges` provides the expected behavior. Named character classes like `[[:lower:]]` and `[[:alpha:]]` already handle Unicode correctly without needing this option.
+
 ## Contributing
 
 Contributions are highly encouraged. Here are some ways you can contribute:

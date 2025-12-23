@@ -117,7 +117,7 @@ extension Pattern {
 					return false
 				}
 
-				guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
+				guard let next = name.first, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return false }
 
 				components = components.dropFirst()
 				name = name.dropFirst()
@@ -153,7 +153,7 @@ extension Pattern {
 				if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.last) {
 					return false
 				}
-				guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
+				guard let next = name.last, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return false }
 
 				components = components.dropLast()
 				name = name.dropLast()
@@ -291,7 +291,7 @@ extension Pattern {
 				return nil
 			}
 
-			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return nil }
+			guard let next = name.first, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return nil }
 			return matchPrefix(
 				components: components.dropFirst(),
 				name.dropFirst()
@@ -551,7 +551,7 @@ extension Pattern {
 			collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
 
 		case let .oneOf(ranges, isNegated: isNegated):
-			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return }
+			guard let next = name.first, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return }
 			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 				return
 			}

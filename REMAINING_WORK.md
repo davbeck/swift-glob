@@ -4,19 +4,20 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Current Status
 
-- **103 tests pass** with **13 known issues** (tests wrapped in `withKnownIssue`)
+- **103 tests pass** with **1 known issue** (tests wrapped in `withKnownIssue`)
 - Core glob matching is fully functional
 - ksh-style pattern lists (`@()`, `*()`, `+()`, `?()`, `!()`) are implemented with proper backtracking
 - Brace expansion (`{a,b,c}`) is implemented and working
 - VSCode compatibility is fully implemented
 - Equivalence classes (`[[=a=]]`) are implemented using Unicode NFD decomposition
 - Trailing `/**` behavior is configurable (Fish shell vs VSCode semantics)
+- Diacritic-insensitive character ranges available via `diacriticInsensitiveRanges` option
 
 ## Test Suite Breakdown
 
 | Test Suite | Passing | Known Issues | Notes |
 |------------|---------|--------------|-------|
-| FNMatchTests | 64 | 12 | POSIX fnmatch compatibility (locale-dependent ranges) |
+| FNMatchTests | 76 | 0 | POSIX fnmatch compatibility (locale-like ranges via option) |
 | VSCodeTests | 15 | 0 | Full VSCode compatibility |
 | FishShellTests | varies | 1 | Symlink edge case |
 | Other tests | all pass | 0 | Core functionality works |
@@ -25,26 +26,7 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Remaining Known Issues
 
-### 1. Locale-Dependent Character Ranges
-
-**Priority: Low** | **Effort: High**
-
-In some locales (e.g., German `de_DE`), character ranges like `[a-z]` should include accented characters like ä, ö, ü because of locale-specific collation order.
-
-**Current behavior:** Character ranges use Unicode scalar comparison, which doesn't include accented characters in `[a-z]`.
-
-**Affected tests:** 12 tests in FNMatchTests:
-- 6 in `character_vs_bytes()` - German umlauts in `[a-z]` and `[A-Z]` ranges
-- 6 in `multibyte_character_set()` - Same issue in UTF-8 locale
-
-**Implementation challenges:**
-- Requires locale-aware collation for range comparisons
-- No standard Swift API for locale-aware character ordering
-- Would need platform-specific implementation
-
----
-
-### 2. Symlink Handling in Search
+### 1. Symlink Handling in Search
 
 **Priority: Medium** | **Effort: Medium**
 
@@ -102,6 +84,7 @@ swift test --filter "FNMatchTests/ksh_style_matching"
 
 ## Recent Changes
 
+- **Diacritic-insensitive character ranges** - Added `diacriticInsensitiveRanges` option to enable locale-like behavior for character ranges. When enabled, `[a-z]` matches accented characters like ä, ö, ü because they are compared as their base characters. Available in `.fnmatch()` preset via the `diacriticInsensitiveRanges` parameter.
 - **Trailing path wildcard control** - Added `trailingPathWildcardRequiresComponent` option to control whether trailing `/**` patterns require at least one path component (Fish shell behavior) or can match empty (VSCode behavior)
 - **Equivalence classes** - Full support for `[[=a=]]` syntax using Unicode NFD decomposition to match accented characters (e.g., `[[=a=]]` matches 'a', 'á', 'à', 'ä', 'â', etc.)
 - **Unclosed bracket handling** - Added `unclosedBracketBehavior` option; in fnmatch mode, unclosed `[` is treated as a literal character

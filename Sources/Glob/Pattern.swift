@@ -168,15 +168,34 @@ public struct Pattern: Equatable, Sendable {
 			.range(character ... character)
 		}
 
-		public func contains(_ character: Character) -> Bool {
+		public func contains(_ character: Character, diacriticInsensitive: Bool = false) -> Bool {
 			switch self {
 			case let .range(closedRange):
-				closedRange.contains(character)
+				if diacriticInsensitive {
+					return Self.isInRange(character, range: closedRange)
+				} else {
+					return closedRange.contains(character)
+				}
 			case let .named(name):
-				name.contains(character)
+				return name.contains(character)
 			case let .equivalence(baseChar):
-				Self.areEquivalent(character, baseChar)
+				return Self.areEquivalent(character, baseChar)
 			}
+		}
+
+		/// Checks if a character is within a range using diacritic-insensitive comparison.
+		///
+		/// This compares characters by stripping diacritics before checking the range.
+		/// For example, 'ä' is compared as 'a', so it would be in the range 'a'...'z'.
+		private static func isInRange(_ character: Character, range: ClosedRange<Character>) -> Bool {
+			let charStr = String(character)
+			let lowerStr = String(range.lowerBound)
+			let upperStr = String(range.upperBound)
+
+			let lowerCmp = charStr.compare(lowerStr, options: .diacriticInsensitive)
+			let upperCmp = charStr.compare(upperStr, options: .diacriticInsensitive)
+
+			return lowerCmp != .orderedAscending && upperCmp != .orderedDescending
 		}
 
 		/// Returns true if two characters are considered equivalent.

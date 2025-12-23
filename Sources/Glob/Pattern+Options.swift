@@ -155,6 +155,18 @@ public extension Pattern {
 		/// match zero path components regardless of this setting.
 		public var trailingPathWildcardRequiresComponent: Bool = true
 
+		/// If character ranges should use diacritic-insensitive comparison.
+		///
+		/// When enabled, character ranges like `[a-z]` will match accented characters like `ä`, `ö`, `ü`
+		/// because they are compared as their base characters (`a`, `o`, `u`). This provides locale-like
+		/// behavior for character ranges without requiring full locale support.
+		///
+		/// This is useful for matching glibc fnmatch behavior in German and other locales where accented
+		/// characters are expected to fall within the `[a-z]` range.
+		///
+		/// Note: This only affects character ranges, not equivalence classes or named character classes.
+		public var diacriticInsensitiveRanges: Bool = false
+
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init()
 
@@ -193,13 +205,15 @@ public extension Pattern {
 		/// - Parameter requiresExplicitLeadingPeriods: If a period in the name is at the beginning of a component, don't match using wildcards. Equivalent to `FNM_PERIOD`.
 		/// - Parameter matchLeadingDirectories: If a pattern should match if it matches a parent directory. Equivalent to `FNM_LEADING_DIR`.
 		/// - Parameter supportsExtendedMatching: Enables `supportsPatternLists` equivalent to `FNM_EXTMATCH`.
+		/// - Parameter diacriticInsensitiveRanges: When true, character ranges use diacritic-insensitive comparison (e.g., `[a-z]` matches `ä`).
 		/// - Returns: Options to use to create a Pattern.
 		public static func fnmatch(
 			usePathnameBehavior: Bool = false,
 			supportsEscapedCharacters: Bool = true,
 			requiresExplicitLeadingPeriods: Bool = false,
 			matchLeadingDirectories: Bool = false,
-			supportsExtendedMatching: Bool = false
+			supportsExtendedMatching: Bool = false,
+			diacriticInsensitiveRanges: Bool = false
 		) -> Self {
 			Options(
 				supportsPathLevelWildcards: false,
@@ -210,7 +224,8 @@ public extension Pattern {
 				matchLeadingDirectories: matchLeadingDirectories,
 				supportsPatternLists: supportsExtendedMatching,
 				pathSeparator: usePathnameBehavior ? "/" : nil,
-				matchesTrailingPathSeparator: false
+				matchesTrailingPathSeparator: false,
+				diacriticInsensitiveRanges: diacriticInsensitiveRanges
 			)
 		}
 

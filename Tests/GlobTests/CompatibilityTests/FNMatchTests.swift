@@ -35,6 +35,41 @@ private func assertMatchesFNMatch(
 	)
 }
 
+/// Helper for testing fnmatch behavior with diacritic-insensitive character ranges.
+/// This simulates locale-aware behavior (e.g., German locale where [a-z] includes ä, ö, ü).
+private func assertMatchesFNMatchWithDiacriticInsensitiveRanges(
+	_ value: String,
+	pattern: String,
+	flags: Int32,
+	result expectedResult: Int32,
+	sourceLocation: SourceLocation = #_sourceLocation
+) {
+	let patternResult: Int32
+	do {
+		let options = Pattern.Options.fnmatch(
+			usePathnameBehavior: (flags & FNM_PATHNAME) != 0,
+			supportsEscapedCharacters: (flags & FNM_NOESCAPE) == 0,
+			requiresExplicitLeadingPeriods: (flags & FNM_PERIOD) != 0,
+			matchLeadingDirectories: (flags & FNM_LEADING_DIR) != 0,
+			supportsExtendedMatching: (flags & FNM_EXTMATCH) != 0,
+			diacriticInsensitiveRanges: true
+		)
+		if try Pattern(pattern, options: options).match(value) {
+			patternResult = 0
+		} else {
+			patternResult = NOMATCH
+		}
+	} catch {
+		patternResult = -1
+	}
+
+	#expect(
+		patternResult == expectedResult,
+		"matching '\(value)' to pattern '\(pattern)' with diacriticInsensitiveRanges did not match expected result \(expectedResult)",
+		sourceLocation: sourceLocation
+	)
+}
+
 struct FNMatchTests {
 	// derrived from https://github.com/bminor/glibc/blob/9fc639f654dc004736836613be703e6bed0c36a8/posix/tst-fnmatch.input
 
@@ -1670,14 +1705,13 @@ struct FNMatchTests {
 		assertMatchesFNMatch("a", pattern: "[a-z]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "z"			"[a-z]"		       0
 		assertMatchesFNMatch("z", pattern: "[a-z]", flags: 0, result: 0)
-		withKnownIssue {
-			// de_DE.ISO-8859-1 "\344"			"[a-z]"		       0
-			assertMatchesFNMatch("\u{e4}", pattern: "[a-z]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\366"			"[a-z]"		       0
-			assertMatchesFNMatch("\u{f6}", pattern: "[a-z]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\374"			"[a-z]"		       0
-			assertMatchesFNMatch("\u{fc}", pattern: "[a-z]", flags: 0, result: 0)
-		}
+		// With diacriticInsensitiveRanges, umlauts match [a-z]
+		// de_DE.ISO-8859-1 "\344"			"[a-z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("\u{e4}", pattern: "[a-z]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\366"			"[a-z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("\u{f6}", pattern: "[a-z]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\374"			"[a-z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("\u{fc}", pattern: "[a-z]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "A"			"[a-z]"		       NOMATCH
 		assertMatchesFNMatch("A", pattern: "[a-z]", flags: 0, result: NOMATCH)
 		// de_DE.ISO-8859-1 "Z"			"[a-z]"		       NOMATCH
@@ -1702,14 +1736,13 @@ struct FNMatchTests {
 		assertMatchesFNMatch("A", pattern: "[A-Z]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "Z"			"[A-Z]"		       0
 		assertMatchesFNMatch("Z", pattern: "[A-Z]", flags: 0, result: 0)
-		withKnownIssue {
-			// de_DE.ISO-8859-1 "\304"			"[A-Z]"		       0
-			assertMatchesFNMatch("\u{c4}", pattern: "[A-Z]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\326"			"[A-Z]"		       0
-			assertMatchesFNMatch("\u{d6}", pattern: "[A-Z]", flags: 0, result: 0)
-			// de_DE.ISO-8859-1 "\334"			"[A-Z]"		       0
-			assertMatchesFNMatch("\u{dc}", pattern: "[A-Z]", flags: 0, result: 0)
-		}
+		// With diacriticInsensitiveRanges, uppercase umlauts match [A-Z]
+		// de_DE.ISO-8859-1 "\304"			"[A-Z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("\u{c4}", pattern: "[A-Z]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\326"			"[A-Z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("\u{d6}", pattern: "[A-Z]", flags: 0, result: 0)
+		// de_DE.ISO-8859-1 "\334"			"[A-Z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("\u{dc}", pattern: "[A-Z]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "a"			"[[:lower:]]"	       0
 		assertMatchesFNMatch("a", pattern: "[[:lower:]]", flags: 0, result: 0)
 		// de_DE.ISO-8859-1 "z"			"[[:lower:]]"	       0
@@ -1873,14 +1906,13 @@ struct FNMatchTests {
 		assertMatchesFNMatch("a", pattern: "[a-z]", flags: 0, result: 0)
 		// de_DE.UTF-8	 "z"			"[a-z]"		       0
 		assertMatchesFNMatch("z", pattern: "[a-z]", flags: 0, result: 0)
-		withKnownIssue {
-			// de_DE.UTF-8	 "ä"			"[a-z]"		       0
-			assertMatchesFNMatch("ä", pattern: "[a-z]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ö"			"[a-z]"		       0
-			assertMatchesFNMatch("ö", pattern: "[a-z]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ü"			"[a-z]"		       0
-			assertMatchesFNMatch("ü", pattern: "[a-z]", flags: 0, result: 0)
-		}
+		// With diacriticInsensitiveRanges, umlauts match [a-z]
+		// de_DE.UTF-8	 "ä"			"[a-z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("ä", pattern: "[a-z]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ö"			"[a-z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("ö", pattern: "[a-z]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ü"			"[a-z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("ü", pattern: "[a-z]", flags: 0, result: 0)
 		// de_DE.UTF-8	 "A"			"[a-z]"		       NOMATCH
 		assertMatchesFNMatch("A", pattern: "[a-z]", flags: 0, result: NOMATCH)
 		// de_DE.UTF-8	 "Z"			"[a-z]"		       NOMATCH
@@ -1905,24 +1937,24 @@ struct FNMatchTests {
 		assertMatchesFNMatch("A", pattern: "[A-Z]", flags: 0, result: 0)
 		// de_DE.UTF-8	 "Z"			"[A-Z]"		       0
 		assertMatchesFNMatch("Z", pattern: "[A-Z]", flags: 0, result: 0)
-		withKnownIssue {
-			// de_DE.UTF-8	 "Ä"			"[A-Z]"		       0
-			assertMatchesFNMatch("Ä", pattern: "[A-Z]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ö"			"[A-Z]"		       0
-			assertMatchesFNMatch("Ö", pattern: "[A-Z]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "Ü"			"[A-Z]"		       0
-			assertMatchesFNMatch("Ü", pattern: "[A-Z]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "a"			"[[:lower:]]"	       0
-			assertMatchesFNMatch("a", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "z"			"[[:lower:]]"	       0
-			assertMatchesFNMatch("z", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ä"			"[[:lower:]]"	       0
-			assertMatchesFNMatch("ä", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ö"			"[[:lower:]]"	       0
-			assertMatchesFNMatch("ö", pattern: "[[:lower:]]", flags: 0, result: 0)
-			// de_DE.UTF-8	 "ü"			"[[:lower:]]"	       0
-			assertMatchesFNMatch("ü", pattern: "[[:lower:]]", flags: 0, result: 0)
-		}
+		// With diacriticInsensitiveRanges, uppercase umlauts match [A-Z]
+		// de_DE.UTF-8	 "Ä"			"[A-Z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("Ä", pattern: "[A-Z]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ö"			"[A-Z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("Ö", pattern: "[A-Z]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "Ü"			"[A-Z]"		       0
+		assertMatchesFNMatchWithDiacriticInsensitiveRanges("Ü", pattern: "[A-Z]", flags: 0, result: 0)
+		// Named character classes already handle Unicode correctly
+		// de_DE.UTF-8	 "a"			"[[:lower:]]"	       0
+		assertMatchesFNMatch("a", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "z"			"[[:lower:]]"	       0
+		assertMatchesFNMatch("z", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ä"			"[[:lower:]]"	       0
+		assertMatchesFNMatch("ä", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ö"			"[[:lower:]]"	       0
+		assertMatchesFNMatch("ö", pattern: "[[:lower:]]", flags: 0, result: 0)
+		// de_DE.UTF-8	 "ü"			"[[:lower:]]"	       0
+		assertMatchesFNMatch("ü", pattern: "[[:lower:]]", flags: 0, result: 0)
 		// de_DE.UTF-8	 "A"			"[[:lower:]]"	       NOMATCH
 		assertMatchesFNMatch("A", pattern: "[[:lower:]]", flags: 0, result: NOMATCH)
 		// de_DE.UTF-8	 "Z"			"[[:lower:]]"	       NOMATCH
