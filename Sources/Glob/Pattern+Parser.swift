@@ -23,6 +23,8 @@ extension Pattern {
 			case plus // +
 			case exclamationMark // !
 			case caret // ^
+			case period // .
+			case equals // =
 
 			init(_ character: Character) {
 				switch character {
@@ -52,6 +54,10 @@ extension Pattern {
 					self = .exclamationMark
 				case "^":
 					self = .caret
+				case ".":
+					self = .period
+				case "=":
+					self = .equals
 				default:
 					self = .character(character)
 				}
@@ -87,6 +93,10 @@ extension Pattern {
 					"!"
 				case .caret:
 					"^"
+				case .period:
+					"."
+				case .equals:
+					"="
 				}
 			}
 		}
@@ -178,107 +188,224 @@ extension Pattern {
 						sections.append(constant: next.character)
 					}
 				case .leftSquareBracket:
-					let negated: Bool
-					if try pop(options.rangeNegationCharacter.token) {
-						negated = true
-					} else {
-						negated = false
-					}
+					let savedPattern = pattern
+					do {
+						let negated: Bool
+						let negationCharacter = options.rangeNegationCharacter
+						if try pop({ negationCharacter.matches($0) }) != nil {
+							negated = true
+						} else {
+							negated = false
+						}
 
-					var ranges: [CharacterClass] = []
+						var ranges: [CharacterClass] = []
 
-					if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.rightSquareBracket) {
-						// https://man7.org/linux/man-pages/man7/glob.7.html
-						// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
-						ranges.append(.character("]"))
-					}
+						if options.emptyRangeBehavior == .treatClosingBracketAsCharacter, try pop(.rightSquareBracket) {
+							// https://man7.org/linux/man-pages/man7/glob.7.html
+							// The string enclosed by the brackets cannot be empty; therefore ']' can be allowed between the brackets, provided that it is the first character.
+							ranges.append(.character("]"))
+						}
 
-					loop: while true {
-						guard let next = try pop() else {
+						loop: while true {
+							guard let next = try pop() else {
+								throw PatternParsingError.rangeNotClosed
+							}
+
+							switch next {
+							case .rightSquareBracket:
+								break loop
+							case .leftSquareBracket:
+								if try pop(.colon) {
+									// Named character classes
+									guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
+
+									let name = pattern.prefix(upTo: endIndex)
+
+									if let name = CharacterClass.Name(rawValue: String(name)) {
+										ranges.append(.named(name))
+										pattern = pattern[endIndex...].dropFirst()
+
+										if try !pop(.rightSquareBracket) {
+											throw PatternParsingError.rangeNotClosed
+										}
+									} else {
+										throw PatternParsingError.invalidNamedCharacterClass(String(name))
+									}
+								} else if try pop(.period) {
+									// Collating symbols [.X.]
+									// In the C locale, collating symbols just represent the character itself
+									guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+									let collatingChar = charToken.character
+
+									// Expect closing .]
+									if try !pop(.period) {
+										throw PatternParsingError.invalidCollatingSymbol
+									}
+									if try !pop(.rightSquareBracket) {
+										throw PatternParsingError.invalidCollatingSymbol
+									}
+
+									// Check if this is the start of a range
+									if try pop(.dash) {
+										if try pop(.rightSquareBracket) {
+											if !options.supportsRangeSeparatorAtBeginningAndEnd {
+												throw PatternParsingError.rangeNotClosed
+											}
+											ranges.append(.character(collatingChar))
+											ranges.append(.character("-"))
+											break loop
+										} else {
+											let upper = try parseRangeUpperBound()
+											// If bounds are reversed, fnmatch treats this as a valid pattern that matches nothing
+											if collatingChar <= upper {
+												ranges.append(.range(collatingChar ... upper))
+											}
+										}
+									} else {
+										ranges.append(.character(collatingChar))
+									}
+								} else if try pop(.equals) {
+									// Equivalence classes [=X=]
+									// Matches characters with the same base character after removing combining marks
+									guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+									let equivChar = charToken.character
+
+									// Expect closing =]
+									if try !pop(.equals) {
+										throw PatternParsingError.invalidEquivalenceClass
+									}
+									if try !pop(.rightSquareBracket) {
+										throw PatternParsingError.invalidEquivalenceClass
+									}
+
+									// Check if this is the start of a range
+									if try pop(.dash) {
+										if try pop(.rightSquareBracket) {
+											if !options.supportsRangeSeparatorAtBeginningAndEnd {
+												throw PatternParsingError.rangeNotClosed
+											}
+											ranges.append(.equivalence(equivChar))
+											ranges.append(.character("-"))
+											break loop
+										} else {
+											let upper = try parseRangeUpperBound()
+											// If bounds are reversed, fnmatch treats this as a valid pattern that matches nothing
+											if equivChar <= upper {
+												ranges.append(.range(equivChar ... upper))
+											}
+										}
+									} else {
+										ranges.append(.equivalence(equivChar))
+									}
+								} else {
+									ranges.append(.character("["))
+								}
+							case .dash:
+								if !options.supportsRangeSeparatorAtBeginningAndEnd {
+									throw PatternParsingError.rangeMissingBounds
+								}
+
+								// https://man7.org/linux/man-pages/man7/glob.7.html
+								// One may include '-' in its literal meaning by making it the first or last character between the brackets.
+								ranges.append(.character("-"))
+							default:
+								if try pop(.dash) {
+									if try pop(.rightSquareBracket) {
+										if !options.supportsRangeSeparatorAtBeginningAndEnd {
+											throw PatternParsingError.rangeNotClosed
+										}
+
+										// `-` is the last character in the group, treat it as a character
+										// https://man7.org/linux/man-pages/man7/glob.7.html
+										// One may include '-' in its literal meaning by making it the first or last character between the brackets.
+										ranges.append(.character(next.character))
+										ranges.append(.character("-"))
+
+										break loop
+									} else {
+										// this is a range like a-z, find the upper limit of the range
+										let upper = try parseRangeUpperBound()
+
+										// If bounds are reversed, fnmatch treats this as a valid pattern that matches nothing
+										if next.character <= upper {
+											ranges.append(.range(next.character ... upper))
+										}
+									}
+								} else {
+									ranges.append(.character(next.character))
+								}
+							}
+						}
+
+						guard !ranges.isEmpty else {
+							if options.emptyRangeBehavior == .error {
+								throw PatternParsingError.rangeIsEmpty
+							} else {
+								break
+							}
+						}
+
+						sections.append(.oneOf(ranges, isNegated: negated))
+					} catch PatternParsingError.rangeNotClosed {
+						if options.unclosedBracketBehavior == .treatAsLiteral {
+							// Restore the pattern position and treat '[' as a literal
+							pattern = savedPattern
+							sections.append(constant: "[")
+						} else {
 							throw PatternParsingError.rangeNotClosed
 						}
-
-						switch next {
-						case .rightSquareBracket:
-							break loop
-						case .leftSquareBracket:
-							if try pop(.colon) {
-								// Named character classes
-								guard let endIndex = pattern.firstIndex(of: ":") else { throw PatternParsingError.rangeNotClosed }
-
-								let name = pattern.prefix(upTo: endIndex)
-
-								if let name = CharacterClass.Name(rawValue: String(name)) {
-									ranges.append(.named(name))
-									pattern = pattern[endIndex...].dropFirst()
-
-									if try !pop(.rightSquareBracket) {
-										throw PatternParsingError.rangeNotClosed
-									}
-								} else {
-									throw PatternParsingError.invalidNamedCharacterClass(String(name))
-								}
-							} else {
-								ranges.append(.character("["))
-							}
-						case .dash:
-							if !options.supportsRangeSeparatorAtBeginningAndEnd {
-								throw PatternParsingError.rangeMissingBounds
-							}
-
-							// https://man7.org/linux/man-pages/man7/glob.7.html
-							// One may include '-' in its literal meaning by making it the first or last character between the brackets.
-							ranges.append(.character("-"))
-						default:
-							if try pop(.dash) {
-								if try pop(.rightSquareBracket) {
-									if !options.supportsRangeSeparatorAtBeginningAndEnd {
-										throw PatternParsingError.rangeNotClosed
-									}
-
-									// `-` is the last character in the group, treat it as a character
-									// https://man7.org/linux/man-pages/man7/glob.7.html
-									// One may include '-' in its literal meaning by making it the first or last character between the brackets.
-									ranges.append(.character(next.character))
-									ranges.append(.character("-"))
-
-									break loop
-								} else {
-									// this is a range like a-z, find the upper limit of the range
-									guard
-										let upper = try pop()
-									else { throw PatternParsingError.rangeNotClosed }
-
-									guard next.character <= upper.character else { throw PatternParsingError.rangeBoundsAreOutOfOrder }
-									ranges.append(.range(next.character ... upper.character))
-								}
-							} else {
-								ranges.append(.character(next.character))
-							}
-						}
 					}
-
-					guard !ranges.isEmpty else {
-						if options.emptyRangeBehavior == .error {
-							throw PatternParsingError.rangeIsEmpty
-						} else {
-							break
-						}
-					}
-
-					sections.append(.oneOf(ranges, isNegated: negated))
 				case let .character(character):
 					if character == options.pathSeparator {
 						sections.append(.pathSeparator)
 					} else {
 						sections.append(constant: character)
 					}
-				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret:
+				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret, .period, .equals:
 					sections.append(constant: next.character)
 				}
 			}
 
 			return sections
+		}
+
+		/// Parses the upper bound of a range in a bracket expression.
+		/// The upper bound can be a regular character, collating symbol [.X.], or equivalence class [=X=].
+		mutating func parseRangeUpperBound() throws -> Character {
+			guard let token = try pop() else {
+				throw PatternParsingError.rangeNotClosed
+			}
+
+			if token == .leftSquareBracket {
+				if try pop(.period) {
+					// Collating symbol [.X.]
+					guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+					let char = charToken.character
+					if try !pop(.period) {
+						throw PatternParsingError.invalidCollatingSymbol
+					}
+					if try !pop(.rightSquareBracket) {
+						throw PatternParsingError.invalidCollatingSymbol
+					}
+					return char
+				} else if try pop(.equals) {
+					// Equivalence class [=X=]
+					guard let charToken = try pop() else { throw PatternParsingError.rangeNotClosed }
+					let char = charToken.character
+					if try !pop(.equals) {
+						throw PatternParsingError.invalidEquivalenceClass
+					}
+					if try !pop(.rightSquareBracket) {
+						throw PatternParsingError.invalidEquivalenceClass
+					}
+					return char
+				} else {
+					// Just a literal '[' character as upper bound
+					return "["
+				}
+			} else {
+				return token.character
+			}
 		}
 
 		/// Parses a pattern list like `(abc|xyz)`
@@ -325,12 +452,18 @@ private extension [Pattern.Section] {
 }
 
 extension Pattern.Options.RangeNegationCharacter {
-	var token: Pattern.Parser.Token {
+	var tokens: [Pattern.Parser.Token] {
 		switch self {
 		case .exclamationMark:
-			.exclamationMark
+			[.exclamationMark]
 		case .caret:
-			.caret
+			[.caret]
+		case .both:
+			[.exclamationMark, .caret]
 		}
+	}
+
+	func matches(_ token: Pattern.Parser.Token) -> Bool {
+		tokens.contains(token)
 	}
 }

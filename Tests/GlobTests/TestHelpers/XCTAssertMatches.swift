@@ -1,33 +1,29 @@
-import XCTest
+import Testing
 
 @testable import Glob
 
-func XCTAssertMatches(
+func assertMatches(
 	_ value: String,
 	pattern: String,
 	options: Glob.Pattern.Options = .default,
-	file: StaticString = #filePath,
-	line: UInt = #line
+	sourceLocation: SourceLocation = #_sourceLocation
 ) throws {
-	try XCTAssertTrue(
-		Pattern(pattern, options: options).match(value),
+	#expect(
+		try Pattern(pattern, options: options).match(value),
 		"\(value) did not match pattern \(pattern) with options \(options)",
-		file: file,
-		line: line
+		sourceLocation: sourceLocation
 	)
 }
 
-func XCTAssertDoesNotMatch(
+func assertDoesNotMatch(
 	_ value: String,
 	pattern: String,
 	options: Glob.Pattern.Options = .default,
-	file: StaticString = #filePath,
-	line: UInt = #line
+	sourceLocation: SourceLocation = #_sourceLocation
 ) throws {
-	try XCTAssertFalse(
-		Pattern(pattern, options: options).match(value),
+	#expect(
+		try !Pattern(pattern, options: options).match(value),
 		"'\(value)' matched pattern '\(pattern)' with options \(options)",
-		file: file,
-		line: line
+		sourceLocation: sourceLocation
 	)
 }

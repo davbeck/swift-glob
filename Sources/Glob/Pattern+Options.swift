@@ -27,6 +27,20 @@ public extension Pattern {
 		/// How are empty ranges handled.
 		public var emptyRangeBehavior: EmptyRangeBehavior = .error
 
+		/// How unclosed bracket expressions (e.g., `[abc` with no closing `]`) are treated
+		public enum UnclosedBracketBehavior: Sendable {
+			/// Treat an unclosed bracket as a parsing error
+			case error
+			/// Treat an unclosed bracket as a literal `[` character
+			case treatAsLiteral
+		}
+
+		/// How are unclosed brackets handled.
+		///
+		/// In fnmatch, an unclosed `[` is treated as a literal character. For example, the pattern `a[b`
+		/// would match the string `a[b` literally.
+		public var unclosedBracketBehavior: UnclosedBracketBehavior = .error
+
 		/// If the pattern supports escaping control characters with `\`
 		///
 		/// When true, a backslash character (`\`) in pattern followed by any other character shall match that second character in string. In particular, `\\` shall match a backslash in string. Otherwise a backslash character shall be treated as an ordinary character.
@@ -65,12 +79,30 @@ public extension Pattern {
 		/// 	The pattern matches if the input string cannot be matched with any of the patterns in the pattern-list.
 		public var supportsPatternLists: Bool = true
 
+		/// Recognize brace expansion syntax like `{a,b,c}`.
+		///
+		/// When enabled, patterns containing braces are expanded into multiple alternative patterns.
+		/// For example, `*.{js,ts}` expands to match either `*.js` or `*.ts`.
+		///
+		/// Examples:
+		/// - `{a,b,c}` matches "a", "b", or "c"
+		/// - `*.{html,js}` matches files ending in ".html" or ".js"
+		/// - `{foo,bar}/**` matches anything under "foo/" or "bar/"
+		/// - `{**/*.js,**/*.ts}` matches any .js or .ts file
+		///
+		/// Note: This is different from ksh-style pattern lists (`@(a|b)`) which are handled by `supportsPatternLists`.
+		/// Brace expansion is a pre-processing step that creates multiple patterns, while pattern lists are
+		/// evaluated during matching.
+		public var supportsBraceExpansion: Bool = false
+
 		/// The character used to invert a character class.
 		public enum RangeNegationCharacter: Equatable, Sendable {
 			/// Use the `!` character to denote an inverse character class.
 			case exclamationMark
 			/// Use the `^` character to denote an inverse character class.
 			case caret
+			/// Use either `!` or `^` to denote an inverse character class.
+			case both
 		}
 
 		/// The character used to specify when a range matches characters that aren't in the range.
@@ -83,10 +115,57 @@ public extension Pattern {
 		/// Defaults to "/" regardless of operating system.
 		public var pathSeparator: Character? = "/"
 
+		/// Additional characters that should be treated as path separators in the input string.
+		///
+		/// This is useful for matching Windows-style paths where both `/` and `\` should be treated as path separators.
+		/// Note: These characters are only recognized as path separators in the input string being matched,
+		/// not in the pattern itself.
+		public var additionalPathSeparators: Set<Character> = []
+
+		/// Returns true if the given character is a path separator (either the primary or an additional one)
+		public func isPathSeparator(_ character: Character?) -> Bool {
+			guard let character else { return false }
+			if let pathSeparator, character == pathSeparator {
+				return true
+			}
+			return additionalPathSeparators.contains(character)
+		}
+
+		/// If true, bracket expressions cannot match path separators even if they explicitly contain them.
+		///
+		/// For example, with this option enabled, `foo[/]bar` will NOT match `foo/bar` because
+		/// path separators cannot be matched within bracket expressions.
+		/// This matches VSCode's glob behavior.
+		public var bracketExpressionsCannotMatchPathSeparators: Bool = false
+
 		/// If a trailing path separator in the search string will be ignored if it's not explicitly matched.
 		///
 		/// This allows patterns to match against a directory or a regular file. For instance "foo*" will match both "foo_file" and "foo_dir/" if this is enabled.
 		public var matchesTrailingPathSeparator: Bool = true
+
+		/// If a trailing `/**` in a pattern requires at least one path component to match.
+		///
+		/// When true (Fish shell behavior), the pattern `foo/**` will NOT match `foo` or `foo/` because
+		/// the trailing `/**` must match at least one component.
+		///
+		/// When false (VSCode behavior), the pattern `foo/**` will match `foo`, `foo/`, and `foo/bar`
+		/// because the trailing `/**` can match zero or more path components.
+		///
+		/// This only affects trailing `/**` patterns. Mid-pattern `/**/` (like `foo/**/bar`) can always
+		/// match zero path components regardless of this setting.
+		public var trailingPathWildcardRequiresComponent: Bool = true
+
+		/// If character ranges should use diacritic-insensitive comparison.
+		///
+		/// When enabled, character ranges like `[a-z]` will match accented characters like `ä`, `ö`, `ü`
+		/// because they are compared as their base characters (`a`, `o`, `u`). This provides locale-like
+		/// behavior for character ranges without requiring full locale support.
+		///
+		/// This is useful for matching glibc fnmatch behavior in German and other locales where accented
+		/// characters are expected to fall within the `[a-z]` range.
+		///
+		/// Note: This only affects character ranges, not equivalence classes or named character classes.
+		public var diacriticInsensitiveRanges: Bool = false
 
 		/// Default options for parsing and matching patterns.
 		public static let `default`: Self = .init()
@@ -94,9 +173,13 @@ public extension Pattern {
 		/// Attempts to match the behavior of [VSCode](https://code.visualstudio.com/docs/editor/glob-patterns).
 		public static let vscode: Self = Options(
 			supportsPathLevelWildcards: true,
-			emptyRangeBehavior: .error,
+			emptyRangeBehavior: .treatClosingBracketAsCharacter,
 			supportsPatternLists: false,
-			rangeNegationCharacter: .caret
+			supportsBraceExpansion: true,
+			rangeNegationCharacter: .both,
+			additionalPathSeparators: ["\\"],
+			bracketExpressionsCannotMatchPathSeparators: true,
+			trailingPathWildcardRequiresComponent: false
 		)
 
 		/// Attempts to match the behavior of [`filepath.Match` in go](https://pkg.go.dev/path/filepath#Match).
@@ -106,6 +189,14 @@ public extension Pattern {
 			supportsRangeSeparatorAtBeginningAndEnd: false,
 			rangeNegationCharacter: .caret
 		)
+
+		/// Options matching [zsh shell behavior](https://zsh.sourceforge.io/Doc/Release/Expansion.html).
+		static let zsh: Self = {
+			var options = Pattern.Options.default
+			options.supportsPatternLists = true
+			options.rangeNegationCharacter = .both
+			return options
+		}()
 
 		/// Attempts to match the behavior of [POSIX glob](https://man7.org/linux/man-pages/man7/glob.7.html).
 		/// - Returns: Options to use to create a Pattern.
@@ -122,23 +213,27 @@ public extension Pattern {
 		/// - Parameter requiresExplicitLeadingPeriods: If a period in the name is at the beginning of a component, don't match using wildcards. Equivalent to `FNM_PERIOD`.
 		/// - Parameter matchLeadingDirectories: If a pattern should match if it matches a parent directory. Equivalent to `FNM_LEADING_DIR`.
 		/// - Parameter supportsExtendedMatching: Enables `supportsPatternLists` equivalent to `FNM_EXTMATCH`.
+		/// - Parameter diacriticInsensitiveRanges: When true, character ranges use diacritic-insensitive comparison (e.g., `[a-z]` matches `ä`).
 		/// - Returns: Options to use to create a Pattern.
 		public static func fnmatch(
 			usePathnameBehavior: Bool = false,
 			supportsEscapedCharacters: Bool = true,
 			requiresExplicitLeadingPeriods: Bool = false,
 			matchLeadingDirectories: Bool = false,
-			supportsExtendedMatching: Bool = false
+			supportsExtendedMatching: Bool = false,
+			diacriticInsensitiveRanges: Bool = false
 		) -> Self {
 			Options(
 				supportsPathLevelWildcards: false,
 				emptyRangeBehavior: .treatClosingBracketAsCharacter,
+				unclosedBracketBehavior: .treatAsLiteral,
 				supportsEscapedCharacters: supportsEscapedCharacters,
 				requiresExplicitLeadingPeriods: requiresExplicitLeadingPeriods,
 				matchLeadingDirectories: matchLeadingDirectories,
 				supportsPatternLists: supportsExtendedMatching,
 				pathSeparator: usePathnameBehavior ? "/" : nil,
-				matchesTrailingPathSeparator: false
+				matchesTrailingPathSeparator: false,
+				diacriticInsensitiveRanges: diacriticInsensitiveRanges
 			)
 		}
 

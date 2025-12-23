@@ -23,12 +23,17 @@ extension Substring {
 extension Pattern {
 	/// Test if a given string matches the pattern
 	/// - Parameter name: The string to match against
-	/// - Returns: true if the string matches the pattern
+	/// - Returns: true if the string matches the pattern (or any alternative if brace expansion was used)
 	public func match(_ name: some StringProtocol) -> Bool {
-		if match(components: .init(sections), .init(name)) {
-			return true
-		} else if options.matchesTrailingPathSeparator && name.last == options.pathSeparator {
-			return match(components: .init(sections), .init(name).dropLast())
+		// Try each alternative (from brace expansion)
+		for sections in alternatives {
+			if match(components: .init(sections), .init(name), originalEndIndex: sections.count) {
+				return true
+			} else if options.matchesTrailingPathSeparator && options.isPathSeparator(name.last) {
+				if match(components: .init(sections), .init(name).dropLast(), originalEndIndex: sections.count) {
+					return true
+				}
+			}
 		}
 
 		return false
@@ -37,7 +42,8 @@ extension Pattern {
 	// recursively matches against the pattern
 	private func match(
 		components: ArraySlice<Section>,
-		_ name: Substring
+		_ name: Substring,
+		originalEndIndex: Int
 	) -> Bool {
 		// we use a loop to avoid unbounded recursion on arbitrarily long search strings
 		// this method still recurses for wildcard matching, but it is bounded by the number of wildcards in the pattern, not the size of the search string
@@ -69,10 +75,18 @@ extension Pattern {
 
 			switch (components.first, components.last, options.matchLeadingDirectories) {
 			case (.pathSeparator, _, _):
-				if name.first == options.pathSeparator {
+				if options.isPathSeparator(name.first) {
 					components = components.dropFirst()
 					name = name.dropFirst()
 				} else if components.dropFirst().first == .pathWildcard {
+					// Check if this /** is at the trailing position and name is empty
+					let nextWildcardIndex = components.index(after: components.startIndex)
+					let wildcardEndIndex = components.index(after: nextWildcardIndex)
+					let isTrailingPathWildcard = wildcardEndIndex == originalEndIndex
+					if options.trailingPathWildcardRequiresComponent && isTrailingPathWildcard && name.isEmpty {
+						// Trailing /** must match at least one component
+						return false
+					}
 					components = components.dropFirst(2)
 				} else {
 					return false
@@ -85,7 +99,7 @@ extension Pattern {
 					return false
 				}
 			case (.singleCharacter, _, _):
-				guard name.first != options.pathSeparator else { return false }
+				guard !name.isEmpty, !options.isPathSeparator(name.first) else { return false }
 				if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
 					return false
 				}
@@ -99,16 +113,26 @@ extension Pattern {
 					// in our implimentation, it will not match
 					return false
 				}
+				if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.first) {
+					return false
+				}
 
-				guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
+				guard let next = name.first, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return false }
 
 				components = components.dropFirst()
 				name = name.dropFirst()
 			case (_, .pathSeparator, false):
-				if name.last == options.pathSeparator {
+				if options.isPathSeparator(name.last) {
 					components = components.dropLast()
 					name = name.dropLast()
 				} else if name.isEmpty && components.dropLast().last == .pathWildcard {
+					// Check if this /**/ is at the END of the original pattern (trailing)
+					// vs at the BEGINNING (leading, which should match empty)
+					let isTrailingPathWildcard = components.endIndex == originalEndIndex
+					if options.trailingPathWildcardRequiresComponent && isTrailingPathWildcard {
+						// Trailing /**  must match at least one component
+						return false
+					}
 					components = components.dropLast(2)
 				} else {
 					return false
@@ -121,12 +145,15 @@ extension Pattern {
 					return false
 				}
 			case (_, .singleCharacter, false):
-				guard name.last != options.pathSeparator else { return false }
+				guard !name.isEmpty, !options.isPathSeparator(name.last) else { return false }
 
 				components = components.dropLast()
 				name = name.dropLast()
 			case let (_, .oneOf(ranges, isNegated: isNegated), false):
-				guard let next = name.last, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return false }
+				if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.last) {
+					return false
+				}
+				guard let next = name.last, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return false }
 
 				components = components.dropLast()
 				name = name.dropLast()
@@ -136,27 +163,33 @@ extension Pattern {
 				}
 
 				if components.count == 1 {
-					if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
+					if options.pathSeparator != nil, !options.matchLeadingDirectories {
 						// the last component is a component level wildcard, which matches anything except for the path separator
-						return !name.contains(pathSeparator)
+						return !name.contains(where: { options.isPathSeparator($0) })
 					} else {
 						// no special treatment for path separators
 						return true
 					}
 				}
 
-				if match(components: components.dropFirst(), name) {
+				if match(components: components.dropFirst(), name, originalEndIndex: originalEndIndex) {
 					return true
 				} else if name.isEmpty {
+					return false
+				} else if options.isPathSeparator(name.first) {
+					// componentWildcard cannot match path separators
 					return false
 				} else {
 					// components remain unchanged
 					name = name.dropFirst()
 				}
 			case (_, .componentWildcard, false):
-				if match(components: components.dropLast(), name) {
+				if match(components: components.dropLast(), name, originalEndIndex: originalEndIndex) {
 					return true
 				} else if name.isEmpty {
+					return false
+				} else if options.isPathSeparator(name.last) {
+					// componentWildcard cannot match path separators
 					return false
 				} else {
 					// components remain unchanged
@@ -165,12 +198,17 @@ extension Pattern {
 			case (.pathWildcard, _, _):
 				if components.count == 1 {
 					// the last component is a path level wildcard, which matches anything
+					let isTrailingPathWildcard = components.endIndex == originalEndIndex
+					if options.trailingPathWildcardRequiresComponent && isTrailingPathWildcard && name.isEmpty {
+						// Trailing /** must match at least one character
+						return false
+					}
 					return true
 				}
 
-				if match(components: components.dropFirst(), name) {
+				if match(components: components.dropFirst(), name, originalEndIndex: originalEndIndex) {
 					return true
-				} else if components.dropFirst().first == .pathSeparator, match(components: components.dropFirst(2), name) {
+				} else if components.dropFirst().first == .pathSeparator, match(components: components.dropFirst(2), name, originalEndIndex: originalEndIndex) {
 					return true
 				} else if name.isEmpty {
 					return false
@@ -183,12 +221,13 @@ extension Pattern {
 					components: components,
 					name,
 					style: style,
-					subSections: subSections
+					subSections: subSections,
+					requiresCompleteMatch: true
 				)
 
-				return remaining?.isEmpty == true
+				return remaining != nil
 			case (.none, _, _):
-				if options.matchLeadingDirectories && name.first == options.pathSeparator {
+				if options.matchLeadingDirectories && options.isPathSeparator(name.first) {
 					return true
 				}
 
@@ -214,7 +253,7 @@ extension Pattern {
 
 		switch components.first {
 		case .pathSeparator:
-			if name.first == options.pathSeparator {
+			if options.isPathSeparator(name.first) {
 				return matchPrefix(
 					components: components.dropFirst(),
 					name.dropFirst()
@@ -232,7 +271,7 @@ extension Pattern {
 				return nil
 			}
 		case .singleCharacter:
-			guard name.first != options.pathSeparator else { return nil }
+			guard !options.isPathSeparator(name.first) else { return nil }
 			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) {
 				return nil
 			}
@@ -248,8 +287,11 @@ extension Pattern {
 				// in our implimentation, it will not match
 				return nil
 			}
+			if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.first) {
+				return nil
+			}
 
-			guard let next = name.first, ranges.contains(where: { $0.contains(next) }) == !isNegated else { return nil }
+			guard let next = name.first, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return nil }
 			return matchPrefix(
 				components: components.dropFirst(),
 				name.dropFirst()
@@ -260,9 +302,9 @@ extension Pattern {
 			}
 
 			if components.count == 1 {
-				if let pathSeparator = options.pathSeparator, !options.matchLeadingDirectories {
+				if options.pathSeparator != nil, !options.matchLeadingDirectories {
 					// the last component is a component level wildcard, which matches anything except for the path separator
-					if let index = name.firstIndex(of: pathSeparator) {
+					if let index = name.firstIndex(where: { options.isPathSeparator($0) }) {
 						return name.suffix(from: index)
 					} else {
 						return name.dropAll()
@@ -307,44 +349,388 @@ extension Pattern {
 		components: ArraySlice<Section>,
 		_ name: Substring,
 		style: Section.PatternListStyle,
-		subSections: [[Section]]
+		subSections: [[Section]],
+		requiresCompleteMatch: Bool = false
 	) -> Substring? {
-		for sectionsOption in subSections {
-			if let remaining = matchPrefix(
-				components: ArraySlice(sectionsOption + components.dropFirst()),
-				name
-			) {
-				// stop infinite recursion
-				guard remaining != name else { return remaining }
-
-				switch style {
-				case .negated:
-					return nil
-				case .oneOrMore, .zeroOrMore:
-					// switch to zeroOrMore since we've already fulfilled the "one" requirement
-					return matchPrefix(
-						components: [.patternList(.zeroOrMore, subSections)] + components.dropFirst(),
-						remaining
+		switch style {
+		case .negated:
+			return matchNegatedPatternListPrefix(
+				components: components,
+				name,
+				subSections: subSections,
+				requiresCompleteMatch: requiresCompleteMatch
+			)
+		case .one:
+			// Must match exactly one of the options
+			for sectionsOption in subSections {
+				// Get all possible matches for this option (enables backtracking)
+				let optionMatches = allPossiblePrefixMatches(
+					components: ArraySlice(sectionsOption),
+					name
+				)
+				for afterOption in optionMatches {
+					// Get all possible matches for the rest of the pattern
+					let restMatches = allPossiblePrefixMatches(
+						components: components.dropFirst(),
+						afterOption
 					)
-				case .one, .zeroOrOne:
-					// already matched "one", can't match any more
+					for remaining in restMatches {
+						if !requiresCompleteMatch || remaining.isEmpty {
+							return remaining
+						}
+					}
+				}
+			}
+			return nil
+		case .zeroOrOne:
+			// Try matching one of the options first
+			for sectionsOption in subSections {
+				let optionMatches = allPossiblePrefixMatches(
+					components: ArraySlice(sectionsOption),
+					name
+				)
+				for afterOption in optionMatches {
+					let restMatches = allPossiblePrefixMatches(
+						components: components.dropFirst(),
+						afterOption
+					)
+					for remaining in restMatches {
+						if !requiresCompleteMatch || remaining.isEmpty {
+							return remaining
+						}
+					}
+				}
+			}
+			// Then try matching zero
+			let zeroMatches = allPossiblePrefixMatches(components: components.dropFirst(), name)
+			for remaining in zeroMatches {
+				if !requiresCompleteMatch || remaining.isEmpty {
+					return remaining
+				}
+			}
+			return nil
+		case .oneOrMore:
+			// Must match at least one, then try to match more
+			return matchRepeatingPatternListPrefix(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: true,
+				requiresCompleteMatch: requiresCompleteMatch
+			)
+		case .zeroOrMore:
+			// Can match zero or more
+			return matchRepeatingPatternListPrefix(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: false,
+				requiresCompleteMatch: requiresCompleteMatch
+			)
+		}
+	}
+
+	private func matchRepeatingPatternListPrefix(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		subSections: [[Section]],
+		needsAtLeastOne: Bool,
+		requiresCompleteMatch: Bool = false
+	) -> Substring? {
+		// Try each option
+		for sectionsOption in subSections {
+			// Get all possible prefix matches for this option (shortest first for backtracking)
+			let possibleMatches = allPossiblePrefixMatches(
+				components: ArraySlice(sectionsOption),
+				name
+			)
+
+			for afterOption in possibleMatches {
+				// Prevent infinite recursion when option matches empty
+				guard afterOption != name else { continue }
+
+				// After matching one, try to match more occurrences
+				if let remaining = matchRepeatingPatternListPrefix(
+					components: components,
+					afterOption,
+					subSections: subSections,
+					needsAtLeastOne: false,
+					requiresCompleteMatch: requiresCompleteMatch
+				) {
+					// Only accept if this leads to a complete match when required
+					if !requiresCompleteMatch || remaining.isEmpty {
+						return remaining
+					}
+				}
+
+				// Try using just this occurrence and matching the rest of the pattern
+				if let remaining = matchPrefix(components: components.dropFirst(), afterOption) {
+					if !requiresCompleteMatch || remaining.isEmpty {
+						return remaining
+					}
+				}
+			}
+		}
+
+		// If allowed, try matching zero occurrences
+		if !needsAtLeastOne {
+			if let remaining = matchPrefix(components: components.dropFirst(), name) {
+				if !requiresCompleteMatch || remaining.isEmpty {
 					return remaining
 				}
 			}
 		}
 
-		switch style {
-		case .negated:
-			return matchPrefix(components: [.pathWildcard] + components.dropFirst(), name)
-		case .zeroOrMore, .zeroOrOne:
-			return matchPrefix(components: components.dropFirst(), name)
-		case .one, .oneOrMore:
-			return nil
+		return nil
+	}
+
+	/// Returns all possible prefix matches for a pattern, sorted by match length (shortest first).
+	/// This enables backtracking by trying shorter matches when longer ones don't work.
+	private func allPossiblePrefixMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring
+	) -> [Substring] {
+		// Check if the pattern contains any variable-length sections that need exploration
+		let hasVariableLengthSections = components.contains { section in
+			switch section {
+			case .componentWildcard, .pathWildcard, .patternList:
+				true
+			default:
+				false
+			}
+		}
+
+		// For simple patterns without wildcards or pattern lists, just use matchPrefix
+		if !hasVariableLengthSections {
+			if let result = matchPrefix(components: components, name) {
+				return [result]
+			}
+			return []
+		}
+
+		// Collect all possible matches
+		var results: [Substring] = []
+		collectAllPrefixMatches(components: components, name, into: &results)
+
+		// Sort by remaining length descending (shortest match first = longest remaining)
+		// and deduplicate
+		let unique = Set(results.map(\.startIndex))
+		return unique.sorted { $0 > $1 }.compactMap { index in
+			results.first { $0.startIndex == index }
 		}
 	}
 
+	private func collectAllPrefixMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		into results: inout [Substring]
+	) {
+		guard let first = components.first else {
+			results.append(name)
+			return
+		}
+
+		let rest = components.dropFirst()
+
+		switch first {
+		case .pathSeparator:
+			if options.isPathSeparator(name.first) {
+				collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
+			}
+
+		case let .constant(constant):
+			if let remaining = name.dropPrefix(constant) {
+				collectAllPrefixMatches(components: rest, remaining, into: &results)
+			}
+
+		case .singleCharacter:
+			guard !name.isEmpty, !options.isPathSeparator(name.first) else { return }
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
+
+		case let .oneOf(ranges, isNegated: isNegated):
+			guard let next = name.first, ranges.contains(where: { $0.contains(next, diacriticInsensitive: options.diacriticInsensitiveRanges) }) == !isNegated else { return }
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			if options.bracketExpressionsCannotMatchPathSeparators && options.isPathSeparator(name.first) {
+				return
+			}
+			collectAllPrefixMatches(components: rest, name.dropFirst(), into: &results)
+
+		case .componentWildcard:
+			if options.requiresExplicitLeadingPeriods && isAtSegmentStart(name) && name.first == "." {
+				return
+			}
+			// Try matching 0, 1, 2, ... characters
+			var remaining = name
+			while true {
+				collectAllPrefixMatches(components: rest, remaining, into: &results)
+				guard !remaining.isEmpty, !options.isPathSeparator(remaining.first) else { break }
+				remaining = remaining.dropFirst()
+			}
+
+		case .pathWildcard:
+			// Try matching 0, 1, 2, ... characters (including path separators)
+			var remaining = name
+			while true {
+				collectAllPrefixMatches(components: rest, remaining, into: &results)
+				guard !remaining.isEmpty else { break }
+				remaining = remaining.dropFirst()
+			}
+
+		case let .patternList(style, subSections):
+			collectPatternListMatches(
+				components: components,
+				name,
+				style: style,
+				subSections: subSections,
+				into: &results
+			)
+		}
+	}
+
+	private func collectPatternListMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		style: Section.PatternListStyle,
+		subSections: [[Section]],
+		into results: inout [Substring]
+	) {
+		let rest = components.dropFirst()
+
+		switch style {
+		case .one:
+			// Match exactly one option
+			for option in subSections {
+				var optionMatches: [Substring] = []
+				collectAllPrefixMatches(components: ArraySlice(option), name, into: &optionMatches)
+				for afterOption in optionMatches {
+					collectAllPrefixMatches(components: rest, afterOption, into: &results)
+				}
+			}
+
+		case .zeroOrOne:
+			// Try zero first
+			collectAllPrefixMatches(components: rest, name, into: &results)
+			// Then try one
+			for option in subSections {
+				var optionMatches: [Substring] = []
+				collectAllPrefixMatches(components: ArraySlice(option), name, into: &optionMatches)
+				for afterOption in optionMatches {
+					collectAllPrefixMatches(components: rest, afterOption, into: &results)
+				}
+			}
+
+		case .oneOrMore:
+			collectRepeatingMatches(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: true,
+				into: &results
+			)
+
+		case .zeroOrMore:
+			collectRepeatingMatches(
+				components: components,
+				name,
+				subSections: subSections,
+				needsAtLeastOne: false,
+				into: &results
+			)
+
+		case .negated:
+			// For negated patterns, try all prefix lengths that don't match any sub-pattern
+			for length in 0 ... name.count {
+				let prefix = name.prefix(length)
+				let matchesAnyPattern = subSections.contains { sections in
+					if let remaining = matchPrefix(components: ArraySlice(sections), Substring(prefix)) {
+						return remaining.isEmpty
+					}
+					return false
+				}
+				if !matchesAnyPattern {
+					let afterNegation = name.dropFirst(length)
+					collectAllPrefixMatches(components: rest, afterNegation, into: &results)
+				}
+			}
+		}
+	}
+
+	private func collectRepeatingMatches(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		subSections: [[Section]],
+		needsAtLeastOne: Bool,
+		into results: inout [Substring]
+	) {
+		let rest = components.dropFirst()
+
+		// Try zero if allowed
+		if !needsAtLeastOne {
+			collectAllPrefixMatches(components: rest, name, into: &results)
+		}
+
+		// Try matching one or more
+		for option in subSections {
+			var optionMatches: [Substring] = []
+			collectAllPrefixMatches(components: ArraySlice(option), name, into: &optionMatches)
+
+			for afterOption in optionMatches {
+				guard afterOption != name else { continue } // Prevent infinite recursion
+
+				// After one match, try matching more (with zero allowed) or finishing
+				collectRepeatingMatches(
+					components: components,
+					afterOption,
+					subSections: subSections,
+					needsAtLeastOne: false,
+					into: &results
+				)
+			}
+		}
+	}
+
+	private func matchNegatedPatternListPrefix(
+		components: ArraySlice<Section>,
+		_ name: Substring,
+		subSections: [[Section]],
+		requiresCompleteMatch: Bool = false
+	) -> Substring? {
+		// !(pattern-list) matches any string that cannot be matched by any pattern in the list
+		// We try different prefix lengths (longest first) and check if any pattern matches that exact prefix
+
+		// Try consuming different lengths of the input (longest first for greedy matching)
+		for length in stride(from: name.count, through: 0, by: -1) {
+			let prefix = name.prefix(length)
+
+			// Check if this exact prefix matches any pattern completely
+			let matchesAnyPattern = subSections.contains { sections in
+				if let remaining = matchPrefix(components: ArraySlice(sections), Substring(prefix)) {
+					return remaining.isEmpty
+				}
+				return false
+			}
+
+			if !matchesAnyPattern {
+				// This prefix doesn't match any pattern exactly, it's a valid negation match
+				let afterNegation = name.dropFirst(length)
+				if let remaining = matchPrefix(components: components.dropFirst(), afterNegation) {
+					if !requiresCompleteMatch || remaining.isEmpty {
+						return remaining
+					}
+				}
+			}
+		}
+
+		return nil
+	}
+
 	private func isAtSegmentStart(_ name: Substring) -> Bool {
-		name.isAtStart || name.previous() == options.pathSeparator
+		name.isAtStart || options.isPathSeparator(name.previous())
 	}
 }
 

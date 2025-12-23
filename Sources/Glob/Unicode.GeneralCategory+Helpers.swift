@@ -9,4 +9,14 @@ extension Unicode.GeneralCategory {
 			true
 		}
 	}
+
+	/// Returns true if this category represents a combining mark (diacritical marks, accents, etc.)
+	var isCombiningMark: Bool {
+		switch self {
+		case .nonspacingMark, .spacingMark, .enclosingMark:
+			true
+		default:
+			false
+		}
+	}
 }
