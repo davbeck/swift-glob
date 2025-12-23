@@ -1,13 +1,17 @@
 public import struct Foundation.URL
 public import struct Foundation.URLResourceKey
 public import class Foundation.FileManager
-import struct ObjectiveC.ObjCBool
+
+#if canImport(ObjectiveC)
+	import struct ObjectiveC.ObjCBool
+#endif
 
 /// The result of a custom matcher for searching directory components
 public struct MatchResult {
 	/// When true, the url will be added to the output
 	var matches: Bool
-	/// When true, the descendents of a directory will be skipped entirely
+
+	/// When true, the descendants of a directory will be skipped entirely
 	///
 	/// This has no effect if the url is not a directory.
 	var skipDescendents: Bool
@@ -24,7 +28,6 @@ public struct MatchResult {
 ///   - include: When provided, only includes results that match these patterns.
 ///   - exclude: When provided, ignore results that match these patterns. If a directory matches an exclude pattern, none of it's descendents will be matched.
 ///   - keys: An array of keys that identify the properties that you want pre-fetched for each returned url. The values for these keys are cached in the corresponding URL objects. You may specify nil for this parameter. For a list of keys you can specify, see [Common File System Resource Keys](https://developer.apple.com/documentation/corefoundation/cfurl/common_file_system_resource_keys).
-///   - skipHiddenFiles: When true, hidden files will not be returned.
 /// - Returns: An async collection of urls.
 public func search(
 	directory baseURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
@@ -64,7 +67,6 @@ public func search(
 ///   - baseURL: The directory to search, defaults to the current working directory.
 ///   - matching: The closure used to filter results. Both the url and the relative path are provided and you can use either one to match against.
 ///   - keys: An array of keys that identify the properties that you want pre-fetched for each returned url. The values for these keys are cached in the corresponding URL objects. You may specify nil for this parameter. For a list of keys you can specify, see [Common File System Resource Keys](https://developer.apple.com/documentation/corefoundation/cfurl/common_file_system_resource_keys).
-///   - skipHiddenFiles: When true, hidden files will not be returned.
 /// - Returns: An async collection of urls.
 public func search(
 	directory baseURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
@@ -97,9 +99,15 @@ public func search(
 
 							// Use fileExists to correctly detect if symlinks point to directories
 							// resourceValues.isDirectory returns false for symlinks even when they point to directories
-							var isDir: ObjCBool = false
-							let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
-							let isDirectory = exists && isDir.boolValue
+							#if canImport(ObjectiveC)
+								var isDir: ObjCBool = false
+								let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
+								let isDirectory = exists && isDir.boolValue
+							#else
+								var isDir = false
+								let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
+								let isDirectory = exists && isDir
+							#endif
 
 							var relativePath = relativeDirectoryPath + name
 							if isDirectory {
