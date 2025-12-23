@@ -190,6 +190,14 @@ public extension Pattern {
 			rangeNegationCharacter: .caret
 		)
 
+		/// Options matching [zsh shell behavior](https://zsh.sourceforge.io/Doc/Release/Expansion.html).
+		static let zsh: Self = {
+			var options = Pattern.Options.default
+			options.supportsPatternLists = true
+			options.rangeNegationCharacter = .both
+			return options
+		}()
+
 		/// Attempts to match the behavior of [POSIX glob](https://man7.org/linux/man-pages/man7/glob.7.html).
 		/// - Returns: Options to use to create a Pattern.
 		public static func posix() -> Self {
