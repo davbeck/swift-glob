@@ -189,7 +189,7 @@ public extension Pattern {
 			supportsRangeSeparatorAtBeginningAndEnd: false,
 			rangeNegationCharacter: .caret
 		)
-		
+
 		/// Options matching bash shell behavior with extglob enabled.
 		///
 		/// Note: Bash `**` is just multiple wildcards unless `shopt -s globstar` is set.

@@ -4,7 +4,7 @@ This document summarizes the remaining issues, missing features, and context for
 
 ## Current Status
 
-- **103 tests pass** with **1 known issue** (tests wrapped in `withKnownIssue`)
+- **All tests pass** with no known issues in core functionality
 - Core glob matching is fully functional
 - ksh-style pattern lists (`@()`, `*()`, `+()`, `?()`, `!()`) are implemented with proper backtracking
 - Brace expansion (`{a,b,c}`) is implemented and working
@@ -12,6 +12,7 @@ This document summarizes the remaining issues, missing features, and context for
 - Equivalence classes (`[[=a=]]`) are implemented using Unicode NFD decomposition
 - Trailing `/**` behavior is configurable (Fish shell vs VSCode semantics)
 - Diacritic-insensitive character ranges available via `diacriticInsensitiveRanges` option
+- Symlinks are correctly descended independently from different paths
 
 ## Test Suite Breakdown
 
@@ -19,25 +20,8 @@ This document summarizes the remaining issues, missing features, and context for
 |------------|---------|--------------|-------|
 | FNMatchTests | 76 | 0 | POSIX fnmatch compatibility (locale-like ranges via option) |
 | VSCodeTests | 15 | 0 | Full VSCode compatibility |
-| FishShellTests | varies | 1 | Symlink edge case |
+| FishShellTests | 6 | 0 | All tests pass including symlink handling |
 | Other tests | all pass | 0 | Core functionality works |
-
----
-
-## Remaining Known Issues
-
-### 1. Symlink Handling in Search
-
-**Priority: Medium** | **Effort: Medium**
-
-The file search functionality has an edge case with symlinks:
-
-**Symlinks not descended independently** - When the same directory is reachable via multiple symlinks, only one path is explored.
-
-**Affected tests:** 1 FishShellTests (`symlinksAreDescendedIntoIndependently`)
-
-**Files to modify:**
-- `Sources/Glob/GlobSearch.swift`
 
 ---
 
@@ -84,6 +68,7 @@ swift test --filter "FNMatchTests/ksh_style_matching"
 
 ## Recent Changes
 
+- **Symlink handling fixed** - Symlinks to the same directory from different paths are now explored independently. Uses per-branch loop detection to prevent infinite recursion while still allowing the same target to be reached via multiple paths. Fixed by using path-based enumeration (`contentsOfDirectory(atPath:)`) and `fileExists(atPath:isDirectory:)` which correctly follow symlinks.
 - **Diacritic-insensitive character ranges** - Added `diacriticInsensitiveRanges` option to enable locale-like behavior for character ranges. When enabled, `[a-z]` matches accented characters like ä, ö, ü because they are compared as their base characters. Available in `.fnmatch()` preset via the `diacriticInsensitiveRanges` parameter.
 - **Trailing path wildcard control** - Added `trailingPathWildcardRequiresComponent` option to control whether trailing `/**` patterns require at least one path component (Fish shell behavior) or can match empty (VSCode behavior)
 - **Equivalence classes** - Full support for `[[=a=]]` syntax using Unicode NFD decomposition to match accented characters (e.g., `[[=a=]]` matches 'a', 'á', 'à', 'ä', 'â', etc.)

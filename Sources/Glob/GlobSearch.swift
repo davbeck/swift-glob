@@ -71,46 +71,75 @@ public func search(
 	AsyncThrowingStream(bufferingPolicy: .unbounded) { continuation in
 		let task = Task {
 			do {
-				@Sendable func enumerate(directory: URL, relativePath relativeDirectoryPath: String) async throws {
-					do {
-						let contents = try FileManager.default.contentsOfDirectory(
-							at: directory,
-							includingPropertiesForKeys: keys + [.isDirectoryKey],
-							options: []
-						)
+				// Track visited directories per exploration branch to detect symlink loops
+				// Each branch tracks canonical paths it has visited on its way to the current location
+				// This allows symlinks from different paths to be explored independently
+				@Sendable func enumerate(
+					directory: URL,
+					relativePath relativeDirectoryPath: String,
+					visitedOnPath: Set<String>
+				) async throws {
+					// Use path-based enumeration which works correctly with symlinks
+					// The URL-based contentsOfDirectory(at:) fails on symlinks to directories
+					let contentNames = try FileManager.default.contentsOfDirectory(atPath: directory.path)
 
-						try await withThrowingTaskGroup(of: Void.self) { group in
-							for url in contents {
-								let isDirectory = try url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false
+					try await withThrowingTaskGroup(of: Void.self) { group in
+						for name in contentNames {
+							let url = directory.appendingPathComponent(name)
 
-								var relativePath = relativeDirectoryPath + url.lastPathComponent
-								if isDirectory {
-									relativePath += "/"
-								}
-
-								let matchResult = try matching(url, relativePath)
-
-								if matchResult.matches {
-									continuation.yield(url)
-								}
-
-								guard !matchResult.skipDescendents else { continue }
-
-								if isDirectory {
-									group.addTask {
-										try await enumerate(directory: url, relativePath: relativePath)
-									}
-								}
+							// Fetch requested resource keys for the URL
+							if !keys.isEmpty {
+								_ = try? url.resourceValues(forKeys: Set(keys))
 							}
 
-							try await group.waitForAll()
+							// Use fileExists to correctly detect if symlinks point to directories
+							// resourceValues.isDirectory returns false for symlinks even when they point to directories
+							var isDir: ObjCBool = false
+							let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
+							let isDirectory = exists && isDir.boolValue
+
+							var relativePath = relativeDirectoryPath + name
+							if isDirectory {
+								relativePath += "/"
+							}
+
+							let matchResult = try matching(url, relativePath)
+
+							if matchResult.matches {
+								continuation.yield(url)
+							}
+
+							guard !matchResult.skipDescendents else { continue }
+
+							if isDirectory {
+								// Check if this is a symlink loop before descending
+								// We use the resolved path to detect loops within this branch
+								let resolvedPath = url.resolvingSymlinksInPath().standardizedFileURL.path
+								guard !visitedOnPath.contains(resolvedPath) else {
+									// Already visited this directory on this path (symlink loop), skip
+									continue
+								}
+
+								var newVisited = visitedOnPath
+								newVisited.insert(resolvedPath)
+
+								group.addTask {
+									try await enumerate(
+										directory: url,
+										relativePath: relativePath,
+										visitedOnPath: newVisited
+									)
+								}
+							}
 						}
-					} catch {
-						throw error
+
+						try await group.waitForAll()
 					}
 				}
 
-				try await enumerate(directory: baseURL, relativePath: "")
+				// Start with the base directory in the visited set
+				let basePath = baseURL.resolvingSymlinksInPath().standardizedFileURL.path
+				try await enumerate(directory: baseURL, relativePath: "", visitedOnPath: [basePath])
 
 				continuation.finish()
 			} catch {

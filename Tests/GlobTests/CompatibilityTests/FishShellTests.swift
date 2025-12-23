@@ -43,9 +43,7 @@ class FishShellTests: SearchTestUtils {
 		try mkdir("dir2")
 		try ln("dir1/child1", "dir2/link2")
 
-		await withKnownIssue {
-			try await #expect(self.search("**/anyfile") == ["dir1/child1/anyfile", "dir2/link2/anyfile"])
-		}
+		try await #expect(self.search("**/anyfile") == ["dir1/child1/anyfile", "dir2/link2/anyfile"])
 	}
 
 	@Test func butSymlinkLoopsOnlyGetExploredOnce() async throws {
