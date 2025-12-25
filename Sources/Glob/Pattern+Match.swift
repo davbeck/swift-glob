@@ -23,16 +23,13 @@ extension Substring {
 extension Pattern {
 	/// Test if a given string matches the pattern
 	/// - Parameter name: The string to match against
-	/// - Returns: true if the string matches the pattern (or any alternative if brace expansion was used)
+	/// - Returns: true if the string matches the pattern
 	public func match(_ name: some StringProtocol) -> Bool {
-		// Try each alternative (from brace expansion)
-		for sections in alternatives {
-			if match(components: .init(sections), .init(name), originalEndIndex: sections.count) {
+		if match(components: .init(sections), .init(name), originalEndIndex: sections.count) {
+			return true
+		} else if options.matchesTrailingPathSeparator && options.isPathSeparator(name.last) {
+			if match(components: .init(sections), .init(name).dropLast(), originalEndIndex: sections.count) {
 				return true
-			} else if options.matchesTrailingPathSeparator && options.isPathSeparator(name.last) {
-				if match(components: .init(sections), .init(name).dropLast(), originalEndIndex: sections.count) {
-					return true
-				}
 			}
 		}
 
@@ -530,6 +527,17 @@ extension Pattern {
 			return
 		}
 
+		// Handle empty input with remaining pattern
+		if name.isEmpty {
+			if components.allSatisfy(\.matchesEmptyContent) {
+				results.append(name)
+			} else if components.contains(.pathWildcard) && components.allSatisfy({ $0 == .pathSeparator || $0.matchesEmptyContent }) {
+				// Special case: [pathSeparator, pathWildcard] can match empty input
+				results.append(name)
+			}
+			return
+		}
+
 		let rest = components.dropFirst()
 
 		switch first {
@@ -575,8 +583,23 @@ extension Pattern {
 		case .pathWildcard:
 			// Try matching 0, 1, 2, ... characters (including path separators)
 			var remaining = name
+			var isFirst = true
 			while true {
 				collectAllPrefixMatches(components: rest, remaining, into: &results)
+				// When **/ matches zero characters at the start, also try skipping the /
+				// This allows **/foo to match "foo" (zero path components)
+				if isFirst && rest.first == .pathSeparator {
+					collectAllPrefixMatches(components: rest.dropFirst(), remaining, into: &results)
+				}
+				// After consuming a path separator, also try matching **/ as if ** matched zero additional chars
+				// This allows **/foo to match "bar/foo"
+				if !isFirst && options.isPathSeparator(remaining.first) {
+					if rest.first == .pathSeparator {
+						// ** has matched up to this separator, skip it and the pattern's /
+						collectAllPrefixMatches(components: rest.dropFirst(), remaining.dropFirst(), into: &results)
+					}
+				}
+				isFirst = false
 				guard !remaining.isEmpty else { break }
 				remaining = remaining.dropFirst()
 			}

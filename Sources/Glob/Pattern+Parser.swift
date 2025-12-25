@@ -25,6 +25,9 @@ extension Pattern {
 			case caret // ^
 			case period // .
 			case equals // =
+			case leftBrace // {
+			case rightBrace // }
+			case comma // ,
 
 			init(_ character: Character) {
 				switch character {
@@ -58,6 +61,12 @@ extension Pattern {
 					self = .period
 				case "=":
 					self = .equals
+				case "{":
+					self = .leftBrace
+				case "}":
+					self = .rightBrace
+				case ",":
+					self = .comma
 				default:
 					self = .character(character)
 				}
@@ -97,6 +106,12 @@ extension Pattern {
 					"."
 				case .equals:
 					"="
+				case .leftBrace:
+					"{"
+				case .rightBrace:
+					"}"
+				case .comma:
+					","
 				}
 			}
 		}
@@ -134,7 +149,7 @@ extension Pattern {
 				let sections = try self.parseSections()
 
 				return Pattern(sections: sections, options: options)
-			} catch let error{
+			} catch {
 				// add information about where the error was encountered by including the original pattern and our current location
 				throw InvalidPatternError(
 					pattern: pattern.base,
@@ -355,13 +370,19 @@ extension Pattern {
 							throw PatternParsingError.rangeNotClosed
 						}
 					}
+				case .leftBrace:
+					if options.supportsBraceExpansion, let sectionsList = try parseBraceExpansion(delimiters: delimiters) {
+						sections.append(.patternList(.one, sectionsList))
+					} else {
+						sections.append(constant: next.character)
+					}
 				case let .character(character):
 					if character == options.pathSeparator {
 						sections.append(.pathSeparator)
 					} else {
 						sections.append(constant: character)
 					}
-				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret, .period, .equals:
+				case .rightSquareBracket, .dash, .colon, .leftParen, .rightParen, .verticalLine, .caret, .period, .equals, .rightBrace, .comma:
 					sections.append(constant: next.character)
 				}
 			}
@@ -406,6 +427,37 @@ extension Pattern {
 			} else {
 				return token.character
 			}
+		}
+
+		/// Parses a brace expansion like `{abc,xyz}`
+		mutating func parseBraceExpansion(delimiters: some Collection<Token>) throws(PatternParsingError) -> [[Section]]? {
+			// We've already consumed the opening brace
+			var sectionsList: [[Section]] = []
+			let savedPattern = pattern
+
+			loop: while !pattern.isEmpty {
+				let subSections = try self.parseSections(delimiters: [.comma, .rightBrace])
+
+				sectionsList.append(subSections)
+
+				switch try pop() {
+				case .comma:
+					continue
+				case .rightBrace:
+					break loop
+				default:
+					// Unclosed brace - restore and treat as literal
+					pattern = savedPattern
+					return nil
+				}
+			}
+
+			guard !sectionsList.isEmpty else {
+				pattern = savedPattern
+				return nil
+			}
+
+			return sectionsList
 		}
 
 		/// Parses a pattern list like `(abc|xyz)`

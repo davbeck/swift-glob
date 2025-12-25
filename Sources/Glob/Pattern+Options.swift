@@ -89,10 +89,6 @@ public extension Pattern {
 		/// - `*.{html,js}` matches files ending in ".html" or ".js"
 		/// - `{foo,bar}/**` matches anything under "foo/" or "bar/"
 		/// - `{**/*.js,**/*.ts}` matches any .js or .ts file
-		///
-		/// Note: This is different from ksh-style pattern lists (`@(a|b)`) which are handled by `supportsPatternLists`.
-		/// Brace expansion is a pre-processing step that creates multiple patterns, while pattern lists are
-		/// evaluated during matching.
 		public var supportsBraceExpansion: Bool = false
 
 		/// The character used to invert a character class.

@@ -236,30 +236,13 @@ public struct Pattern: Equatable, Sendable {
 	}
 
 	/// The individual parts of the pattern to match against
-	///
-	/// When brace expansion is used, this returns the sections of the first alternative.
-	/// Use `alternatives` to access all expanded patterns.
-	public var sections: [Section] {
-		get { alternatives.first ?? [] }
-		set { alternatives = [newValue] }
-	}
-
-	/// All pattern alternatives after brace expansion.
-	///
-	/// When brace expansion is not used or the pattern contains no braces,
-	/// this contains a single element.
-	public var alternatives: [[Section]]
+	public var sections: [Section]
 
 	/// Options used for parsing and matching
 	public var options: Options
 
 	init(sections: [Section], options: Options) {
-		self.alternatives = [sections]
-		self.options = options
-	}
-
-	init(alternatives: [[Section]], options: Options) {
-		self.alternatives = alternatives
+		self.sections = sections
 		self.options = options
 	}
 
@@ -268,24 +251,7 @@ public struct Pattern: Equatable, Sendable {
 		_ pattern: some StringProtocol,
 		options: Options = .default
 	) throws(InvalidPatternError) {
-		if options.supportsBraceExpansion {
-			let expandedPatterns = BraceExpansion.expand(
-				String(pattern),
-				supportsEscapedCharacters: options.supportsEscapedCharacters
-			)
-
-			var allAlternatives: [[Section]] = []
-			for expandedPattern in expandedPatterns {
-				var parser = Parser(pattern: expandedPattern, options: options)
-				let parsed = try parser.parse()
-				allAlternatives.append(contentsOf: parsed.alternatives)
-			}
-
-			self.alternatives = allAlternatives
-			self.options = options
-		} else {
-			var parser = Parser(pattern: pattern, options: options)
-			self = try parser.parse()
-		}
+		var parser = Parser(pattern: pattern, options: options)
+		self = try parser.parse()
 	}
 }
