@@ -104,6 +104,10 @@ pattern2.match("Ä") // false (case is still respected)
 
 For most use cases involving Western European languages, `diacriticInsensitiveRanges` provides the expected behavior. Named character classes like `[[:lower:]]` and `[[:alpha:]]` already handle Unicode correctly without needing this option.
 
+## Documentation
+
+For a comprehensive guide to all supported glob pattern features, options, and implementation compatibility, see [Glob Features](Documentation/GlobFeatures.md).
+
 ## Contributing
 
 Contributions are highly encouraged. Here are some ways you can contribute:
