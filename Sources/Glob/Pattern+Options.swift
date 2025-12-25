@@ -14,7 +14,7 @@ public extension Pattern {
 		/// If `pathSeparator` is `nil` this has no effect.
 		public var supportsPathLevelWildcards: Bool = true
 
-		/// How empty ranges (`[]`) are treated
+		/// How empty ranges (`[]`) are treated.
 		public enum EmptyRangeBehavior: Sendable {
 			/// Treat an empty range as matching nothing, equivalent to nothing at all
 			case allow
@@ -24,10 +24,10 @@ public extension Pattern {
 			case treatClosingBracketAsCharacter
 		}
 
-		/// How are empty ranges handled.
+		/// How empty ranges (`[]`) are treated.
 		public var emptyRangeBehavior: EmptyRangeBehavior = .error
 
-		/// How unclosed bracket expressions (e.g., `[abc` with no closing `]`) are treated
+		/// How unclosed bracket expressions (e.g., `[abc` with no closing `]`) are treated.
 		public enum UnclosedBracketBehavior: Sendable {
 			/// Treat an unclosed bracket as a parsing error
 			case error
@@ -35,7 +35,7 @@ public extension Pattern {
 			case treatAsLiteral
 		}
 
-		/// How are unclosed brackets handled.
+		/// How unclosed bracket expressions (e.g., `[abc` with no closing `]`) are treated.
 		///
 		/// In fnmatch, an unclosed `[` is treated as a literal character. For example, the pattern `a[b`
 		/// would match the string `a[b` literally.
@@ -121,15 +121,6 @@ public extension Pattern {
 		/// Note: These characters are only recognized as path separators in the input string being matched,
 		/// not in the pattern itself.
 		public var additionalPathSeparators: Set<Character> = []
-
-		/// Returns true if the given character is a path separator (either the primary or an additional one)
-		public func isPathSeparator(_ character: Character?) -> Bool {
-			guard let character else { return false }
-			if let pathSeparator, character == pathSeparator {
-				return true
-			}
-			return additionalPathSeparators.contains(character)
-		}
 
 		/// If true, bracket expressions cannot match path separators even if they explicitly contain them.
 		///

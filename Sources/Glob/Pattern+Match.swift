@@ -734,6 +734,17 @@ extension Pattern {
 	}
 }
 
+private extension Pattern.Options {
+	/// Returns true if the given character is a path separator (either the primary or an additional one)
+	func isPathSeparator(_ character: Character?) -> Bool {
+		guard let character else { return false }
+		if let pathSeparator, character == pathSeparator {
+			return true
+		}
+		return additionalPathSeparators.contains(character)
+	}
+}
+
 private extension Substring {
 	/// Returns the character just before the substring starts
 	func previous() -> Character? {
