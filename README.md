@@ -6,18 +6,12 @@ A native Swift implementation of glob patterns, those patterns used to match and
 
 - Fast matching against patterns, even as the complexity of a pattern and the length of the path increase.
 - Concurrent searching of directory hierarchies and thread safety.
-- Configurable pattern matching behavior. There are lots of different implimentations of glob pattern matching with different features and behavior. Switching to a Swift based library may mean matching existing behavior from other tools.
+- Configurable pattern matching behavior. There are lots of different implementations of glob pattern matching with different features and behavior. Switching to a Swift based library may mean matching existing behavior from other tools.
 - Ergonomic API that is accessible to users of varying skill levels and fits in to all types of Swift projects.
 
 In other words, the project seeks to be _the_ glob library for Swift that can be used both in low level tools and in high level apps.
 
-By creating a glob matching implimentation in native Swift with strict compatibility with existing things like POSIX, it allows tools to be migrated to Swift, behavior to be customized and exteded, and implimentations to be made more performant and concurrent.
-
-## Status
-
-Basic pattern matching and director search is working and in my tests searching a large hiearchy of files and folders with about 10 exclude patterns runs very quickly. However there are still some features missing like [grouping](https://github.com/davbeck/swift-glob/issues/1). The [tests to match `fnmatch` behavior](https://github.com/davbeck/swift-glob/pull/5) has 588 failing tests as of this writing.
-
-A 1.0.0 release is dependent on compatibility tests with `fnmatch` passing.
+By creating a glob matching implementation in native Swift with strict compatibility with existing things like POSIX, it allows tools to be migrated to Swift, behavior to be customized and extended, and implimentations to be made more performant and concurrent.
 
 ## Usage
 
@@ -76,33 +70,6 @@ options.pathSeparator = #"\"# // use windows path separator
 ### fnmatch Compatibility
 
 The `.fnmatch()` preset provides compatibility with the POSIX `fnmatch` function. However, there is one notable difference related to locale-dependent character ranges.
-
-#### Character Range Behavior
-
-In C's `fnmatch`, character ranges like `[a-z]` use locale-aware collation. In locales like `de_DE` (German), this means `[a-z]` matches accented characters like ä, ö, ü because they sort between a and z in the German collation order.
-
-This library uses Unicode scalar comparison by default, which does not include accented characters in `[a-z]`. To approximate locale-like behavior, use the `diacriticInsensitiveRanges` option:
-
-```swift
-// Default behavior: [a-z] does NOT match ä
-let pattern1 = try Glob.Pattern("[a-z]", options: .fnmatch())
-pattern1.match("ä") // false
-
-// With diacriticInsensitiveRanges: [a-z] DOES match ä
-let pattern2 = try Glob.Pattern("[a-z]", options: .fnmatch(diacriticInsensitiveRanges: true))
-pattern2.match("ä") // true
-pattern2.match("Ä") // false (case is still respected)
-```
-
-**Technical difference:** The `diacriticInsensitiveRanges` option uses Swift's `String.compare(_:options: .diacriticInsensitive)` which strips diacritical marks before comparison. This means ä is compared as "a", ö as "o", etc. This differs from true locale collation in subtle ways:
-
-| Character | glibc `fnmatch` (de_DE) | `diacriticInsensitiveRanges` |
-|-----------|-------------------------|------------------------------|
-| ä in [a-z] | Match (collation order) | Match (ä → a) |
-| ø in [a-z] | Match (collation order) | No match (ø has no base in a-z) |
-| ß in [a-z] | Match (collation order) | No match (ß is its own character) |
-
-For most use cases involving Western European languages, `diacriticInsensitiveRanges` provides the expected behavior. Named character classes like `[[:lower:]]` and `[[:alpha:]]` already handle Unicode correctly without needing this option.
 
 ## Documentation
 
