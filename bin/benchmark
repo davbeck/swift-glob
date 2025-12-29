@@ -1,13 +1,91 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+BENCHMARK_DIR="$PROJECT_DIR/Benchmark"
 SEARCH_DIR=/private/tmp/swift-6.0-RELEASE
 
-if [ ! -d $SEARCH_DIR ]; then
-    echo "Search directory does not exist. Cloning..."
-    git clone --depth 1 -b swift-6.0-RELEASE https://github.com/swiftlang/swift.git $SEARCH_DIR
+# Default settings
+IMPLEMENTATIONS="swift,c,go"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --impl=*)
+            IMPLEMENTATIONS="${1#*=}"
+            shift
+            ;;
+        --help)
+            echo "Usage: $0 [options] [search_path]"
+            echo ""
+            echo "Options:"
+            echo "  --impl=swift,c,go   Comma-separated list of implementations to run (default: all)"
+            echo "  --help              Show this help"
+            echo ""
+            echo "If search_path is not specified, uses /private/tmp/swift-6.0-RELEASE"
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+        *)
+            SEARCH_DIR="$1"
+            shift
+            ;;
+    esac
+done
+
+# Clone test repository if needed
+if [ ! -d "$SEARCH_DIR" ]; then
+    echo "Search directory does not exist. Cloning..." >&2
+    git clone --depth 1 -b swift-6.0-RELEASE https://github.com/swiftlang/swift.git "$SEARCH_DIR"
 fi
 
-cd Benchmark
-swift run --quiet -c release Benchmark $@ $SEARCH_DIR
+# Print CSV header
+echo "implementation,level,pattern,count,time_ms"
+
+run_swift() {
+    cd "$BENCHMARK_DIR"
+    swift run --quiet -c release Benchmark "$SEARCH_DIR"
+}
+
+run_c() {
+    local C_DIR="$BENCHMARK_DIR/c"
+    local C_BINARY="$C_DIR/glob_benchmark"
+
+    # Compile if needed
+    if [ ! -f "$C_BINARY" ] || [ "$C_DIR/glob_benchmark.c" -nt "$C_BINARY" ]; then
+        echo "Compiling C benchmark..." >&2
+        cc -O2 -o "$C_BINARY" "$C_DIR/glob_benchmark.c"
+    fi
+
+    "$C_BINARY" "$SEARCH_DIR"
+}
+
+run_go() {
+    local GO_DIR="$BENCHMARK_DIR/go"
+    local GO_BINARY="$GO_DIR/glob_benchmark"
+
+    # Compile if needed
+    if [ ! -f "$GO_BINARY" ] || [ "$GO_DIR/glob_benchmark.go" -nt "$GO_BINARY" ]; then
+        echo "Compiling Go benchmark..." >&2
+        cd "$GO_DIR"
+        go build -o glob_benchmark glob_benchmark.go
+    fi
+
+    "$GO_BINARY" "$SEARCH_DIR"
+}
+
+# Run selected implementations
+IFS=',' read -ra IMPL_ARRAY <<< "$IMPLEMENTATIONS"
+for impl in "${IMPL_ARRAY[@]}"; do
+    case $impl in
+        swift) run_swift ;;
+        c) run_c ;;
+        go) run_go ;;
+        *) echo "Unknown implementation: $impl" >&2 ;;
+    esac
+done
