@@ -81,8 +81,6 @@ Contributions are highly encouraged. Here are some ways you can contribute:
 
 **Writing code:** if you see a missing piece of functionality or bug, I welcome pull requests. It's best to open an issue first to make sure you don't waste any effort in case what you are building is already being worked on or going in a different direction. Even if you aren't up to writing an implimentation, creating a PR with a failing test goes a long way towards getting something off the ground.
 
-There are already a good number of failing tests (wrapped in `XCTExpectFailure`). These would be a good place to start.
-
 **Improving documentation:** if you find something that isn't clear it's likely that other people would find it unclear as well.
 
 **Submitting issues:** if you find a bug or an inconsistentcy in how patterns are matched, pleas file an issue.
