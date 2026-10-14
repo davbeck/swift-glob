@@ -2,6 +2,12 @@
 
 import PackageDescription
 
+#if os(Windows)
+let platformTestExcludes = ["CompatibilityTests/FNMatchTests.swift"]
+#else
+let platformTestExcludes: [String] = []
+#endif
+
 let package = Package(
 	name: "swift-glob",
 	platforms: [
@@ -41,7 +47,8 @@ let package = Package(
 			name: "GlobTests",
 			dependencies: [
 				"Glob",
-			]
+			],
+			exclude: platformTestExcludes
 		),
 	]
 )
