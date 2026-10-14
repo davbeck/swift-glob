@@ -36,3 +36,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test
         run: swift test
+
+  windows_test:
+    name: Test Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: SwiftyLab/setup-swift@v1
+        with:
+          swift-version: '6.2'
+      - name: Test
+        run: swift test
