@@ -3,9 +3,9 @@
 import PackageDescription
 
 #if os(Windows)
-let platformTestExcludes = ["CompatibilityTests/FNMatchTests.swift"]
+	let platformTestExcludes = ["CompatibilityTests/FNMatchTests.swift"]
 #else
-let platformTestExcludes: [String] = []
+	let platformTestExcludes: [String] = []
 #endif
 
 let package = Package(
