@@ -1,3 +1,4 @@
+#if !os(Windows)
 import FNMDefinitions
 import Testing
 
@@ -2403,3 +2404,5 @@ struct FNMatchTests {
 		#expect(fnmatch("*/", "abc2/", PATHNAME) == 0)
 	}
 }
+
+#endif
